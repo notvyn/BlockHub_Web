@@ -27,10 +27,25 @@
 </head>
 <body>
     <div class="wrapper">
+        <!-- The Sidebar -->
         {% include 'navbar.html' %}
-        {% block content %}
 
-        {% endblock %}
+        <!-- The Main Content Area -->
+        <div class="main w-100">
+            
+            <!-- Mobile-Only Header -->
+            <div class="d-md-none p-1 d-flex bg-dark align-items-center">
+                <button id="mobile-toggle" type="button">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+                <div class="sidebar-logo">
+                    <a href="#">KomSy3</a>
+                </div>
+            </div>
+
+            <!-- Dashboard Content Injected Here -->
+            {% block content %}{% endblock %}
+        </div>
     </div>
 
     <!-- Bootstrap JS-->
