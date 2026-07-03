@@ -1,8 +1,14 @@
 {% extends 'base.html' %}
 
 {% block head %}
+    <link href="{{ url_for('static', filename='css/navbar.css')}}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<h1>BlockHub!</h1>
+    <div class="main p-3">
+        <div class="text-center">
+            <h1>Dashboard</h1>
+            <p>Welcome to your CICS Block Management System.</p>
+        </div>
+    </div>
 {% endblock %}
