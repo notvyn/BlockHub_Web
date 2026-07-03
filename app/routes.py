@@ -2,7 +2,12 @@
 
 from flask import render_template, redirect, url_for
 
-from app import app
+from app import app, login_manager
+from app.models import Announcement, User
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.route('/')
 @app.route('/dashboard')
