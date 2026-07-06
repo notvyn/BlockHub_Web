@@ -15,6 +15,48 @@ class Announcement(db.Model):
     def __repr__(self):
         return f"Announcement('{self.title}', '{self.date_posted}')"
 
+class ClassSummary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+
+    content = db.Column(db.Text, nullable=False)
+    note = db.Column(db.Text, nullable=True)
+    date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return f'<ClassSummary {self.content}>'
+
+class Course(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    instructor = db.Column(db.String(200), nullable=False)
+    units = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
+    date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
+
+    deadline = db.relationship('Deadline', backref='course', lazy=True)
+    class_summary = db.relationship('ClassSummary', backref='course', lazy=True)
+
+    def __repr__(self):
+        return f'<Course {self.code}>'
+
+class Deadline(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+
+    description = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    date_given = db.Column(db.Date, nullable=False)
+    due_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(50), nullable=False, default='Upcoming')
+    note = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<Deadline {self.description}>'
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
@@ -27,4 +69,4 @@ class User(db.Model, UserMixin):
     announcements = db.relationship('Announcement', backref='author', lazy=True)
 
     def __repr__(self):
-        return f"User('{self.username}')"
+        return f"User('{self.name}')"
