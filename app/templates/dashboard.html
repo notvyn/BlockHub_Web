@@ -1,14 +1,153 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <link href="{{ url_for('static', filename='css/navbar.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/dashboard.css')}}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-    <div class="main p-3">
-        <div class="text-center">
-            <h1>Dashboard</h1>
-            <p>Welcome to your CICS Block Management System.</p>
+    <main class="main-content">
+        <!-- Header -->
+        <div class="top-bar">
+            <div>
+                <h2 class="page-title" style="font-family: 'JetBrains Mono', monospace;"># Dashboard</h2>
+                <p class="text-muted mt-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">> Welcome to Class, John!</p>
+            </div>
+            <div class="d-flex align-items-center justify-content-evenly">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="e.g. Online Enrollment..." style="background: transparent; border: 1px solid rgba(0,0,0,0.1);">
+                </div>
+                <button class="theme-toggle"><i class="bi bi-moon-fill"></i></button>
+                <button class="entry-toggle"><i class="fa-solid fa-plus"></i></button>
+            </div>
         </div>
-    </div>
+
+        <!-- Dashboard Grid Layout -->
+        <div class="row mt-4">
+            <!-- Left Column (Wider for main content) -->
+            <div class="col-lg-8 pe-lg-5">
+                
+                <!-- Obsidian Style Deadlines -->
+                <div class="md-section">
+                    <div class="md-h2-container d-flex justify-content-between">
+                        <div class="md-h2">Upcoming Deadlines</div>
+                        <div>
+                            <a href="#">
+                                <span>Urgent</span>
+                            </a>
+                            <a href="#">
+                                <span>This week</span>
+                            </a>
+                            <a href="#">
+                                <span>All</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="md-task">
+                        <i class="bi bi-square"></i>
+                        <div>
+                            <div class="md-task-title">Quiz #2: Recursive Functions</div>
+                            <div>
+                                <span class="md-code">CC 102</span>
+                                <span class="md-code">Quiz</span>
+                                <span class="md-code md-code-hot">Due: Jul 02</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md-task">
+                        <i class="bi bi-square"></i>
+                        <div>
+                            <div class="md-task-title">Oral Recitation #1</div>
+                            <div>
+                                <span class="md-code">CC 102</span>
+                                <span class="md-code">Recitation</span>
+                                <span class="md-code md-code-warm">Due: Jul 07</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md-task">
+                        <i class="bi bi-square"></i>
+                        <div>
+                            <div class="md-task-title">Practical Set #3</div>
+                            <div>
+                                <span class="md-code">MATH 102</span>
+                                <span class="md-code">Assignment</span>
+                                <span class="md-code md-code-chill">Due: Jul 15</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Obsidian Style Announcements -->
+                <div class="md-section">
+                    <div class="md-h2-container d-flex justify-content-between">
+                        <div class="md-h2">Recent Announcements</div>
+                        <a href="#">
+                            <span>View All</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="md-quote">
+                        <div class="md-quote-title">
+                            <a href="#">CICS Membership Fee Collection Guide</a>
+                            <span class="md-code text-white bg-danger border-0 ms-2">NEW</span>
+                        </div>
+                        <p>The CICS organizations will collect payment for its membership fees starting from February 26, 2026 until the end of the Second Semester in May 1, 2026. Please ensure your payments are routed to your block representative before the deadline.</p>
+                        <div class="md-code text-muted border-0 bg-transparent p-0">Posted: Apr 21, 2026</div>
+                    </div>
+
+                    <div class="md-quote">
+                        <div class="md-quote-title">
+                            <a href="#">RE: TECHNOFUSION 2026</a>
+                        </div>
+                        <p>ACADEMICS CATEGORY: 1 Technology Quiz Challenge, 2 SQL Speed Challenge, 3 Networking Challenge, 4 Business Intelligence Dashboard Challenge, 5 Programming Challenge, 6 UI/UX Redesign Challenge. Contact the student council for signups.</p>
+                        <div class="md-code text-muted border-0 bg-transparent p-0">Posted: Apr 21, 2026</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column (Narrower for side content) -->
+            <div class="col-lg-4 d-flex flex-column">
+                
+                <!-- Quick Links -->
+                <div class="md-section" id="quick-links">
+                    <div class="md-h2-container d-flex justify-content-between">
+                        <div class="md-h2">Quick Links</div>
+                        <a href="#">
+                            <span>View All</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    <ul class="md-list">
+                        <li><a href="#" class="md-link">CICS Student Council</a></li>
+                        <li><a href="#" class="md-link">ACCESS BatStateU</a></li>
+                        <li><a href="#" class="md-link">Supreme Student Council</a></li>
+                    </ul>
+                </div>
+
+                <!-- Class Summary -->
+                <div class="md-section" id="latest-summary">
+                    <div class="md-h2-container d-flex justify-content-between">
+                        <div class="md-h2">Latest Summary</div>
+                        <a href="#">
+                            <span>View All</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="md-code text-muted border-0 bg-transparent p-0 mb-2">Date: Tue - Apr 21, 2026</div>
+                    <div class="md-quote" style="border-left-color: var(--text-muted);">
+                        <div class="md-quote-title" style="font-size: 0.9rem;">CC102 | Adv. Programming</div>
+                        <p style="font-size: 0.85rem; margin-bottom: 0.3rem;">Presented the Final Project.</p>
+                        <p style="font-size: 0.85rem; font-style: italic; opacity: 0.8;">Note: Reverse Alphabetical Presentation</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 {% endblock %}
