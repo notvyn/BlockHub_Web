@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Signup</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {{ form.name.label() }}
+        {{ form.name(placeholder="Enter Name") }}
+
+        {{ form.email.label() }}
+        {{ form.email(placeholder="Enter Email") }}
+        
+        {{ form.password.label() }}
+        {{ form.password(placeholder="Enter Password") }}
+        
+        {{ form.confirm_password.label() }}
+        {{ form.confirm_password(placeholder="Enter Confirm Password") }}
+
+        {{ form.role.label() }}
+        {{ form.role(placeholder="Enter Role") }}
+
+        {{ form.submit(value="Submit") }}
+    </form>
+
+{% endblock %}

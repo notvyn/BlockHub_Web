@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Add Class Summary</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {{ form.course.label() }}
+        {{ form.course(placeholder="Enter Course") }}
+
+        {{ form.content.label() }}
+        {{ form.content(placeholder="Enter Content") }}
+        
+        {{ form.scheduled_date.label() }}
+        {{ form.scheduled_date(placeholder="Enter Scheduled Date") }}
+        
+        {{ form.note.label() }}
+        {{ form.note(placeholder="Enter Note") }}
+
+        {{ form.submit(value="Submit") }}
+    </form>
+
+{% endblock %}

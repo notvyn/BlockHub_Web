@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Add Deadline</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {{ form.course.label() }}
+        {{ form.course(placeholder="Enter Course e.g. CC102") }}
+
+        {{ form.description.label() }}
+        {{ form.description(placeholder="Enter Description") }}
+        
+        {{ form.category.label() }}
+        {{ form.category(placeholder="Enter Category") }}
+        
+        {{ form.date_given.label() }}
+        {{ form.date_given(placeholder="Enter Date Given") }}
+        
+        {{ form.due_date.label() }}
+        {{ form.due_date(placeholder="Enter Due Date") }}
+        
+        {{ form.status.label() }}
+        {{ form.status(placeholder="Enter Status") }}
+        
+        {{ form.note.label() }}
+        {{ form.note(placeholder="Enter Note") }}
+
+        {{ form.submit(value="Submit") }}
+    </form>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Add Course</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {{ form.code.label() }}
+        {{ form.code(placeholder="Enter Code") }}
+
+        {{ form.title.label() }}
+        {{ form.title(placeholder="Enter Title") }}
+        
+        {{ form.instructor.label() }}
+        {{ form.instructor(placeholder="Enter Instructor") }}
+        
+        {{ form.units.label() }}
+        {{ form.units(placeholder="Enter Units") }}
+
+        {{ form.submit(value="Submit") }}
+    </form>
+
+{% endblock %}

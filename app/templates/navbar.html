@@ -9,7 +9,7 @@
     </div>
     <ul class="sidebar-nav">
         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
+            <a href="{{ url_for('dashboard') }}" class="sidebar-link">
                 <i class="fa-solid fa-house"></i>
                 <span>Dashboard</span>
             </a>
@@ -66,11 +66,29 @@
                 <span>Setting</span>
             </a>
         </li>
-        <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>                   
-                <span>Logout</span>
-            </a>
-        </li>
+
+        <div class="sidebar-auth">
+            {% if current_user.is_authenticated %}
+                <li class="sidebar-item">
+                    <a href="{{ url_for('logout') }}" class="sidebar-link">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>                   
+                        <span>Logout</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="sidebar-item">
+                    <a href="{{ url_for('login') }}" class="sidebar-link">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>                   
+                        <span>Login</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('signup') }}" class="sidebar-link">
+                        <i class="fa-solid fa-person-circle-plus"></i>             
+                        <span>Signup</span>
+                    </a>
+                </li>
+            {% endif %}
+        </div>
     </div>
 </aside>
