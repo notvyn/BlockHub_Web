@@ -8,6 +8,7 @@ class Announcement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    url = db.Column(db.Text, nullable=True)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -21,6 +22,7 @@ class ClassSummary(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
 
     content = db.Column(db.Text, nullable=False)
+    scheduled_date = db.Column(db.DateTime, nullable=False)
     note = db.Column(db.Text, nullable=True)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 
@@ -53,9 +55,17 @@ class Deadline(db.Model):
     status = db.Column(db.String(50), nullable=False, default='Upcoming')
     note = db.Column(db.Text, nullable=True)
 
+    date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
+    is_archived = db.Column(db.Boolean, default=False)
+
     def __repr__(self):
         return f'<Deadline {self.description}>'
 
+class Link(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    url = db.Column(db.Text, nullable=False)
+    date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
