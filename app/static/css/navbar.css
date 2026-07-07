@@ -136,9 +136,15 @@ a.sidebar-link:hover {
     position: relative;
 }
 
+.sidebar-auth {
+    margin: 0.5rem 0 0 0;
+}
+
 .m-nav {
     background-color: var(--sidebar-bg);
 }
+
+
 
 /* #sidebar.expand .sidebar-dropdown .sidebar-link {
     padding-left: 3.5rem;

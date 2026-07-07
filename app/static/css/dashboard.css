@@ -168,6 +168,47 @@ body {
     margin-bottom: 0.3rem;
     color: var(--text-dark);
 }
+.md-task input {
+    border-color: var(--sidebar-bg);
+    background-color: #31226b;
+}
+/* 1. Default State (Unchecked) */
+.btn-obsidian {
+    color: var(--text-muted); /* Faded gray/violet icon */
+    border: 1px solid rgba(21, 16, 44, 0.2); /* Ghost border */
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+    padding: 0.25rem 0.5rem; /* Keeps the box tight and minimal */
+}
+
+/* 2. Hover State */
+.btn-obsidian:hover {
+    color: var(--sidebar-bg); /* Dark violet icon */
+    border-color: var(--sidebar-bg); /* Dark violet border */
+    background-color: rgba(21, 16, 44, 0.05); /* Very subtle dark background */
+}
+
+/* 3. Checked State (The Magic) */
+/* This triggers when the hidden .btn-check is checked, targeting the label next to it */
+.btn-check:checked + .btn-obsidian {
+    background-color: var(--sidebar-bg); /* Fills with solid dark violet */
+    color: var(--main-bg); /* Cream colored checkmark */
+    border-color: var(--sidebar-bg);
+}
+
+/* Optional: Add a slight focus ring for accessibility */
+.btn-check:focus + .btn-obsidian {
+    box-shadow: 0 0 0 0.25rem rgba(21, 16, 44, 0.25);
+}
+/* The class we will inject using JavaScript */
+.task-done-text {
+    opacity: 0.5;
+    transition: all 0.2s ease;
+}
+.task-done-text .md-task-title {
+    text-decoration: line-through;
+}
+
 
 /* Blockquotes (Announcements) */
 .md-quote {
