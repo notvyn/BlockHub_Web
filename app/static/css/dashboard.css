@@ -105,16 +105,21 @@ body {
     gap: 10px;
     padding-bottom: 0.5rem;
 }
-.md-h2-container a {
+.filter-btn {
     color: var(--text-dark);
     font-size: 0.8rem;
     padding: 5px;
     border-radius: 2px;
 }
-.md-h2-container a:hover {
+.filter-btn:hover {
     color: var(--text-dark);
     font-size: 0.8rem;
     background-color: rgba(0,0,0,0.15);
+}
+.md-title:hover, .md-quote-title:hover {
+    transform: translateX(4px);
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease;
 }
 
 /* Typography & Inline Code Tags */
