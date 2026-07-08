@@ -16,6 +16,11 @@ class Announcement(db.Model):
     def __repr__(self):
         return f"Announcement('{self.title}', '{self.date_posted}')"
 
+class AnnouncementRead(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    announcement_id = db.Column(db.Integer, db.ForeignKey('announcement.id'), nullable=False)
+
 class ClassSummary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     
