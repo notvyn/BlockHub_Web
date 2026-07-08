@@ -18,6 +18,11 @@ A centralized class management system for CS 2103.
 - Limited the visible content for Announcement, and refined UX through clickable titles.
 - Created AnnouncementRead model for tagging unread announcements.
 
+<p align="center">
+    <img src="app/assets/july-08-2026-d1.png" alt="July 08, 2026 - Enhanced Dashboard UI & UX" width="45%">
+    <img src="app/assets/july-08-2026-d2.png" alt="July 08, 2026 - Hover Effect & Mark Task" width="45%">
+</p>
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [ ] Add password security and form validation.
