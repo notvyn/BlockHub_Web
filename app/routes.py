@@ -4,11 +4,11 @@ from flask import render_template, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from datetime import date
+from datetime import date, timedelta
 
 from app import app, login_manager, db
 
-from app.models import User, Announcement, ClassSummary, Course, Deadline, Link
+from app.models import User, Announcement, AnnouncementRead, ClassSummary, Course, Deadline, Link
 from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, DeadlineForm, LinkForm, LoginForm, SignupForm
 
 @login_manager.user_loader
@@ -37,6 +37,49 @@ def complete_deadline(id):
     # Send a success message back to the JavaScript
     return jsonify({'success': True, 'new_status': deadline.status})
 
+@app.route('/mark-announcement-read/<int:id>', methods=['POST'])
+@login_required
+def mark_read(id):
+    # Check if a receipt already exists so we don't make duplicates
+    existing_receipt = AnnouncementRead.query.filter_by(
+        user_id=current_user.id, 
+        announcement_id=id
+    ).first()
+    
+    # If not, create one!
+    if not existing_receipt:
+        receipt = AnnouncementRead(user_id=current_user.id, announcement_id=id)
+        db.session.add(receipt)
+        db.session.commit()
+        
+    return {"status": "success"} # We just return a tiny dictionary, no HTML template!
+
+@app.route('/sync-guest-reads', methods=['POST'])
+@login_required
+def sync_guest_reads():
+    # 1. Catch the JSON data sent by JavaScript
+    data = request.get_json()
+    
+    # 2. Extract the list of IDs (or default to an empty list)
+    announcement_ids = data.get('ids', [])
+    
+    # 3. Loop through the IDs and save them to the database
+    for a_id in announcement_ids:
+        # Check if the receipt already exists so we don't cause a database error
+        existing = AnnouncementRead.query.filter_by(
+            user_id=current_user.id, 
+            announcement_id=a_id
+        ).first()
+        
+        if not existing:
+            receipt = AnnouncementRead(user_id=current_user.id, announcement_id=a_id)
+            db.session.add(receipt)
+            
+    # 4. Commit all the new receipts at once
+    db.session.commit()
+    
+    return jsonify({"status": "success"})
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -45,14 +88,35 @@ def dashboard():
     deadline_form = DeadlineForm()
     
     announcement = Announcement.query.order_by(Announcement.date_posted).all()
-    deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).all()
+
+    # THE FIX: Only check read receipts if they are actually logged in
+    read_announcement_ids = []
+    if current_user.is_authenticated:
+        # Get a list of announcement IDs that THIS user has explicitly read
+        read_records = AnnouncementRead.query.filter_by(user_id=current_user.id).all()
+        read_announcement_ids = [record.announcement_id for record in read_records]
+
+    total_deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).count()
+
+    deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).limit(5).all()
+    
     # class_summary = ClassSummary.query.order_by(ClassSummary.scheduled_date).all()
+
     link = Link.query.order_by(Link.date_added).all()
+
+    today = date.today()
+
+    # 1. Math: Sunday is 6. If today is Wed (2), 6 - 2 = 4 days until Sunday.
+    days_until_sunday = 6 - today.weekday()
+    
+    # 2. Add those days to today's date to find the exact date of this Sunday
+    end_of_week = today + timedelta(days=days_until_sunday)
 
     # 1. Grab the absolute newest record, regardless of time.
     target_record = ClassSummary.query.order_by(ClassSummary.scheduled_date.desc()).first()
     
-    daily_summaries = []
+    # 2. Create an empty dictionary to hold our grouped data
+    daily_summaries = {}
     
     if target_record:
         # 2. Extract just the calendar date from the newest record
@@ -65,10 +129,20 @@ def dashboard():
         
         # 4. If it is 3 days old or less, fetch all summaries for that calendar day
         if days_old <= 3:
-            daily_summaries = ClassSummary.query.options(joinedload(ClassSummary.course)).filter(
-                # THE FIX: Wrap the database column in func.date()
+            # 1. Fetch the raw summaries just like before
+            raw_summaries = ClassSummary.query.options(joinedload(ClassSummary.course)).filter(
                 func.date(ClassSummary.scheduled_date) == record_date
             ).all()
+
+            for summary in raw_summaries:
+                course_header = f"{summary.course.code} | {summary.course.title}"
+            
+                # If we haven't seen this course yet, create a new list for it
+                if course_header not in daily_summaries:
+                    daily_summaries[course_header] = []
+                    
+                # Add the summary to that course's list
+                daily_summaries[course_header].append(summary)
         else:
             # If it's too old, trigger the "No recent summaries" UI
             target_record = None
@@ -83,12 +157,15 @@ def dashboard():
         class_summary_form=class_summary_form,
         deadline_form=deadline_form,
         announcement=announcement,
+        read_ids=read_announcement_ids,
         deadline=deadline,
+        total_deadline=total_deadline,
         target_record=target_record,
         daily_summaries=daily_summaries,
         link=link,
         user=user,
-        today=date.today()
+        today=today,
+        end_of_week=end_of_week,
     )
 
 @app.route('/add-entry/announcement', methods=['GET', 'POST'])
