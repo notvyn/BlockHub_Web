@@ -118,6 +118,10 @@ body {
 .md-section {
     margin-bottom: 3.5rem;
 }
+.text-muted {
+    color: var(--text-muted) !important;
+    opacity: 0.7;
+}
 .md-h2 {
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.15rem;

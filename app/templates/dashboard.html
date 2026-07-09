@@ -38,7 +38,7 @@
                         <div class="md-h2-container d-flex justify-content-between">
                             <a href="#" class="md-title d-flex align-items-center gap-2">
                                 <div class="md-h2 mb-0">Upcoming Deadlines</div>
-                                <span class="badge bg-danger rounded-pill">{{ total_deadline }}</span>
+                                <span id="deadline-badge" class="badge bg-danger rounded-pill">{{ total_deadline }}</span>
                                 <i class="fa-solid fa-chevron-right text-muted"></i>
                             </a>
                             <div class="d-flex align-items-center gap-3">
@@ -54,35 +54,39 @@
                             </div>
                         </div>
                         
-                        {% for d in deadline %}
-                            {% set days_left = (d.due_date - today).days %}
-                            {% set is_this_week = "true" if d.due_date <= end_of_week else "false" %}
+                        {% if deadline %}
+                            {% for d in deadline %}
+                                {% set days_left = (d.due_date - today).days %}
+                                {% set is_this_week = "true" if d.due_date <= end_of_week else "false" %}
 
-                            <div class="md-task deadline-item" data-days="{{ days_left }}" data-this-week="{{ is_this_week }}">
-                                <!-- <i class="bi bi-square"></i> -->
-                                <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off">
-                                <label class="btn btn-obsidian" for="btn-check-{{ d.id }}">
-                                    <i class="fa-solid fa-check"></i>
-                                </label>
-                                <div id="task-text-{{ d.id }}">
-                                    <div class="md-task-title">{{ d.description }}</div>
-                                    <div>
-                                        <span class="md-code">{{ d.course.code }} | {{ d.course.title }}</span>
-                                        <span class="md-code">{{ d.category }}</span>
-                                        
-                                        {% if days_left <= 2 %}
-                                            {% set urgency_class = 'md-code-hot' %}
-                                        {% elif days_left <= 5 %}
-                                            {% set urgency_class = 'md-code-warm' %}
-                                        {% else %}
-                                            {% set urgency_class = 'md-code-chill' %}
-                                        {% endif %}
+                                <div class="md-task deadline-item" data-days="{{ days_left }}" data-this-week="{{ is_this_week }}">
+                                    <!-- <i class="bi bi-square"></i> -->
+                                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off">
+                                    <label class="btn btn-obsidian" for="btn-check-{{ d.id }}">
+                                        <i class="fa-solid fa-check"></i>
+                                    </label>
+                                    <div id="task-text-{{ d.id }}">
+                                        <div class="md-task-title">{{ d.description }}</div>
+                                        <div>
+                                            <span class="md-code">{{ d.course.code }} | {{ d.course.title }}</span>
+                                            <span class="md-code">{{ d.category }}</span>
+                                            
+                                            {% if days_left <= 2 %}
+                                                {% set urgency_class = 'md-code-hot' %}
+                                            {% elif days_left <= 5 %}
+                                                {% set urgency_class = 'md-code-warm' %}
+                                            {% else %}
+                                                {% set urgency_class = 'md-code-chill' %}
+                                            {% endif %}
 
-                                        <span class="md-code {{ urgency_class }}">{{ d.due_date.strftime("%a, %b %d") }}</span>
+                                            <span class="md-code {{ urgency_class }}">{{ d.due_date.strftime("%a, %b %d") }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                                <div>No deadlines found. Rest Well !</div>
+                        {% endif %}
                     </div> 
 
                     <!-- Obsidian Style Announcements -->
