@@ -1,4 +1,4 @@
-# KomSy3 (formerly BlockHub_Web) - ON DEVELOPMENT
+# KomSy3 (formerly BlockHub_Web) - UNDER DEVELOPMENT
 A centralized class management system for CS 2103.
 
 **Created By: John Calvin Samson**
@@ -23,12 +23,17 @@ A centralized class management system for CS 2103.
     <img src="app/assets/july-08-2026-d2.png" alt="July 08, 2026 - Hover Effect & Mark Task" width="45%">
 </p>
 
+**July 9, 2026**
+- Enabled routing for viewing individual announcement.
+- Enabled Dark Mode for Dashboard Content.
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [ ] Add password security and form validation.
 - [/] Limit content for Announcement.
-- [ ] Enable Dark Mode.
+- [/] Enable Dark Mode.
 - [ ] Enable dropdown for adding entry.
 - [ ] Build Search Feature.
 - [ ] Construct Templates for entries.
+- [/] Create route for individual viewing of announcement
 

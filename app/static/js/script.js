@@ -186,8 +186,44 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-        });
-
-
+        });  
     });
+
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon')
+
+    // 1. Check if they already have a saved preference
+    const savedTheme = localStorage.getItem('blockhub_theme');
+
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.classList.replace('fa-moon', 'fa-sun'); // Change to sun icon
+    }
+
+    // 2. The Click Event
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // What is the current theme?
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+
+            if (currentTheme === 'dark') {
+                // Switch to light
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('blockhub_theme', 'light');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            }
+            else {
+                // Switch to dark
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('blockhub_theme', 'dark');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            }
+        })
+    }
+
+
+
+
 });

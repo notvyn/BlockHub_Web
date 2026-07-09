@@ -1,15 +1,38 @@
 :root {
     --sidebar-bg: #31226b;
     --sidebar-footer: #15102c;
-    --main-bg: #efebdd;
-    --text-dark: #15102c;
+    --main-bg: #E7DFC6;
+    --text-dark: #31226b;
     --text-muted: #6b7280;
-    --surface-bg: #ffffff;
+    --theme-bg: #DBD4BC;
     --accent-purple: #6d28d9;
+    --accent-red: #ef4444;
+    --accent-yellow: #ca7d01;
+    --accent-blue: #0ea5e9;
     --ADLamDisplayFont: "ADLaM Display";
     --ABeeZeeFont: "ABeeZee";
     --ActorFont: "Actor";
     --AlbertSansFont: "Albert Sans";
+}
+
+[data-theme="dark"] {
+    /* Backgrounds: Moving into deep, rich violets instead of pure black */
+    --main-bg: #16141d;         /* Soft, dark gray-violet */
+    --theme-bg: #221a42;        /* Slightly lighter elevated color for cards/sections */
+    
+    /* Sidebar: Keeping the hierarchy clear */
+    --sidebar-bg: #1e1b29;      /* Slightly lighter gray-violet */
+    --sidebar-footer: #0d0c12;  /* Very dark */
+    
+    /* Typography: Using your old cream background as the primary text color! */
+    --text-dark: #E7DFC6;       /* (Note: Even though it's called 'dark', it acts as your main light text now) */
+    --text-muted: #9a91b5;      /* A soft, readable lavender-gray instead of harsh gray */
+    
+    /* Accents: Brightened up by about 10-15% so they pop against the dark backgrounds */
+    --accent-purple: #8b5cf6;   
+    --accent-red: #f87171;      
+    --accent-yellow: #fbbf24;   
+    --accent-blue: #38bdf8;     
 }
 
 ::after,
@@ -45,7 +68,6 @@ body {
     width: 100%;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
-    background-color: #E7DFC6;
 }
 
 #sidebar {

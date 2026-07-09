@@ -1,12 +1,29 @@
-/* --- Core Variables --- */
-:root {
-    --sidebar-bg: #31226b;
-    --sidebar-footer: #15102c;
-    --main-bg: #efebdd;
-    --text-dark: #15102c;
-    --text-muted: #6b7280;
-    --surface-bg: #ffffff;
-    --accent-purple: #6d28d9;
+/* --- DARK MODE SPECIFIC OVERRIDES --- */
+[data-theme="dark"] .search-box input, [data-theme="dark"] #theme-toggle  {
+    border-color: rgba(255, 255, 255, 0.1); 
+    color: var(--text-dark); /* Ensures text typed in the box is cream, not black */
+    box-shadow: 0 2px 10px rgba(0,0,0, 0.2); /* Slightly stronger shadow for dark mode */
+}
+
+[data-theme="dark"] .md-code {
+    background-color: rgba(255, 255, 255, 0.05); /* Faint white overlay instead of black */
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .md-h2-container, 
+[data-theme="dark"] hr,
+[data-theme="dark"] .btn-obsidian {
+    border-color: rgba(255, 255, 255, 0.15); /* Brightens dashed borders */
+}
+
+[data-theme='dark'] .md-date {
+    background: transparent;
+    border: none;
+    margin: 0 0 0.4rem 0;
+}
+
+[data-theme='dark'] .entry-toggle {
+    background-color: var(--text-muted);
 }
 
 body {
@@ -17,6 +34,7 @@ body {
     display: flex;
     min-height: 100vh;
     min-width: 100vw;
+    transition: all 0.2s ease-in-out;
 }
 
 /* --- Main Content --- */
@@ -38,7 +56,13 @@ body {
 .page-title { 
     margin: 0; 
     font-weight: 700; 
-    color: var(--sidebar-bg); 
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dark);
+}
+.tb-txt p {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    font-size: 0.85rem;
 }
 .search-box { 
     position: relative; 
@@ -48,9 +72,11 @@ body {
     width: 100%; 
     border-radius: 50px; 
     padding: 0.5rem 1rem 0.5rem 2.5rem; 
-    border: none; 
+    border: 1px solid rgba(0,0,0,0.1); 
     box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-    outline: none;}
+    background: transparent; 
+    outline: none;
+}
 .search-box i { 
     position: absolute; 
     left: 15px; 
@@ -58,26 +84,34 @@ body {
     transform: translateY(-50%); 
     color: var(--text-muted); 
 }
-.theme-toggle { 
-    background: #e0dcd0; 
-    border: none; 
+#theme-toggle { 
+    background: transparent; 
+    border: 1px solid rgba(0,0,0,0.1); 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
     width: 40px; 
     height: 40px; 
     border-radius: 50%; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    cursor: pointer; 
-    color: var(--sidebar-bg); 
+    color: var(--text-dark); 
     margin-left: 1rem;
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
 }
 .entry-toggle {
     border: none;
-    margin-left: 1rem;
-    padding: 0.5rem;
-    background-color: var(--sidebar-bg);
+    width: 40px; 
+    height: 40px;
     border-radius: 50%;
-    color: var(--surface-bg);
+    margin-left: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    background-color: var(--text-dark);
+    color: var(--main-bg);
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+#theme-toggle:hover, .entry-toggle:hover { 
+    transform: scale(1.05);
+    opacity: 0.7;
 }
 
 /* --- Markdown / Obsidian Aesthetic --- */
@@ -88,7 +122,7 @@ body {
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--sidebar-bg);
+    color: var(--text-dark);
     display: flex;
     gap: 10px;
 }
@@ -106,7 +140,7 @@ body {
     padding-bottom: 0.5rem;
 }
 .filter-btn {
-    color: var(--text-dark);
+    color: var(--text-muted);
     font-size: 0.8rem;
     padding: 5px;
     border-radius: 2px;
@@ -115,6 +149,10 @@ body {
     color: var(--text-dark);
     font-size: 0.8rem;
     background-color: rgba(0,0,0,0.15);
+}
+.md-title i {
+    font-size: 0.8rem;
+    color: var(--text-dark);
 }
 .md-title:hover, .md-quote-title:hover {
     transform: translateX(4px);
@@ -133,14 +171,22 @@ body {
     color: var(--text-dark);
     margin-right: 0.35rem;
 }
+.md-date {
+    background: transparent;
+    border: none;
+    margin: 0 0 0.4rem 0;
+}
 .md-code-hot {
-    color: #ef4444; border-color: #ef4444;
+    color: var(--accent-red); 
+    border-color: var(--accent-red);
 }
 .md-code-warm {
-    color: #d29b03; border-color: #d29b03;
+    color: var(--accent-yellow); 
+    border-color: var(--accent-yellow);
 }
 .md-code-chill {
-    color: #0ea5e9; border-color: #0ea5e9;
+    color: var(--accent-blue); 
+    border-color: var(--accent-blue);
 }
 .md-link {
     color: var(--accent-purple);
@@ -151,8 +197,8 @@ body {
     transition: 0.2s;
 }
 .md-link:hover {
-    color: var(--sidebar-bg);
     text-decoration-style: solid;
+    opacity: 0.7;
 }
 
 /* Task List (Deadlines) */
@@ -175,7 +221,7 @@ body {
 }
 .md-task input {
     border-color: var(--sidebar-bg);
-    background-color: #31226b;
+    background-color: var(--sidebar-bg);
 }
 /* 1. Default State (Unchecked) */
 .btn-obsidian {
@@ -188,17 +234,17 @@ body {
 
 /* 2. Hover State */
 .btn-obsidian:hover {
-    color: var(--sidebar-bg); /* Dark violet icon */
-    border-color: var(--sidebar-bg); /* Dark violet border */
+    color: var(--text-dark); /* Dark violet icon */
+    border-color: var(--text-dark); /* Dark violet border */
     background-color: rgba(21, 16, 44, 0.05); /* Very subtle dark background */
 }
 
 /* 3. Checked State (The Magic) */
 /* This triggers when the hidden .btn-check is checked, targeting the label next to it */
 .btn-check:checked + .btn-obsidian {
-    background-color: var(--sidebar-bg); /* Fills with solid dark violet */
+    background-color: var(--text-dark); /* Fills with solid dark violet */
     color: var(--main-bg); /* Cream colored checkmark */
-    border-color: var(--sidebar-bg);
+    border-color: var(--text-dark);
 }
 
 /* Optional: Add a slight focus ring for accessibility */
@@ -220,12 +266,13 @@ body {
     border-left: 3px solid var(--accent-purple);
     padding-left: 1.25rem;
     margin-bottom: 2rem;
+    border-left-color: var(--text-muted);
 }
 .md-quote-title {
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     margin-bottom: 0.4rem;
-    color: var(--sidebar-bg);
+    color: var(--text-dark);
 }
 .md-quote-title a {
     color: var(--accent-purple);
@@ -255,7 +302,7 @@ body {
     color: var(--accent-purple);
     font-family: 'JetBrains Mono', monospace;
     font-weight: bold;
-}
+} 
 
 /* --- MOBILE RESPONSIVE OVERRIDES --- */
 @media (max-width: 992px) {
