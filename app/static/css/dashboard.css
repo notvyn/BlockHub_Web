@@ -308,6 +308,69 @@ body {
     font-weight: bold;
 } 
 
+/* --- Omni-Add Dropdown Styling --- */
+
+/* 1. Style the main dropdown box */
+.dropdown-menu {
+    background-color: var(--main-bg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+    min-width: 200px;
+    z-index: 1050; /* Ensures it stays on top of other elements */
+}
+
+/* 2. Style the individual items */
+.md-dropdown-item {
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 0.4rem 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+/* Color the icons to match your theme */
+.md-dropdown-item i {
+    color: var(--accent-purple);
+    font-size: 0.9rem;
+    width: 16px; /* Keeps the icons perfectly aligned */
+    text-align: center;
+}
+
+/* 3. The Hover State */
+.md-dropdown-item:hover, 
+.md-dropdown-item:focus {
+    background-color: var(--theme-bg);
+    color: var(--sidebar-bg);
+    transform: translateX(2px); /* A subtle nudge */
+}
+
+/* 4. The Divider Line */
+.dropdown-divider {
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    margin: 0.4rem 0;
+}
+
+/* --- DARK MODE OVERRIDES --- */
+[data-theme="dark"] .dropdown-menu {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .md-dropdown-item:hover, 
+[data-theme="dark"] .md-dropdown-item:focus {
+    background-color: rgba(255, 255, 255, 0.05); /* Soft highlight */
+    color: var(--text-dark);
+}
+
 /* --- MOBILE RESPONSIVE OVERRIDES --- */
 @media (max-width: 992px) {
     #quick-links {

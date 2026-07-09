@@ -26,13 +26,15 @@ A centralized class management system for CS 2103.
 **July 9, 2026**
 - Enabled routing for viewing individual announcement.
 - Enabled Dark Mode for Dashboard Content.
+- Fixed checkbox logic to properly remove task once clicked.
+- Created Dropdown for creating entries
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [ ] Add password security and form validation.
 - [/] Limit content for Announcement.
 - [/] Enable Dark Mode.
-- [ ] Enable dropdown for adding entry.
+- [/] Enable dropdown for adding entry.
 - [ ] Build Search Feature.
 - [ ] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
