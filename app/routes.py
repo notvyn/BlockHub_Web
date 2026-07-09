@@ -300,6 +300,11 @@ def add_link():
 
     return render_template('add-link.html', form=form)
 
+@app.route('/announcements/<int:id>')
+def announcement(id):
+    announcement = Announcement.query.get_or_404(id)
+    return render_template('announcement.html', announcement=announcement)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
