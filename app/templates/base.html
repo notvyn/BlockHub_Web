@@ -60,9 +60,10 @@
                         </button>
                         
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="mobileAddEntryDropdown">
-                            <li><a class="dropdown-item md-dropdown-item" href="#"><i class="fa-solid fa-clock"></i> Post Deadline</a></li>
-                            <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_announcement')}}"><i class="fa-solid fa-bullhorn"></i> Post Announcement</a></li>
-                            <li><a class="dropdown-item md-dropdown-item" href="#"><i class="fa-solid fa-book-open"></i> Add Summary</a></li>
+                            <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_deadline') }}"><i class="fa-solid fa-clock"></i> Post Deadline</a></li>
+                            <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_announcement') }}"><i class="fa-solid fa-bullhorn"></i> Post Announcement</a></li>
+                            <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_summary') }}"><i class="fa-solid fa-book-open"></i> Add Summary</a></li>
+                            <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_course') }}"><i class="fa-solid fa-address-book"></i> Add Course</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item md-dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addLinkModal"><i class="fa-solid fa-link"></i> Add Quick Link</a></li>
                         </ul>
@@ -81,7 +82,52 @@
             </div>
 
             <!-- Dashboard Content Injected Here -->
-            {% block content %}{% endblock %}
+            <main>
+                <div class="top-bar d-flex justify-content-between align-items-center">
+                    <div class="tb-txt d-flex align-items-center gap-3">
+                        
+                        {% if is_entry != true %}
+                        <a href="{% block back_url %}{{ url_for('dashboard') }}{% endblock %}" class="back-btn">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                        {% endif %}
+                        
+                        <div>
+                            <h2 class="page-title"># {% block page_title %}{% endblock %}</h2>
+                            <p class="page-title-txt">> {%block page_title_txt %}{% endblock %}</p> 
+                        </div>
+                        
+                    </div>
+                    <div class="tb-btn d-none d-md-flex align-items-center justify-content-evenly">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" placeholder="e.g. Online Enrollment...">
+                        </div>
+                        
+                        <button class="theme-toggle-btn" id="theme-toggle-desktop"><i class="fa-solid fa-moon"></i></button>
+
+                        {% if is_entry == true %}
+                        <div class="dropdown">
+                            <button class="entry-toggle" type="button" id="desktopAddEntryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="desktopAddEntryDropdown">
+                                <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_deadline') }}"><i class="fa-solid fa-clock"></i> Post Deadline</a></li>
+                                <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_announcement')}}"><i class="fa-solid fa-bullhorn"></i> Post Announcement</a></li>
+                                <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_summary') }}"><i class="fa-solid fa-book-open"></i> Add Summary</a></li>
+                                <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_course') }}"><i class="fa-solid fa-address-book"></i> Add Course</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item md-dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addLinkModal"><i class="fa-solid fa-link"></i> Add Quick Link</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% block content %}{% endblock %}
+            </main>
+            
         </div>
     </div>
 

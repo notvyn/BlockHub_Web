@@ -104,9 +104,10 @@ def dashboard():
         read_records = AnnouncementRead.query.filter_by(user_id=current_user.id).all()
         read_announcement_ids = [record.announcement_id for record in read_records]
 
-    total_deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).count()
+    upcoming_deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).all()
+    total_deadline = len(upcoming_deadline)
 
-    deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).limit(5).all()
+    deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).limit(3).all()
     
     # class_summary = ClassSummary.query.order_by(ClassSummary.scheduled_date).all()
 

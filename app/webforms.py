@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField
 from wtforms.validators import DataRequired, Email, EqualTo, URL
 from wtforms.widgets import TextArea
 from datetime import date, timedelta
@@ -11,7 +11,7 @@ class AnnouncementForm(FlaskForm):
     submit = SubmitField()
 
 class ClassSummaryForm(FlaskForm):
-    course = SelectField("Course", validators=[DataRequired()], coerce=int)
+    course = RadioField("Course", validators=[DataRequired()], coerce=int)
     content = StringField("Content", validators=[DataRequired()], widget=TextArea())
     scheduled_date = DateField("Scheduled Date",  default=date.today, validators=[DataRequired()])
     note = StringField("Note", widget=TextArea())
@@ -28,14 +28,14 @@ def get_tomorrow():
     return date.today() + timedelta(days=1)
 
 class DeadlineForm(FlaskForm):
-    course = SelectField("Subject", validators=[DataRequired()], coerce=int)
+    course = RadioField("Subject", validators=[DataRequired()], coerce=int)
     description = StringField("Task Description", validators=[DataRequired()])
-    category = SelectField("Category", validators=[DataRequired()], choices=['Activity', 'Assignment', 'Quiz', 'Exam', 'Project', 'Laboratory', 'Recitation', 'Research', 'Group Activity', 'Presentation', 'Practical Test', 'Requirements'])
+    category = RadioField("Category", validators=[DataRequired()], choices=['Activity', 'Assignment', 'Quiz', 'Exam', 'Project', 'Laboratory', 'Recitation', 'Research', 'Group Activity', 'Presentation', 'Practical Test', 'Requirements'])
 
     date_given = DateField("Date Given", default=date.today, validators=[DataRequired()])
     due_date = DateField("Deadline", default=get_tomorrow, validators=[DataRequired()])
 
-    status = SelectField("Status", default="Upcoming", validators=[DataRequired()], choices=['Upcoming', 'Pending', 'Done', 'Dropped'])
+    status = RadioField("Status", default="Upcoming", validators=[DataRequired()], choices=['Upcoming', 'Pending', 'Done', 'Dropped'])
 
     note = StringField("Notes", widget=TextArea())
     submit = SubmitField()

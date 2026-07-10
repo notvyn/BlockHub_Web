@@ -1,24 +1,76 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+{% endblock %}
+
+{% block page_title %}New Class Summary{% endblock %}
+{% block page_title_txt %}What's the haps today? Everybody needs to know !{% endblock %}
+
 {% block content %}
-    <h1>Add Class Summary</h1>
+    <div class="row mt-4">
+        <div class="col-12">
+            <form method="POST" class="add-entry-form">
+                {{ form.hidden_tag() }}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+                <div class="form-container">
+                    
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">1. SELECT COURSE</label>
+                        <div class="d-flex flex-wrap gap-2 pill-group">
+                            {% for subfield in form.course %}
+                                {{ subfield(class="btn-check course-radio") }}
+                                <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">2. SELECT SCHEDULE</label>
+                        <div id="dynamic-date-container" class="d-flex flex-wrap gap-2 pill-group">
+                            <span class="text-muted" style="font-size: 0.85rem; font-style: italic;">Select a course above to view available dates...</span>
+                        </div>
+                    </div>
+                </div>
 
-        {{ form.course.label() }}
-        {{ form.course(placeholder="Enter Course") }}
+                <div class="mb-4">
+                    <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">TAKEAWAY (MAIN CONTENT)</label>
+                    {{ form.content(class="form-control", id="summary-content", placeholder="e.g. Discussion of...") }}
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">EXTRA NOTE (OPTIONAL)</label>
+                    {{ form.note(class="form-control custom-textarea", rows="2", placeholder="e.g. Bring laptops tomorrow...") }}
+                </div>
 
-        {{ form.content.label() }}
-        {{ form.content(placeholder="Enter Content") }}
-        
-        {{ form.scheduled_date.label() }}
-        {{ form.scheduled_date(placeholder="Enter Scheduled Date") }}
-        
-        {{ form.note.label() }}
-        {{ form.note(placeholder="Enter Note") }}
+                <div class="form-btn d-flex justify-content-end gap-3 mt-5">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                    {{ form.submit(value="Post Summary", class="btn btn-modal-save px-4") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
 
-        {{ form.submit(value="Submit") }}
-    </form>
-
+{% block script %}
+    <script>
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('summary-content'),
+            theme: "modern",
+            minHeight: "100px", // <--- ADD THIS LINE (Adjust the pixel value to your liking)
+            maxHeight: "250px",
+            spellChecker: false,
+            toolbar: [
+                "bold", "italic", "strikethrough", "|", 
+                "heading-1", "heading-2", "heading-3", "|", 
+                "code", "quote", "|", 
+                "unordered-list", "ordered-list", "|", 
+                "link", "image", "horizontal-rule", "|", 
+                "preview", "side-by-side", "fullscreen", "|", 
+                "guide"
+            ]
+        });
+    </script>
 {% endblock %}

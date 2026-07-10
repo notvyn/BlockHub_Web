@@ -1,33 +1,88 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+{% endblock %}
+
+{% block page_title %}New Deadline{% endblock %}
+{%block page_title_txt %}Don't forget to do it ;){% endblock %}
+
 {% block content %}
-    <h1>Add Deadline</h1>
+    <div class="row mt-4">
+        <div class="col-12">
+            <form method="POST" class="add-entry-form">
+                {{ form.hidden_tag() }}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+                <div class="mb-5">
+                    {{ form.description(class="form-control title-input border-0 shadow-none px-0", placeholder="Deadline Title...") }}
+                </div>
 
-        {{ form.course.label() }}
-        {{ form.course(placeholder="Enter Course e.g. CC102") }}
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE</label>
+                    <div class="d-flex flex-wrap gap-2 pill-group">
+                        {% for subfield in form.course %}
+                            {{ subfield(class="btn-check") }}
+                            <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">CATEGORY</label>
+                    <div class="d-flex flex-wrap gap-2 pill-group">
+                        {% for subfield in form.category %}
+                            {{ subfield(class="btn-check") }}
+                            <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                        {% endfor %}
+                    </div>
+                </div>
 
-        {{ form.description.label() }}
-        {{ form.description(placeholder="Enter Description") }}
-        
-        {{ form.category.label() }}
-        {{ form.category(placeholder="Enter Category") }}
-        
-        {{ form.date_given.label() }}
-        {{ form.date_given(placeholder="Enter Date Given") }}
-        
-        {{ form.due_date.label() }}
-        {{ form.due_date(placeholder="Enter Due Date") }}
-        
-        {{ form.status.label() }}
-        {{ form.status(placeholder="Enter Status") }}
-        
-        {{ form.note.label() }}
-        {{ form.note(placeholder="Enter Note") }}
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">STATUS</label>
+                    <div class="d-flex flex-wrap gap-2 pill-group">
+                        {% for subfield in form.status %}
+                            {{ subfield(class="btn-check") }}
+                            <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                        {% endfor %}
+                    </div>
+                </div>
 
-        {{ form.submit(value="Submit") }}
-    </form>
+                <div class="date-grid mb-4">
+                    <div>
+                        <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DATE GIVEN</label>
+                        {{ form.date_given(class="form-control custom-date-input") }}
+                    </div>
+                    <div>
+                        <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DUE DATE</label>
+                        {{ form.due_date(class="form-control custom-date-input") }}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">NOTE (OPTIONAL)</label>
+                    {{ form.note(class="form-control custom-textarea", rows="3", placeholder="e.g. Coverage Topics...") }}
+                </div>
 
+                <div class="form-btn d-flex justify-content-end gap-3 mt-5">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                    {{ form.submit(value="Post Deadline", class="btn btn-modal-save px-4") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr(".custom-date-input", {
+            altInput: true,
+            altFormat: "D - M d, Y", // This outputs: Mon - Jul 07, 2026
+            dateFormat: "Y-m-d",     // This keeps the backend data clean
+            allowInput: true
+        });
+    </script>
 {% endblock %}

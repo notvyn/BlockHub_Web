@@ -1,0 +1,220 @@
+/* --- Standard Form Inputs --- */
+.add-entry-form .form-control {
+    background-color: transparent;
+    color: var(--text-dark);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+}
+.add-entry-form .form-control:focus {
+    box-shadow: 0 0 0 2px var(--accent-purple);
+    border-color: transparent;
+}
+.form-container {
+    border-radius: 0.5rem;
+    border: solid 1px rgba(255, 255, 255, 0.15) !important;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+.form-control-lg {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+.form-control::placeholder, .form-label{
+    color: var(--text-muted);
+}
+.form-btn * {
+    padding: 0.5rem 0.9rem;
+    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.form-btn .btn-modal-cancel {
+    color: var(--text-muted);
+}
+
+.form-btn .btn-modal-save {
+    color: var(--main-bg);
+    background-color: var(--accent-purple);
+}
+
+.form-btn .btn-modal-save:hover, .form-btn .btn-modal-cancel:hover {
+    transform: translateY(-2px);
+    opacity: 0.7;
+}
+
+/* --- 1. Highlighted Title Input --- */
+.title-input {
+    font-size: 2rem !important;
+    font-weight: 700;
+    color: var(--text-dark) !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
+    transition: border-color 0.3s ease;
+}
+.title-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 700;
+    opacity: 0.5;
+}
+.title-input:focus {
+    border-bottom: 2px solid var(--accent-purple) !important;
+}
+[data-theme="dark"] .title-input {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.title-input, 
+[data-theme="dark"] .add-entry-form .title-input {
+    background-color: transparent !important;
+    color: var(--text-dark) !important;
+    box-shadow: none !important; /* Kills the blue bootstrap glow */
+}
+
+/* --- 2. Single-Click Pills (Bulletproof Radio Hack) --- */
+.btn-pill {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--text-muted);
+    border-radius: 50px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-block; /* Ensures padding applies correctly */
+}
+
+.btn-pill:hover {
+    color: var(--text-dark);
+    border-color: var(--text-dark);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Safely hide the native radio circle without disabling it */
+.btn-check {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* The Checked State */
+.btn-check:checked + .btn-pill {
+    background-color: var(--accent-purple) !important;
+    color: #ffffff !important;
+    border-color: var(--accent-purple) !important;
+}
+
+/* Dark Mode Hover */
+[data-theme="dark"] .btn-pill:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- 3. Date Grid & Custom Inputs --- */
+.date-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.custom-date-input, .custom-textarea {
+    border-radius: 8px !important;
+    padding: 0.6rem 1rem !important;
+}
+/* Force standard HTML5 date pickers to blend with the theme */
+::-webkit-calendar-picker-indicator {
+    filter: opacity(0.6);
+    cursor: pointer;
+}
+[data-theme="dark"] ::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.6);
+}
+
+/* Mobile responsive fallback for the dates */
+@media (max-width: 768px) {
+    .date-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+
+/* --- EasyMDE Core Styling --- */
+.CodeMirror {
+    /* min-height: 400px !important; */
+    background-color: var(--main-bg) !important;
+    color: var(--text-dark) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 0 0 8px 8px !important;
+    font-family: 'JetBrains Mono', monospace !important; 
+    font-size: 0.9rem;
+}
+
+/* --- EasyMDE Flexbox Toolbar Fix --- */
+.editor-toolbar {
+    background-color: var(--theme-bg) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-bottom: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    opacity: 1 !important;
+    
+    /* Modern Flexbox to fix chaotic wrapping */
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center;
+}
+.editor-toolbar::before, 
+.editor-toolbar::after {
+    display: none !important; /* Strips out legacy float hacks */
+}
+
+.editor-toolbar button {
+    color: var(--text-muted) !important;
+    transition: all 0.2s ease;
+}
+.editor-toolbar button:hover, 
+.editor-toolbar button.active {
+    color: var(--accent-purple) !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* --- EasyMDE Expansion Modes (Side-by-Side & Fullscreen) --- */
+.editor-toolbar.fullscreen,
+.CodeMirror-fullscreen,
+.editor-preview-side {
+    z-index: 1050 !important;
+}
+.editor-preview-side {
+    border-left: 1px dashed rgba(0,0,0,0.15) !important;
+    background-color: var(--main-bg) !important;
+    padding: 2rem !important;
+}
+.editor-preview {
+    background-color: var(--main-bg) !important;
+    color: var(--text-dark) !important;
+}
+
+/* --- DARK MODE DYNAMIC OVERRIDES --- */
+[data-theme="dark"] .add-entry-form .form-control,
+[data-theme="dark"] .CodeMirror,
+[data-theme="dark"] .editor-toolbar {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+[data-theme="dark"] .add-entry-form .form-control {
+    background-color: rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .editor-toolbar button:hover, 
+[data-theme="dark"] .editor-toolbar button.active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+[data-theme="dark"] .editor-preview-side {
+    border-left: 1px dashed rgba(255,255,255,0.15) !important;
+}
+/* Change the EasyMDE blinking cursor color in Dark Mode */
+[data-theme="dark"] .CodeMirror-cursor {
+    border-left-color: var(--text-dark) !important; /* Pure white, or use your var(--text-dark) */
+}
+/* Change the blinking cursor for all standard inputs in Dark Mode */
+[data-theme="dark"] .add-entry-form .form-control {
+    caret-color: var(--text-dark) !important; 
+}
