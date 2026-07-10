@@ -2,6 +2,7 @@
 
 {% block head %}
     <link href="{{ url_for('static', filename='css/dashboard.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
 {% endblock %}
 
 {% block page_title %}Dashboard{% endblock %}
@@ -195,7 +196,7 @@
                             <div class="text-danger mt-2" id="url-error" style="font-size: 0.8rem; display: none;"></div>
                         </div>
                         
-                        <div class="d-flex justify-content-end gap-2 mt-4">
+                        <div class="form-btn d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
                             {{ link_form.submit(class="btn-modal-save") }}
                         </div>

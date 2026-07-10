@@ -34,6 +34,7 @@ A centralized class management system for CS 2103.
 - Fixed Announcement Posting Page visual bug.
 - Changed mobile navbar design to put search, theme, and add button at the top.
 - Organized css files for better styling accessibility.
+- Created Summary, Deadline, and Course Form Page
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -44,4 +45,5 @@ A centralized class management system for CS 2103.
 - [ ] Build Search Feature.
 - [ ] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
+- [ ] Fix total deadline visual number
 

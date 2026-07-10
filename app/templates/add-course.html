@@ -1,24 +1,47 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}New Course{% endblock %}
+{% block page_title_txt %}Knowledge is Power! :D{% endblock %}
+
 {% block content %}
-    <h1>Add Course</h1>
+    <div class="row mt-4">
+        <div class="col-12">
+            <form method="POST" class="add-entry-form">
+                {{ form.hidden_tag() }}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+                <div class="mb-5">
+                    {{ form.title(class="form-control title-input border-0 shadow-none px-0", autocomplete="off", placeholder="Course Title...") }}
+                </div>
 
-        {{ form.code.label() }}
-        {{ form.code(placeholder="Enter Code") }}
+                <div class="form-container">
+                    
+                    <div class="date-grid mb-4">
+                        <div>
+                            <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE CODE</label>
+                            {{ form.code(class="form-control custom-date-input", autocomplete="off", placeholder="e.g. CC 102") }}
+                        </div>
+                        <div>
+                            <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">CREDIT UNITS</label>
+                            {{ form.units(class="form-control custom-date-input", autocomplete="off", placeholder="e.g. 3") }}
+                        </div>
+                    </div>
 
-        {{ form.title.label() }}
-        {{ form.title(placeholder="Enter Title") }}
-        
-        {{ form.instructor.label() }}
-        {{ form.instructor(placeholder="Enter Instructor") }}
-        
-        {{ form.units.label() }}
-        {{ form.units(placeholder="Enter Units") }}
+                    <div>
+                        <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE INSTRUCTOR</label>
+                        {{ form.instructor(class="form-control custom-date-input", autocomplete="off", placeholder="e.g. Dr. Ada Lovelace") }}
+                    </div>
 
-        {{ form.submit(value="Submit") }}
-    </form>
+                </div>
 
+                <div class="form-btn d-flex justify-content-end gap-3 mt-5">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                    {{ form.submit(value="Add Course", class="btn btn-modal-save px-4") }}
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

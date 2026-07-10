@@ -11,7 +11,7 @@
 }
 .form-container {
     border-radius: 0.5rem;
-    border: solid 1px rgba(255, 255, 255, 0.15) !important;
+    border: solid 1px rgba(0, 0, 0, 0.15) !important;
     margin-bottom: 1.5rem;
     padding: 1rem;
     background-color: rgba(255, 255, 255, 0.05);
@@ -209,6 +209,9 @@
 }
 [data-theme="dark"] .editor-preview-side {
     border-left: 1px dashed rgba(255,255,255,0.15) !important;
+}
+[data-theme="dark"] .form-container {
+    border: solid 1px rgba(255, 255, 255, 0.15) !important;
 }
 /* Change the EasyMDE blinking cursor color in Dark Mode */
 [data-theme="dark"] .CodeMirror-cursor {
