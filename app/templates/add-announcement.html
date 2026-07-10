@@ -1,21 +1,85 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+
+    <link href="{{ url_for('static', filename='css/dashboard.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/add-announcement.css')}}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-    <h1>Add Announcement</h1>
+    <main>
+        <div class="top-bar d-flex justify-content-between align-items-center">
+            <div class="tb-txt d-flex align-items-center gap-3"> 
+                
+                <a href="{{ url_for('dashboard') }}" class="back-btn">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                
+                <div>
+                    <h2 class="page-title mb-0"># Post Announcement</h2>
+                    <p class="page-title-txt mb-0">> Tell the whole block about it</p> 
+                </div>
+                
+            </div>
+            <div class="tb-btn d-none d-md-flex align-items-center justify-content-evenly">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="e.g. Online Enrollment...">
+                </div>
+                
+                <button class="theme-toggle-btn" id="theme-toggle-desktop"><i class="fa-solid fa-moon"></i></button>
+            </div>
+        </div>
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+        <div class="row mt-4">
+            <div class="col-12">
+                <form method="POST" class="add-entry-form">
+                    {{ form.hidden_tag() }}
 
-        {{ form.title.label() }}
-        {{ form.title(placeholder="Enter Title") }}
+                    <div class="mb-4">
+                        <label class="form-label md-code border-0 bg-transparent mb-1">TITLE</label>
+                        {{ form.title(class="form-control form-control-lg", placeholder="e.g., General Assembly Guidelines") }}
+                    </div>
 
-        {{ form.content.label() }}
-        {{ form.content(placeholder="Enter Content") }}
-        
-        {{ form.url.label() }}
-        {{ form.url(placeholder="Enter Url") }}
+                    <div class="mb-4">
+                        <label class="form-label md-code border-0 bg-transparent mb-1">CONTENT</label>
+                        {{ form.content(id="announcement-content") }}
+                    </div>
 
-        {{ form.submit(value="Submit") }}
-    </form>
+                    <div class="mb-4">
+                        <label class="form-label md-code border-0 bg-transparent mb-1">ATTACHED URL (OPTIONAL)</label>
+                        {{ form.url(class="form-control", placeholder="https://...") }}
+                    </div>
 
+                    <div class="form-btn d-flex justify-content-end gap-3 mt-5">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                        {{ form.submit(value="Post", class="btn btn-modal-save") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block script %}
+<script>
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('announcement-content'),
+            theme: "modern",
+            minHeight: "100px", // <--- ADD THIS LINE (Adjust the pixel value to your liking)
+            maxHeight: "250px",
+            spellChecker: false,
+            toolbar: [
+                "bold", "italic", "strikethrough", "|", 
+                "heading-1", "heading-2", "heading-3", "|", 
+                "code", "quote", "|", 
+                "unordered-list", "ordered-list", "|", 
+                "link", "image", "horizontal-rule", "|", 
+                "preview", "side-by-side", "fullscreen", "|", 
+                "guide"
+            ]
+        });
+    </script>
 {% endblock %}

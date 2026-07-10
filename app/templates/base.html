@@ -20,8 +20,9 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
 
     <!-- Font Style -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
     
     {% block head %}{% endblock %}
 </head>
@@ -31,17 +32,52 @@
         {% include 'navbar.html' %}
 
         <!-- The Main Content Area -->
-        <div class="main w-100">
-            
+        <div class="main-content">
             <!-- Mobile-Only Header -->
-            <!-- p-1 bg-dark -->
-            <div class="d-flex d-md-none align-items-center m-nav">
-                <button id="mobile-toggle" type="button">
-                    <i class="bi bi-grid-fill"></i>
-                </button>
-                <div class="sidebar-logo">
-                    <a href="#">KomSy3</a>
+            <div class="d-flex d-md-none align-items-center justify-content-between m-nav position-relative shadow-sm">
+                <div class="m-site-logo d-flex align-items-center">
+                    <button id="mobile-toggle" type="button" class="btn text-white p-2 border-0">
+                        <i class="bi bi-grid-fill fs-5"></i>
+                    </button>
+                    <div class="sidebar-logo ms-2 mb-0">
+                        <a href="{{ url_for('dashboard') }}" class="text-white text-decoration-none fs-4 fw-bold">KomSy3</a>
+                    </div>
                 </div>
+
+                <div class="m-nav-btns d-flex align-items-center justify-content-evenly">
+                    <button id="m-search-trigger">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    
+                    <button class="theme-toggle-btn">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+
+                    {% if is_entry == true %}
+                    <div class="dropdown d-flex align-items-center">
+                        <button class="entry-toggle" type="button" id="mobileAddEntryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="mobileAddEntryDropdown">
+                            <li><a class="dropdown-item md-dropdown-item" href="#"><i class="fa-solid fa-clock"></i> Post Deadline</a></li>
+                            <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_announcement')}}"><i class="fa-solid fa-bullhorn"></i> Post Announcement</a></li>
+                            <li><a class="dropdown-item md-dropdown-item" href="#"><i class="fa-solid fa-book-open"></i> Add Summary</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item md-dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addLinkModal"><i class="fa-solid fa-link"></i> Add Quick Link</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div id="m-search-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center px-3">
+                    <i class="bi bi-search text-white me-2"></i>
+                    <input type="text" class="form-control border-0 " placeholder="Search announcements, deadlines..." autofocus>
+                    <button id="m-search-close" class="btn text-white p-0 ms-3 border-0 fs-4">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+
             </div>
 
             <!-- Dashboard Content Injected Here -->

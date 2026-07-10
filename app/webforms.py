@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField, IntegerField, TimeField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField
+from wtforms.validators import DataRequired, Email, EqualTo, URL
 from wtforms.widgets import TextArea
 from datetime import date, timedelta
 
@@ -41,9 +41,9 @@ class DeadlineForm(FlaskForm):
     submit = SubmitField()
 
 class LinkForm(FlaskForm):
-    title = StringField("Title", validators=[DataRequired()])
-    url = StringField("URL", validators=[DataRequired()], widget=TextArea())
-    submit = SubmitField()
+    title = StringField("Link Title", validators=[DataRequired()])
+    url = URLField("URL", validators=[DataRequired(), URL()], widget=TextArea())
+    submit = SubmitField('Save Link')
 
 class LoginForm(FlaskForm):
     email = StringField(validators=[DataRequired(), Email()])

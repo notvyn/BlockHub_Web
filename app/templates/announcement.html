@@ -3,7 +3,9 @@
 {% block content %}
     <h2>{{ announcement.title }}</h2>
     <p>Posted by: {{ announcement.author.name }} @ {{ announcement.date_posted }}</p>
-    <p>{{ announcement.content }}</p>
+    <div class="full-announcement-content">
+        {{ announcement.content | markdown }}
+    </div>
 
     {% if announcement.url %}
         <p>{{ announcement.url }}</p>

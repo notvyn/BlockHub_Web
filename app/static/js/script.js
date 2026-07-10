@@ -12,6 +12,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Handle Mobile Search Expansion
+    const mSearchTrigger = document.getElementById('m-search-trigger');
+    const mSearchClose = document.getElementById('m-search-close');
+    const mSearchOverlay = document.getElementById('m-search-overlay');
+    const mSearchInput = mSearchOverlay.querySelector('input');
+
+    mSearchTrigger.addEventListener('click', () => {
+        mSearchOverlay.classList.add('active');
+        setTimeout(() => mSearchInput.focus(), 300); // Auto-focuses the keyboard
+    });
+
+    mSearchClose.addEventListener('click', () => {
+        mSearchOverlay.classList.remove('active');
+        mSearchInput.value = ''; // Clears the text when closed
+    });
+
     // Helper function to count visible tasks and update the badge
     function updateDeadlineBadge() {
         const badge = document.getElementById('deadline-badge');
@@ -227,41 +243,194 @@ document.addEventListener('DOMContentLoaded', function() {
         });  
     });
 
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon')
+    // Select ALL buttons with the theme-toggle-btn class
+    const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn');
 
-    // 1. Check if they already have a saved preference
+    // 1. Helper function to sync ALL icons at the same time
+    function updateThemeIcons(isDark) {
+        themeToggleBtns.forEach(btn => {
+            if (isDark) {
+                btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            }
+        });
+    }
+
+    // 2. Check if they already have a saved preference on page load
     const savedTheme = localStorage.getItem('blockhub_theme');
 
     if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        themeIcon.classList.replace('fa-moon', 'fa-sun'); // Change to sun icon
+        updateThemeIcons(true); // Set all to sun
+    } else {
+        updateThemeIcons(false); // Set all to moon
     }
 
-    // 2. The Click Event
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', function(e) {
+    // 3. The Click Event
+    if (themeToggleBtns.length > 0) {
+        themeToggleBtns.forEach(btn => {
+            // Attach the event directly to the specific button (btn.)
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // What is the current theme?
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+
+                if (currentTheme === 'dark') {
+                    // Switch to light
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('blockhub_theme', 'light');
+                    updateThemeIcons(false); // Changes BOTH icons to moon
+                } else {
+                    // Switch to dark
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('blockhub_theme', 'dark');
+                    updateThemeIcons(true); // Changes BOTH icons to sun
+                }
+            });
+        });
+    }
+
+    /* =========================================
+       8. MODAL AJAX SUBMISSION (QUICK LINKS)
+       ========================================= */
+    const addLinkForm = document.getElementById('addLinkForm');
+    
+    if (addLinkForm) {
+        addLinkForm.addEventListener('submit', function(e) {
+            // 1. STOP the page from reloading!
             e.preventDefault();
-
-            // What is the current theme?
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-
-            if (currentTheme === 'dark') {
-                // Switch to light
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('blockhub_theme', 'light');
-                themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
-            }
-            else {
-                // Switch to dark
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('blockhub_theme', 'dark');
-                themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
-            }
-        })
+            
+            // 2. Clear any old error messages
+            document.getElementById('title-error').style.display = 'none';
+            document.getElementById('url-error').style.display = 'none';
+            
+            // 3. Package the form data (automatically grabs CSRF and inputs)
+            const formData = new FormData(this);
+            
+            // 4. Send it silently to Flask
+            fetch('/api/add-link', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // SUCCESS! 
+                    // 1. Close the modal using Bootstrap's JS API
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('addLinkModal'));
+                    modalInstance.hide();
+                    
+                    // 3. Instantly inject the new link into the Quick Links list!
+                    const linkList = document.querySelector('#quick-links .md-list');
+                    if (linkList) {
+                        const newLi = document.createElement('li');
+                        newLi.innerHTML = `<a href="${data.link.url}" target="_blank" class="md-link">${data.link.title}</a>`;
+                        linkList.appendChild(newLi);
+                    }
+                } else {
+                    // ERROR! (e.g., Invalid URL format)
+                    // Inject the WTForms error messages directly under the inputs
+                    if (data.errors.title) {
+                        const err = document.getElementById('title-error');
+                        err.textContent = data.errors.title[0];
+                        err.style.display = 'block';
+                    }
+                    if (data.errors.url) {
+                        const err = document.getElementById('url-error');
+                        err.textContent = data.errors.url[0];
+                        err.style.display = 'block';
+                    }
+                }
+            })
+            .catch(error => console.error('Fetch error:', error));
+        });
     }
 
+    /* =========================================
+       9. LIVE FORM VALIDATION (QUICK LINKS)
+       ========================================= */
+    const titleInput = document.getElementById('title');
+    const urlInput = document.getElementById('url');
+    const titleError = document.getElementById('title-error');
+    const urlError = document.getElementById('url-error');
 
+    function isValidURL(string) {
+        const urlPattern = /^(https?:\/\/)/i;
+        return urlPattern.test(string);
+    }
 
+    // TITLE FIELD LOGIC
+    if (titleInput && titleError) {
+        titleInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                // Invalid State
+                titleError.textContent = 'Please provide a title for the link.';
+                titleError.style.display = 'block';
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            } else {
+                // Success State!
+                titleError.style.display = 'none';
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    }
+
+    // URL FIELD LOGIC
+    if (urlInput && urlError) {
+        urlInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                // Invalid State (Empty)
+                urlError.textContent = 'Please provide a URL.';
+                urlError.style.display = 'block';
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            } else if (!isValidURL(this.value)) {
+                // Invalid State (Bad Format)
+                urlError.textContent = 'URL must start with http:// or https://';
+                urlError.style.display = 'block';
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            } else {
+                // Success State!
+                urlError.style.display = 'none';
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    }
+
+    /* =========================================
+       10. MODAL CLEANUP ROUTINE
+       ========================================= */
+    const addLinkModal = document.getElementById('addLinkModal');
+    
+    // Create a reusable function to scrub everything clean
+    function scrubLinkForm() {
+        const form = document.getElementById('addLinkForm');
+        if (form) form.reset(); // 1. Clear the text
+        
+        // 2. Hide the error messages
+        const tError = document.getElementById('title-error');
+        const uError = document.getElementById('url-error');
+        if (tError) tError.style.display = 'none';
+        if (uError) uError.style.display = 'none';
+        
+        // 3. Strip away all the green/red validation glows
+        const inputs = form.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.classList.remove('is-valid', 'is-invalid');
+        });
+    }
+
+    // Tell Bootstrap to run our scrub function every time the modal closes
+    if (addLinkModal) {
+        addLinkModal.addEventListener('hidden.bs.modal', function () {
+            scrubLinkForm();
+        });
+    }
 
 });

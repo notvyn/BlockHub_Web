@@ -28,6 +28,12 @@ A centralized class management system for CS 2103.
 - Enabled Dark Mode for Dashboard Content.
 - Fixed checkbox logic to properly remove task once clicked.
 - Created Dropdown for creating entries
+- Drafted Announcement Posting Page (has visual bugs)
+
+**July 10, 2026**
+- Fixed Announcement Posting Page visual bug.
+- Changed mobile navbar design to put search, theme, and add button at the top.
+- Organized css files for better styling accessibility.
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

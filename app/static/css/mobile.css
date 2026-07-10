@@ -1,0 +1,149 @@
+/* --- MOBILE RESPONSIVE OVERRIDES --- */
+@media (max-width: 768px) {
+    /* Mobile Header Base Styling */
+    .m-nav {
+        background-color: var(--sidebar-bg);
+        height: 60px; /* Gives the header a sturdy, touch-friendly height */
+        padding: 0 0.5rem;
+    }
+
+    .sidebar-logo {
+        margin-left: 0.5rem; 
+    }
+
+    #m-search-trigger, .theme-toggle-btn, .entry-toggle {
+        width: 40px; 
+        height: 40px;  
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #fff;
+        background-color: transparent;
+        border: none;
+        transition: opacity 0.15s ease-in, transform 0.1s ease-in, backgroundColor 0.1s ease-out;
+    }
+
+    [data-theme='dark'] .entry-toggle {
+        background-color: var(--sidebar-bg) !important;
+    }
+
+    #m-search-trigger:hover, .theme-toggle-btn:hover, .entry-toggle:hover {
+        border-radius: 50%;
+        background-color: var(--text-muted) !important;
+        transform: scale(1.05);
+        opacity: 0.7;
+    }
+
+    #m-search-close {
+        transition: opacity 0.05s ease-in, transform 0.05s ease-in;
+    }
+
+    #m-search-close:hover {
+        transform: scale(1.05);
+        opacity: 0.7;
+    }
+
+    #m-search-close:active {
+        transform: scale(0.85);
+    }
+
+    #m-search-trigger:active, .theme-toggle-btn:active, .entry-toggle:active {
+        border-radius: 50%;
+        background-color: var(--accent-purple) !important;
+        transform: scale(0.8);
+    }
+
+    #m-search-overlay {
+        border: none;
+        background-color: var(--sidebar-bg); 
+        z-index: 20; 
+        clip-path: inset(0 0 0 100%); 
+        transition: clip-path 0.3s ease-in-out;
+    }
+
+    #m-search-overlay .form-control {
+        background-color: var(--main-bg);
+        color: var(--text-dark);
+    }
+    
+    /* Search Overlay Animation State */
+    #m-search-overlay.active {
+        clip-path: inset(0 0 0 0) !important; /* Expands the search bar to full width */
+    }
+    
+    /* Ensure inputs look clean on iOS/Android */
+    #m-search-overlay input:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    /* --- SIDEBAR --- */
+    #sidebar {
+        /* Detach it from the layout and make it float over the content */
+        position: fixed;
+        top: 0;
+        left: -260px; /* Hide it entirely off the left side of the screen */
+        height: 100vh;
+        z-index: 1050; /* Ensure it floats above absolutely everything */
+        width: 260px; /* When open, it should be full size, not 70px */
+    }
+
+    /* When the Javascript adds the 'expand' class, slide it into view */
+    #sidebar.expand {
+        left: 0; 
+    }
+
+    /* Ensure the text is always visible on mobile when opened */
+    #sidebar .sidebar-logo,
+    #sidebar a.sidebar-link span {
+        display: inline; 
+    }
+
+    /* --- DASHBOARD --- */
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .top-bar > .d-flex {
+        width: 100%;
+        align-content: center;
+    }
+    .md-section .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .md-h2 {
+        margin-bottom: 0;
+        font-size: 1.1rem;
+    }
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    /* 1. Ensure the normal state has a smooth transition */
+    .wrapper > div,
+    .wrapper > main {
+        transition: filter 0.3s ease-in-out;
+    }
+
+    /* 2. The Sibling Selector Trick! 
+       When #sidebar has .expand, apply these styles to the main content next to it */
+    #sidebar.expand ~ div,
+    #sidebar.expand ~ main {
+        filter: contrast(0.6) brightness(0.7); /* Soft Wash (Low Contrast) */
+        pointer-events: none; /* Prevents accidentally clicking dashboard buttons through the blur */
+        user-select: none; /* Prevents accidental text highlighting */
+    }
+}
+
+/* --- MOBILE RESPONSIVE OVERRIDES --- */
+@media (max-width: 992px) {
+    #quick-links {
+        order: 2;
+    }
+    #latest-summary {
+        order: 1;
+    }
+}

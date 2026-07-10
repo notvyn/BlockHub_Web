@@ -5,6 +5,8 @@ from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 from datetime import date, timedelta
+from markupsafe import Markup
+import markdown
 
 from app import app, login_manager, db
 
@@ -15,6 +17,12 @@ from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, Deadlin
 def load_user(user_id):
     # This looks up the user in your database by their ID
     return User.query.get(int(user_id))
+
+# Add this custom filter to your Flask app
+@app.template_filter('markdown')
+def markdown_filter(text):
+    # This converts the Markdown to HTML, and Markup() tells Jinja it is safe to render
+    return Markup(markdown.markdown(text))
 
 # --- Add this new route anywhere in routes.py ---
 @app.route('/complete-deadline/<int:id>', methods=['POST'])
@@ -87,7 +95,7 @@ def dashboard():
     class_summary_form = DeadlineForm()
     deadline_form = DeadlineForm()
     
-    announcement = Announcement.query.order_by(Announcement.date_posted).all()
+    announcement = Announcement.query.order_by(Announcement.date_posted.desc()).all()
 
     # THE FIX: Only check read receipts if they are actually logged in
     read_announcement_ids = []
@@ -103,6 +111,7 @@ def dashboard():
     # class_summary = ClassSummary.query.order_by(ClassSummary.scheduled_date).all()
 
     link = Link.query.order_by(Link.date_added).all()
+    link_form = LinkForm()
 
     today = date.today()
 
@@ -163,9 +172,11 @@ def dashboard():
         target_record=target_record,
         daily_summaries=daily_summaries,
         link=link,
+        link_form=link_form,
         user=user,
         today=today,
         end_of_week=end_of_week,
+        is_entry=True
     )
 
 @app.route('/add-entry/announcement', methods=['GET', 'POST'])
@@ -299,6 +310,32 @@ def add_link():
         return redirect(url_for('add_link'))
 
     return render_template('add-link.html', form=form)
+
+@app.route('/api/add-link', methods=['POST'])
+def add_link_api():
+    form = LinkForm()
+    
+    # WTForms automatically checks the CSRF token and the URL format here!
+    if form.validate_on_submit():
+        new_link = Link(
+            title=form.title.data, 
+            url=form.url.data,
+            # user_id=current_user.id  # If your links are tied to specific users
+        )
+        db.session.add(new_link)
+        db.session.commit()
+        
+        # Send back a success message and the new data
+        return jsonify({
+            'success': True,
+            'link': {'title': new_link.title, 'url': new_link.url}
+        })
+        
+    # If validation fails, send back the exact error messages
+    return jsonify({
+        'success': False,
+        'errors': form.errors
+    }), 400
 
 @app.route('/announcements/<int:id>')
 def announcement(id):
