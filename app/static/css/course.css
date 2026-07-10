@@ -1,0 +1,57 @@
+/* --- COURSE FLEX CARDS --- */
+.course-card {
+    background-color: #ffffff; 
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); 
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+.course-title {
+    color: var(--text-dark);
+}
+
+/* Mobile Responsive Fixes for Columns */
+@media (max-width: 768px) {
+    .course-schedules.border-start {
+        /* Flips the vertical border to a horizontal divider on mobile */
+        border-left: none !important;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        padding-left: 0 !important;
+    }
+    
+    .course-actions {
+        align-items: flex-start !important; /* Aligns buttons to the left on mobile */
+    }
+}
+
+/* --- DARK MODE ADAPTATIONS --- */
+[data-theme="dark"] .course-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .course-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .course-title {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .course-schedules.border-start {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ensure the instructor name turns white in dark mode */
+[data-theme="dark"] .course-card span.text-dark {
+    color: #ffffff !important;
+}

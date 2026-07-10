@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/course.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Courses{% endblock %}
+{% block page_title_txt %}Success is one step ahead! :}{% endblock %}
+
+{% block content %}
+    <div class="courses-list mt-4">
+        {% for c in courses %}
+            <div class="course-card d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+                
+                <div class="course-core flex-grow-1" style="flex: 1 1 40%; min-width: 0;">
+                    <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Course Code: {{ c.code }}</div>
+                    <div class="course-title fs-5 fw-bold mb-1 text-truncate" title="{{ c.title }}">{{ c.title }}</div>
+                    <div class="text-muted" style="font-size: 0.85rem;">
+                        Instructor: <span class="fw-medium text-dark">{{ c.instructor }}</span>
+                    </div>
+                </div>
+
+                <div class="course-schedules flex-grow-1 border-start px-md-4" style="flex: 1 1 40%; min-width: 0;">
+                    <div class="text-muted fw-bold mb-2" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Schedules:</div>
+                    <!-- <div style="font-size: 0.85rem; color: var(--text-dark);">
+                        {% if c.schedules %}
+                            <ul class="list-unstyled mb-0">
+                            {% for sched in c.schedules %}
+                                <li class="mb-1"><i class="fa-regular fa-clock me-2 text-muted" style="font-size: 0.8rem;"></i>{{ sched.day }}, {{ sched.start_time }} - {{ sched.end_time }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted fst-italic">No schedule set</span>
+                        {% endif %}
+                    </div> -->
+                </div>
+
+                <div class="course-actions d-flex flex-column align-items-md-end justify-content-center mt-3 mt-md-0 ps-md-3" style="flex: 1 1 20%; min-width: 140px;">
+                    <div class="d-flex gap-2 mb-2">
+                        <a href="#" class="btn btn-view-post" style="padding: 0.4rem 0.8rem;">Add Schedule</a>
+                        
+                        <a href="#" class="btn btn-icon-action" title="Edit">
+                            <i class="fa-solid fa-pencil"></i>
+                        </a>
+                        <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ c.id }}" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="fw-bold mt-1" style="color: var(--accent-purple); font-size: 0.9rem;">
+                        Units: {{ "%.2f"|format(c.units) }}
+                    </div>
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

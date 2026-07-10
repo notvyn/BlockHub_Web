@@ -343,6 +343,28 @@ def announcement(id):
     announcement = Announcement.query.get_or_404(id)
     return render_template('announcement.html', announcement=announcement)
 
+@app.route('/announcements')
+def announcements():
+    announcements = Announcement.query.order_by(Announcement.date_posted).all()
+    return render_template('announcements.html', announcements=announcements, is_entry=True)
+
+@app.route('/deadlines')
+def deadlines():
+    deadlines = Deadline.query.order_by(Deadline.due_date).all()
+    today = date.today()
+    return render_template('deadlines.html', deadlines=deadlines, today=today, is_entry=True)
+
+@app.route('/courses')
+def courses():
+    courses = Course.query.order_by(Course.date_added).all()
+    return render_template('courses.html', courses=courses, is_entry=True)
+
+@app.route('/class-summaries')
+def summaries():
+    summaries = ClassSummary.query.order_by(ClassSummary.date_added).all()
+    return render_template('summaries.html', summaries=summaries, is_entry=True)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()

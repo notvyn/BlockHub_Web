@@ -1,0 +1,105 @@
+/* --- DEADLINE FLEX CARDS --- */
+.deadline-card {
+    background-color: var(--main-bg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    
+    /* Squaring off the right corners for the color strip */
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deadline-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+}
+
+.dl-title {
+    color: var(--text-dark);
+}
+
+/* Mobile Responsive Fixes */
+@media (max-width: 768px) {
+    .dl-notes.border-start {
+        /* Removes the vertical divider line on mobile and turns it into a horizontal one */
+        border-left: none !important;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        padding-left: 0 !important;
+    }
+}
+
+/* --- DARK MODE ADAPTATIONS --- */
+[data-theme="dark"] .deadline-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .deadline-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .dl-title {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .dl-notes.border-start {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Make sure the text inside the note respects dark mode */
+[data-theme="dark"] .dl-notes div:last-child {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+
+
+/* --- DEADLINE FLEX CARDS --- */
+.deadline-card {
+    /* Changed to pure white so it stands out against the cream background */
+    background-color: #ffffff; 
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    padding: 1.5rem;
+    
+    /* Added a permanent, soft shadow to lift it off the page */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); 
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deadline-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* --- COLUMN LOCKS (Prevents Overlap) --- */
+.dl-core {
+    flex: 1 1 45%; /* Always takes up 45% of the card */
+    min-width: 0;  /* Crucial: Prevents long titles from pushing the column wider */
+    padding-right: 1rem;
+}
+
+.dl-notes {
+    flex: 1 1 35%; /* Always takes up 35% of the card */
+    min-width: 0; 
+}
+
+.dl-actions {
+    flex: 1 1 20%; /* Always takes up 20% of the card */
+    min-width: 120px; /* Guarantees the buttons never get crushed */
+}
+
+/* --- DARK MODE OVERRIDES (Keep these exactly the same) --- */
+[data-theme="dark"] .deadline-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .deadline-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}

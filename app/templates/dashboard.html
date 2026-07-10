@@ -26,7 +26,7 @@
                 <!-- Obsidian Style Deadlines -->
                 <div class="md-section">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="#" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('deadlines') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Upcoming Deadlines</div>
                             <span id="deadline-badge" class="badge bg-danger rounded-pill">{{ total_deadline }}</span>
                             <i class="fa-solid fa-chevron-right text-muted"></i>
@@ -82,7 +82,7 @@
                 <!-- Obsidian Style Announcements -->
                 <div class="md-section">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="#" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('announcements') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Recent Announcements</div>
                             <span id="announcement-badge" class="badge bg-danger rounded-pill" style="display: none;">0</span>
                             <i class="fa-solid fa-chevron-right text-muted"></i>
@@ -137,7 +137,7 @@
                 <!-- Class Summary -->
                 <div class="md-section" id="latest-summary">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="#" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('summaries') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Latest Summary</div>
                                 <!-- <span class="badge bg-danger rounded-pill">{{ total_deadline }}</span> -->
                                 <i class="fa-solid fa-chevron-right text-muted"></i>

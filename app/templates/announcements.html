@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/announcement.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Announcements{% endblock %}
+{% block page_title_txt %}New Chika around the corner ;P{% endblock %}
+
+{% block content %}
+    <div class="masonry-grid mt-4">
+        {% for a in announcements %}
+        <div class="announcement-card d-flex flex-column">
+            
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="{{ url_for('announcement', id=a.id)}}" class="announcement-link card-title" data-id="{{ a.id }}">{{ a.title }}</a>
+                
+                {% if a.id not in read_ids %}
+                    <span class="badge bg-danger rounded-pill" style="font-size: 0.65rem; letter-spacing: 0.5px;">NEW</span>
+                {% endif %}
+            </div>
+            
+            <div class="card-meta">Posted by: {{ a.author.name }} @ {{ a.date_posted.strftime("%a - %b %d, %Y | %I:%M %p") }}</div>
+            
+            <div class="card-content mt-3">
+                {{ a.content | markdown }}
+            </div>
+            
+            {% if a.url %}
+            <div class="card-attached mt-3 pt-3 border-top">
+                <span class="text-muted" style="font-size: 0.8rem;">Attached Link:</span><br>
+                <a href="{{ a.url }}" target="_blank" class="fw-bold text-decoration-none" style="color: var(--accent-purple);">
+                    <i class="fa-solid fa-link me-1"></i> Link
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="card-actions d-flex justify-content-end gap-2 align-items-center mt-auto pt-4">
+                
+                <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-view-post">View Post</a>
+                
+                {% if current_user.id == a.author.id %}
+                
+                    <a href="#" class="btn btn-icon-action" title="Edit">
+                        <i class="fa-solid fa-pencil"></i>
+                    </a>
+                    
+                    <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" title="Delete">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                {% endif %}
+                
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

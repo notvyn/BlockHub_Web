@@ -35,6 +35,7 @@ A centralized class management system for CS 2103.
 - Changed mobile navbar design to put search, theme, and add button at the top.
 - Organized css files for better styling accessibility.
 - Created Summary, Deadline, and Course Form Page
+- Drafted dedicated pages of each content
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -43,7 +44,10 @@ A centralized class management system for CS 2103.
 - [/] Enable Dark Mode.
 - [/] Enable dropdown for adding entry.
 - [ ] Build Search Feature.
-- [ ] Construct Templates for entries.
+- [/] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
 - [ ] Fix total deadline visual number
+- [ ] Fix style and structure dedicated pages for each content (i.e. Announcement, Courses, Deadlines, Summaries)
+- [ ] Create new model for Courses' schedule
+- [ ] Include total number of content and other labels on each dedicated pages
 

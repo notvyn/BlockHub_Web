@@ -1,0 +1,36 @@
+/* --- CLASS SUMMARY CARDS --- */
+.summary-card {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* --- DARK MODE ADAPTATIONS --- */
+[data-theme="dark"] .summary-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .summary-course-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .summary-note.border-top {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .summary-note .text-dark {
+    color: rgba(255, 255, 255, 0.8) !important;
+}

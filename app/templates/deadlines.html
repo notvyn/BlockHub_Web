@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/deadline.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Deadlines{% endblock %}
+{% block page_title_txt %}Being productive right now! ;>{% endblock %}
+
+{% block content %}
+    <div class="deadlines-list mt-4">
+        {% for d in deadlines %}
+            {% set days_left = (d.due_date - today).days %}
+
+            {% if days_left <= 2 %}
+                {% set urgency_color = '#dc3545' %} {% elif days_left <= 7 %}
+                {% set urgency_color = '#ffc107' %} {% else %}
+                {% set urgency_color = '#0dcaf0' %} {% endif %}
+
+            <div class="deadline-card d-flex flex-column flex-md-row justify-content-between gap-3 mb-3" style="border-right: 6px solid {{ urgency_color }};">
+                
+                <div class="dl-core flex-grow-1">
+                    <div class="md-code mb-1 border-0 bg-transparent p-0">{{ d.course.code }} | {{ d.category }}</div>
+                    <div class="dl-title fs-5 fw-bold mb-1">{{ d.description }}</div>
+                    <div class="text-muted" style="font-size: 0.85rem;">
+                        Submission: {{ d.due_date.strftime("%A - %B %d, %Y") }}
+                    </div>
+                </div>
+
+                <div class="dl-notes flex-grow-1 border-start px-md-4">
+                    <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
+                    <div style="font-size: 0.85rem; color: var(--text-dark);">
+                        {{ d.note if d.note else "No additional notes provided." }}
+                    </div>
+                </div>
+
+                <div class="dl-actions d-flex flex-column align-items-md-end justify-content-center mt-3 mt-md-0 ps-md-3">
+                    <div class="d-flex gap-2 mb-2">
+
+                            <a href="#" class="btn btn-icon-action" title="Edit">
+                                <i class="fa-solid fa-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ d.id }}" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+
+                    </div>
+                    <div class="text-muted" style="font-size: 0.8rem;">
+                        Status: <span class="fw-bold">{{ d.status }}</span>
+                    </div>
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,125 @@
+/* --- THE MASONRY CONTAINER --- */
+.masonry-grid {
+    column-count: 1; /* 1 column on mobile */
+    column-gap: 1.5rem; /* Space between the left and right columns */
+}
+
+/* Switch to 2 columns on tablets and desktops */
+@media (min-width: 768px) {
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+
+/* --- THE CARD STYLING --- */
+.announcement-card {
+    background-color: var(--main-bg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem; /* Pushes the next card down vertically */
+    break-inside: avoid; /* The magic rule: Prevents the card from splitting across columns */
+    
+    /* Adds a subtle hover float effect for a premium feel */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.announcement-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Typography matching the old design */
+.card-title {
+    color: var(--accent-purple);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.card-content {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* --- DARK MODE ADAPTATIONS --- */
+[data-theme="dark"] .announcement-card {
+    background-color: rgba(255, 255, 255, 0.03); /* Soft elevation wash */
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .card-attached.border-top {
+    border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .announcement-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* --- CARD ACTION BUTTONS --- */
+.btn-view-post {
+    background-color: var(--accent-purple);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.4rem 1.2rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-view-post:hover {
+    background-color: var(--text-dark);
+    color: var(--main-bg);
+}
+
+.btn-icon-action {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Default hover for the pencil edit icon */
+.btn-icon-action:hover {
+    background-color: var(--accent-purple);
+    color: #ffffff;
+    border-color: var(--accent-purple);
+}
+
+/* Specific hover effect for the trash delete icon */
+.btn-delete:hover {
+    background-color: #dc3545; /* Bootstrap danger red */
+    color: #ffffff;
+    border-color: #dc3545;
+}
+
+/* --- DARK MODE BUTTON OVERRIDES --- */
+[data-theme="dark"] .btn-view-post {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .btn-icon-action {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .btn-icon-action:hover {
+    color: #ffffff;
+    background-color: var(--accent-purple);
+}
+
+[data-theme="dark"] .btn-delete:hover {
+    background-color: #dc3545; 
+}
