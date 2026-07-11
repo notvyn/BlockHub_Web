@@ -21,6 +21,16 @@ class AnnouncementRead(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     announcement_id = db.Column(db.Integer, db.ForeignKey('announcement.id'), nullable=False)
 
+class AnnouncementHeart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # The user who clicked the heart
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # The announcement they hearted
+    announcement_id = db.Column(db.Integer, db.ForeignKey('announcement.id'), nullable=False)
+    
+    # Optional: Track when they liked it
+    date_hearted = db.Column(db.DateTime, default=datetime.utcnow)
+
 class ClassSummary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     

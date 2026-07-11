@@ -1,71 +1,147 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <link href="{{ url_for('static', filename='css/announcement.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
 {% endblock %}
 
 {% block page_title %}Announcements{% endblock %}
-{% block page_title_txt %}New Chika Around the Corner ;P{% endblock %}
-{% block total_num %}Announcements: {{ announcements|length }} {% endblock %}
+{% block page_title_txt %}New Sagap Around the Corner ;P{% endblock %}
+{% block total_num %}Total Announcements: {{ announcements|length }} {% endblock %}
 
 {% block content %}
-    <div class="feed-container mx-auto mt-4" >
+    <div class="card-container" >
     
         {% for a in announcements %}
-        <div class="feed-card mb-4 d-flex flex-column">
+        <div class="card-wrapper announcement-card d-flex flex-column">
             
             <!-- HEADER: Author, Date, and Badges -->
             <div class="d-flex justify-content-between align-items-start mb-3">
-                <div class="d-flex align-items-center gap-3">
+                <div class="auth-wrapper">
                     <!-- Placeholder for an avatar, optional but looks great in feeds -->
-                    <div class="author-avatar bg-dark-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                        <i class="fa-solid fa-user text-muted"></i>
+                    <div class="author-avatar rounded-circle">
+                        <i class="fa-solid fa-user"></i>
                     </div>
-                    <div>
-                        <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ a.author.name }}</div>
-                        <div class="text-muted" style="font-size: 0.8rem;">{{ a.date_posted.strftime("%A - %b %d, %Y | %I:%M %p") }}</div>
+                    <div class="auth-txt">
+                        <div class="auth-name">{{ a.author.name }}</div>
+                        <div class="auth-posted">{{ a.date_posted.strftime("%A - %b %d, %Y | %I:%M %p") }}</div>
                     </div>
                 </div>
+
+                {% if current_user.id == a.author.id %}
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('update_announcement', id=a.id)}}" class="btn btn-icon-action" title="Edit">
+                            <i class="fa-solid fa-pencil"></i>
+                        </a>
+                        <a href="{{ url_for('delete_announcement', id=a.id) }}" type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </div>
+                {% endif %}
+                
             </div>
 
             <!-- TITLE -->
             <div>
-                <a href="{{ url_for('announcement', id=a.id) }}" class="fw-bold mb-2" style="color: var(--accent-purple);">{{ a.title }}</a>
+                <a href="{{ url_for('announcement', id=a.id) }}" class="card-title">{{ a.title }}</a>
                 {% if a.id not in read_ids %}
                     <span class="badge bg-danger rounded-pill" style="font-size: 0.7rem;">NEW</span>
                 {% endif %}
             </div>
 
+            <!-- 1. Split the data using our new Python filters -->
+            {% set images = a.content | extract_images %}
+            {% set text_only = a.content | remove_images %}
+
             <!-- CONTENT: Truncated to prevent massive walls of text -->
-            <div class="feed-content text-muted mb-3" style="font-size: 0.9rem; line-height: 1.6;">
+            <div class="card-content">
                 <!-- striptags removes Markdown/HTML formatting so it truncates cleanly -->
-                {{ a.content | markdown | striptags | truncate(250, True, '...') }}
+                {{ text_only | markdown | truncate(300, True, '...') }}
             </div>
 
-            <!-- CONDITIONAL LINK -->
+            <!-- 3. Render the Image Gallery BELOW the text -->
+            {% if images %}
+                <div class="feed-image-gallery mb-3">
+                    {% for alt, url in images %}
+                        <img src="{{ url }}" 
+                            alt="{{ alt }}" 
+                            class="feed-image"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#imageLightboxModal" 
+                            data-img-url="{{ url }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- CONDITIONAL LINKS -->
             {% if a.url %}
-            <div class="feed-link mb-3 p-2 bg-dark-subtle rounded border" style="font-size: 0.85rem;">
-                <i class="fa-solid fa-link me-2 text-muted"></i>
-                <a href="{{ a.url }}" target="_blank" class="text-decoration-none fw-bold" style="color: var(--accent-purple);">Attached Resource Link</a>
-            </div>
+                {% set attached_links = a.url | parse_links %}
+                
+                <div class="card-links">
+                    
+                    <!-- Scenario A: The links were formatted with [Title](URL) -->
+                    {% if attached_links %}
+                        <div class="d-flex justify-content-start gap-3">
+                            {% for title, link_url in attached_links %}
+                                <a href="{{ link_url }}" target="_blank" class="attached-link-card">
+                                    <i class="fa-solid fa-link me-2"></i>
+                                    <span>{{ title }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                        
+                    <!-- Scenario B: Fallback for raw URLs already in the database -->
+                    {% else %}
+                        <a href="{{ a.url }}" target="_blank" class="attached-link-card">
+                            <i class="fa-solid fa-link me-2"></i>
+                            <span>{{ a.url }}</span>
+                            </div>
+                        </a>
+                    {% endif %}
+                    
+                </div>
             {% endif %}
 
             <!-- FOOTER: Read Receipts & Reactions -->
-            <div class="feed-footer mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+            <div class="card-footer ">
                 
                 <!-- Read By List (UI Mockup) -->
-                <div class="read-receipts text-muted" style="font-size: 0.75rem;">
+                <div class="read-receipts">
                     <i class="fa-solid fa-eye me-1"></i> 
-                    <!-- You will need to write the Jinja logic to count your readers here -->
-                    Read by <strong>John S.</strong> and <strong>14 others</strong>
+                    
+                    <!-- Grab the specific stats for this announcement -->
+                    {% set stats = read_stats[a.id] %}
+                    
+                    <!-- Scenario 1: Nobody has read it -->
+                    {% if stats.count == 0 %}
+                        Not read yet
+                        
+                    <!-- Scenario 2: Exactly one person read it -->
+                    {% elif stats.count == 1 %}
+                        Read by <strong>{{ stats.first_reader }}</strong>
+                        
+                    <!-- Scenario 3: Multiple people read it -->
+                    {% else %}
+                        <!-- We subtract 1 from the total count because the first reader is already named! -->
+                        Read by <strong>{{ stats.first_reader }}</strong> and <strong>{{ stats.count - 1 }} others</strong>
+                    {% endif %}
                 </div>
 
                 <!-- Actions: Reactions & Read More -->
                 <div class="d-flex gap-2">
                     <!-- Reaction Button Mockup -->
-                    <button class="btn btn-icon-action rounded-pill px-3 d-flex align-items-center gap-2" title="Acknowledge">
-                        <i class="fa-regular fa-heart"></i>
-                        <span style="font-size: 0.8rem;">12</span>
+                    <!-- We need a data-id attribute so JS knows WHICH post was clicked -->
+                    <button class="btn btn-icon-action rounded-pill heart-btn" data-id="{{ a.id }}" title="Heart">
+    
+                        <!-- Check if the current user already hearted this post -->
+                        {% if a.id in user_hearted_ids %}
+                            <i class="heart-icon fa-solid fa-heart text-danger"></i>
+                        {% else %}
+                            <i class="heart-icon fa-regular fa-heart"></i> 
+                        {% endif %}
+                        
+                        <!-- Display the specific total count for this post -->
+                        <span class="heart-count">{{ heart_counts[a.id] }}</span>
+                        
                     </button>
                     
                     <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-view-post">View Full Post</a>
@@ -74,6 +150,5 @@
 
         </div>
         {% endfor %}
-
     </div>
 {% endblock %}

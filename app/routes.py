@@ -5,24 +5,28 @@ from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 from datetime import date, timedelta
-from markupsafe import Markup
-import markdown
 
 from app import app, login_manager, db
 
-from app.models import User, Announcement, AnnouncementRead, ClassSummary, Course, Deadline, Link
+import cloudinary
+import cloudinary.uploader
+
+from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, Deadline, Link
 from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, DeadlineForm, LinkForm, LoginForm, SignupForm
+from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter
 
 @login_manager.user_loader
 def load_user(user_id):
     # This looks up the user in your database by their ID
     return User.query.get(int(user_id))
 
-# Add this custom filter to your Flask app
-@app.template_filter('markdown')
-def markdown_filter(text):
-    # This converts the Markdown to HTML, and Markup() tells Jinja it is safe to render
-    return Markup(markdown.markdown(text))
+@app.context_processor
+def inject_global_forms():
+    """
+    This makes the LinkForm available to every single HTML template automatically,
+    so our global modal.html never crashes.
+    """
+    return dict(link_form=LinkForm())
 
 @app.route('/complete-deadline/<int:id>', methods=['POST'])
 def complete_deadline(id):
@@ -93,13 +97,57 @@ def sync_guest_reads():
     
     return jsonify({"status": "success"})
 
+@app.route('/toggle-heart/<int:announcement_id>', methods=['POST'])
+def toggle_heart(announcement_id):
+    # Check if the user already hearted this announcement
+    existing_heart = AnnouncementHeart.query.filter_by(
+        user_id=current_user.id, 
+        announcement_id=announcement_id
+    ).first()
+
+    if existing_heart:
+        # If it exists, they are "un-hearting" it
+        db.session.delete(existing_heart)
+        is_hearted = False
+    else:
+        # If it doesn't exist, they are "hearting" it
+        new_heart = AnnouncementHeart(user_id=current_user.id, announcement_id=announcement_id)
+        db.session.add(new_heart)
+        is_hearted = True
+        
+    db.session.commit()
+
+    # Count the new total of hearts for this announcement
+    total_hearts = AnnouncementHeart.query.filter_by(announcement_id=announcement_id).count()
+
+    # Send the data back to the JavaScript
+    return jsonify({'success': True, 'is_hearted': is_hearted, 'total_hearts': total_hearts})
+
+@app.route('/upload-image', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
+
+    file = request.files['image']
+    
+    try:
+        # NEW: Tell Cloudinary to auto-detect if it's an image, video, or raw file (like a PDF)
+        upload_result = cloudinary.uploader.upload(file, resource_type='auto')
+        
+        image_url = upload_result.get("secure_url")
+        
+        return jsonify({'data': {'filePath': image_url}})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     announcement_form = AnnouncementForm()
     class_summary_form = DeadlineForm()
     deadline_form = DeadlineForm()
-    link_form = LinkForm()
     
     # ---------------------------------------------------------
     # 1. TOTAL COUNTS (The highly optimized database way)
@@ -232,11 +280,9 @@ def dashboard():
         target_record=target_record,
         daily_summaries=daily_summaries,
         links=links,
-        link_form=link_form,
         user=user,
         today=today,
-        end_of_week=end_of_week,
-        is_entry=True
+        end_of_week=end_of_week
     )
 
 @app.route('/add-entry/announcement', methods=['GET', 'POST'])
@@ -261,7 +307,7 @@ def add_announcement():
 
         return redirect(url_for('add_announcement'))
 
-    return render_template('add-announcement.html', form=form)
+    return render_template('add-announcement.html', form=form, has_back_btn=True, is_entry=True)
 
 @app.route('/add-entry/class-summary', methods=['GET', 'POST'])
 def add_summary():
@@ -287,7 +333,7 @@ def add_summary():
         db.session.commit()
 
         return redirect(url_for('add_summary'))
-    return render_template('add-summary.html', form=form)
+    return render_template('add-summary.html', form=form, has_back_btn=True, is_entry=True)
 
 @app.route('/add-entry/course', methods=['GET', 'POST'])
 def add_course():
@@ -313,7 +359,7 @@ def add_course():
 
         return redirect(url_for('add_course'))
     
-    return render_template('add-course.html', form=form)
+    return render_template('add-course.html', form=form, has_back_btn=True, is_entry=True)
 
 @app.route('/add-entry/deadline', methods=['GET', 'POST'])
 def add_deadline():
@@ -349,27 +395,27 @@ def add_deadline():
 
         return redirect(url_for('add_deadline'))
 
-    return render_template('add-deadline.html', form=form)
+    return render_template('add-deadline.html', form=form, has_back_btn=True, is_entry=True)
 
-@app.route('/add-entry/link', methods=['GET', 'POST'])
-def add_link():
-    form = LinkForm()
+# @app.route('/add-entry/link', methods=['GET', 'POST'])
+# def add_link():
+#     form = LinkForm()
 
-    if form.validate_on_submit():
-        new_link = Link(
-            title=form.title.data,
-            url=form.url.data
-        )
+#     if form.validate_on_submit():
+#         new_link = Link(
+#             title=form.title.data,
+#             url=form.url.data
+#         )
 
-        form.title.data = ''
-        form.url.data = ''
+#         form.title.data = ''
+#         form.url.data = ''
 
-        db.session.add(new_link)
-        db.session.commit()
+#         db.session.add(new_link)
+#         db.session.commit()
 
-        return redirect(url_for('add_link'))
+#         return redirect(url_for('add_link'))
 
-    return render_template('add-link.html', form=form)
+#     return render_template('add-link.html', form=form)
 
 @app.route('/api/add-link', methods=['POST'])
 def add_link_api():
@@ -400,28 +446,189 @@ def add_link_api():
 @app.route('/announcements/<int:id>')
 def announcement(id):
     announcement = Announcement.query.get_or_404(id)
-    return render_template('announcement.html', announcement=announcement)
+    
+    read_stats = {}
+    
+    # --- Heart Logic ---
+    heart_counts = AnnouncementHeart.query.filter_by(announcement_id=id).count()
+        
+    # --- Read Receipt Logic (For the "Read by X" footer) ---
+    read_count = AnnouncementRead.query.filter_by(announcement_id=id).count()
+        
+    if read_count > 0:
+        first_read = AnnouncementRead.query.filter_by(announcement_id=id).first()
+        first_user = User.query.get(first_read.user_id)
+            
+        # Format the name
+        name_parts = first_user.name.split()
+        if len(name_parts) > 1:
+            display_name = f"{name_parts[0]} {name_parts[-1][0]}."
+        else:
+            display_name = first_user.name
+                
+        read_stats[id] = {
+            'count': read_count,
+            'first_reader': display_name
+        }
+    else:
+        read_stats[id] = {
+            'count': 0,
+            'first_reader': None
+        }
+
+    # 4. Fetch the CURRENT USER'S specific interactions
+    # FIX: Define this variable outside the if-statement so logged-out users don't crash the page!
+    user_hearted = []
+    
+    if current_user.is_authenticated:
+        # FIX: Filter by BOTH the user's ID and the announcement ID
+        heart_record = AnnouncementHeart.query.filter_by(
+            user_id=current_user.id, 
+            announcement_id=id
+        ).first()
+        
+        # FIX: If a record exists, append the ID so your HTML {% if announcement.id in user_hearted %} works
+        if heart_record:
+            user_hearted.append(id)
+        
+    # 5. Pass it all to the template
+    return render_template('announcement.html', 
+                           announcement=announcement, 
+                           heart_counts=heart_counts, 
+                           user_hearted=user_hearted,
+                           read_stats=read_stats,
+                           has_back_btn=True, 
+                           is_dedicated_page=True)
 
 @app.route('/announcements')
 def announcements():
+    # 1. Fetch all announcements, newest first
     announcements = Announcement.query.order_by(Announcement.date_posted.desc()).all()
-    return render_template('announcements.html', announcements=announcements, is_entry=True, is_dedicated_page=True)
+    
+    # 2. Prepare empty containers for our frontend data
+    heart_counts = {}
+    user_hearted_ids = []
+    read_stats = {}
+    read_ids = [] # <-- NEW: Container for the logged-in user's read receipts
+    
+    # 3. Process data for EACH announcement
+    for a in announcements:
+        # --- Heart Logic ---
+        count = AnnouncementHeart.query.filter_by(announcement_id=a.id).count()
+        heart_counts[a.id] = count
+        
+        # --- Read Receipt Logic (For the "Read by X" footer) ---
+        read_count = AnnouncementRead.query.filter_by(announcement_id=a.id).count()
+        
+        if read_count > 0:
+            first_read = AnnouncementRead.query.filter_by(announcement_id=a.id).first()
+            first_user = User.query.get(first_read.user_id)
+            
+            # Format the name
+            name_parts = first_user.name.split()
+            if len(name_parts) > 1:
+                display_name = f"{name_parts[0]} {name_parts[-1][0]}."
+            else:
+                display_name = first_user.name
+                
+            read_stats[a.id] = {
+                'count': read_count,
+                'first_reader': display_name
+            }
+        else:
+            read_stats[a.id] = {
+                'count': 0,
+                'first_reader': None
+            }
+
+    # 4. Fetch the CURRENT USER'S specific interactions
+    if current_user.is_authenticated:
+        # What have they hearted?
+        user_hearts = AnnouncementHeart.query.filter_by(user_id=current_user.id).all()
+        user_hearted_ids = [heart.announcement_id for heart in user_hearts]
+        
+        # What have they read? (For the NEW tag)
+        read_records = AnnouncementRead.query.filter_by(user_id=current_user.id).all()
+        read_ids = [record.announcement_id for record in read_records]
+        
+    # 5. Pass it all to the template
+    return render_template('announcements.html', 
+                           announcements=announcements, 
+                           heart_counts=heart_counts, 
+                           user_hearted_ids=user_hearted_ids,
+                           read_stats=read_stats,
+                           read_ids=read_ids, # <-- Pass the list to the template
+                           is_dedicated_page=True)
+
+@app.route('/update-entry/announcement/<int:id>', methods=['GET', 'POST'])
+def update_announcement(id):
+    announcement_to_update = Announcement.query.get_or_404(id)
+    form = AnnouncementForm()
+
+    if form.validate_on_submit():
+        # POST REQUEST: The form is valid, save the new data
+        announcement_to_update.title = form.title.data
+        announcement_to_update.content = form.content.data
+        announcement_to_update.url = form.url.data
+
+        db.session.commit()
+        return redirect(url_for('announcements'))
+        
+    elif request.method == 'GET':
+        # GET REQUEST: Pre-fill the form fields with the existing database data
+        form.title.data = announcement_to_update.title
+        form.content.data = announcement_to_update.content
+        form.url.data = announcement_to_update.url
+    else:
+        # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!
+        print("FORM VALIDATION FAILED:", form.errors)
+
+    return render_template('update-announcement.html', form=form, has_back_btn=True, is_entry=True)
+
+@app.route('/delete-entry/announcement/<int:id>', methods=['POST', 'DELETE'])
+def delete_announcement(id):
+    # Only allow the author (or an admin) to delete it
+    announcement_to_delete = Announcement.query.get_or_404(id)
+    
+    if current_user.id != announcement_to_delete.user_id:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    try:
+        # 1. Delete all attached Read Receipts first
+        AnnouncementRead.query.filter_by(announcement_id=id).delete()
+        
+        # 2. Delete all attached Hearts first
+        AnnouncementHeart.query.filter_by(announcement_id=id).delete()
+        
+        # 3. NOW it is safe to delete the actual announcement
+        db.session.delete(announcement_to_delete)
+        db.session.commit()
+
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    
 
 @app.route('/deadlines')
 def deadlines():
     deadlines = Deadline.query.order_by(Deadline.due_date).all()
     today = date.today()
-    return render_template('deadlines.html', deadlines=deadlines, today=today, is_entry=True, is_dedicated_page=True)
+    return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True)
 
 @app.route('/courses')
 def courses():
     courses = Course.query.order_by(Course.date_added).all()
-    return render_template('courses.html', courses=courses, is_entry=True, is_dedicated_page=True)
+    return render_template('courses.html', courses=courses, is_dedicated_page=True)
 
 @app.route('/class-summaries')
 def summaries():
     summaries = ClassSummary.query.order_by(ClassSummary.date_added).all()
-    return render_template('summaries.html', summaries=summaries, is_entry=True, is_dedicated_page=True)
+    return render_template('summaries.html', summaries=summaries, is_dedicated_page=True)
+
+
+
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
