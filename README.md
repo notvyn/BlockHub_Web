@@ -39,6 +39,14 @@ A centralized class management system for CS 2103.
 
 **July 11, 2026**
 - Added overdue tag for deadline task 
+- Added image upload feature using cloudinary, reaction button, and seen by count
+- Fixed Announcements page and Enabled editing and deleting of post.
+- Created URL pattern validator and constructed element validator for potential cross site scripting (XSS) attacks
+- Enable image and file uploading
+- Made it so the back button redirects back to previous page (based on site history)
+- Separated modals into a single html file
+- 
+
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -50,7 +58,8 @@ A centralized class management system for CS 2103.
 - [/] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
 - [/] Fix total deadline visual number
-- [ ] Fix style and structure dedicated pages for each content (i.e. Announcement, Courses, Deadlines, Summaries)
+- [ ] Fix style and structure dedicated pages for each content (i.e. Announcement ✔️, Courses, Deadlines, Summaries)
 - [ ] Create new model for Courses' schedule
-- [ ] Include total number of content and other labels on each dedicated pages
-
+- [/] Include total number of content and other labels on each dedicated pages
+- [ ] Add small red dot on sidebar for pages with new content
+- [ ] Fix Recent Announcements Total Count and refine Query 

@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
+    
     
     {% block head %}{% endblock %}
 </head>
@@ -53,7 +56,7 @@
                         <i class="fa-solid fa-moon"></i>
                     </button>
 
-                    {% if is_entry == true %}
+                    {% if is_entry != true %}
                     <div class="dropdown d-flex align-items-center">
                         <button class="entry-toggle" type="button" id="mobileAddEntryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-plus"></i>
@@ -86,8 +89,8 @@
                 <div class="top-bar d-flex justify-content-between align-items-center">
                     <div class="tb-txt d-flex align-items-center gap-3">
                         
-                        {% if is_entry != true %}
-                        <a href="{% block back_url %}{{ url_for('dashboard') }}{% endblock %}" class="back-btn">
+                        {% if has_back_btn == true %}
+                        <a href="javascript:history.back()" class="back-btn">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                         {% endif %}
@@ -106,7 +109,7 @@
                         
                         <button class="theme-toggle-btn" id="theme-toggle-desktop"><i class="fa-solid fa-moon"></i></button>
 
-                        {% if is_entry == true %}
+                        {% if is_entry != true %}
                         <div class="dropdown">
                             <button class="entry-toggle" type="button" id="desktopAddEntryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa-solid fa-plus"></i>
@@ -126,11 +129,13 @@
                 </div>
                 {% if is_dedicated_page %}
                     <div class="d-flex justify-content-end">
-                        <div style="color: var(--text-muted);">Total {% block total_num %}{% endblock %}</div>
+                        <div style="color: var(--text-muted);">{% block total_num %}{% endblock %}</div>
                     </div>
                 {% endif %}
 
                 {% block content %}{% endblock %}
+
+                {% include 'modal.html' %}
             </main>
             
         </div>

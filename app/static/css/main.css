@@ -15,6 +15,7 @@
     --sidebar-bg: #31226b;
     --sidebar-footer: #15102c;
     --main-bg: #E7DFC6;
+    --card-bg: #eae6dc;
     --text-dark: #31226b;
     --text-muted: #6b7280;
     --theme-bg: #DBD4BC;
@@ -32,6 +33,7 @@
     /* Backgrounds: Moving into deep, rich violets instead of pure black */
     --main-bg: #16141d;         /* Soft, dark gray-violet */
     --theme-bg: #221a42;        /* Slightly lighter elevated color for cards/sections */
+    --card-bg: rgba(255, 255, 255, 0.03);
     
     /* Sidebar: Keeping the hierarchy clear */
     --sidebar-bg: #1e1b29;      /* Slightly lighter gray-violet */

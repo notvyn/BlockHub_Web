@@ -206,76 +206,6 @@
 } 
 
 
-
-/* --- MODAL STYLING OVERRIDES --- */
-.modal-content {
-    background-color: var(--main-bg); 
-    border: 1px solid var(--sidebar-bg);
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-/* 1. The Inputs */
-.modal-content .form-control {
-    background-color: rgba(0,0,0,0.02) !important;
-    color: var(--text-dark) !important; 
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-}
-.modal-content .form-control:focus {
-    box-shadow: 0 0 0 2px var(--accent-purple) !important;
-    border-color: transparent !important;
-}
-.form-control::placeholder {
-    color: var(--text-muted);
-}
-
-/* 2. The Cancel Button */
-.btn-modal-cancel {
-    background-color: transparent;
-    color: var(--text-muted);
-    border: 1px solid transparent;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-.btn-modal-cancel:hover {
-    color: var(--text-dark);
-    background-color: rgba(0,0,0,0.05);
-    transform: translateY(-1px);
-}
-
-/* 3. The Save Button */
-.btn-modal-save {
-    background-color: var(--accent-purple);
-    color: var(--text-dark);
-    border: none;
-    border-radius: 5px;
-    padding: 0.4rem;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-.btn-modal-save:hover {
-    opacity: 0.7;
-    transform: translateY(-1px);
-}
-
-/* --- DARK MODE MODAL FIXES --- */
-/* Invert the 'X' button so it's visible in dark mode */
-[data-theme="dark"] .btn-close {
-    filter: invert(1); 
-    opacity: 0.7;
-}
-[data-theme="dark"] .btn-close:hover {
-    opacity: 1;
-}
-[data-theme="dark"] .modal-content .form-control {
-    background-color: rgba(255,255,255,0.05) !important;
-    border-color: rgba(255,255,255,0.1) !important;
-}
-[data-theme="dark"] .btn-modal-cancel:hover {
-    background-color: rgba(255,255,255,0.05);
-    border-radius: 5px;
-}
-
 /* --- DARK MODE OVERRIDES --- */
 [data-theme="dark"] .md-code {
     background-color: rgba(255, 255, 255, 0.05); /* Faint white overlay instead of black */
@@ -296,31 +226,6 @@
 }
 
 
-
-/* --- LIVE VALIDATION REWARDS --- */
-
-/* 1. The Success State (Green Checkmark & Glow) */
-.modal-content .form-control.is-valid {
-    border-color: #10b981 !important; /* A smooth, modern emerald green */
-    padding-right: calc(1.5em + 0.75rem);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
-}
-
-.modal-content .form-control.is-valid:focus {
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25) !important;
-}
-
-/* 2. The Error State (Red Warning & Glow) */
-.modal-content .form-control.is-invalid {
-    border-color: var(--accent-red) !important; 
-    padding-right: calc(1.5em + 0.75rem);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ef4444' stroke='none'/%3e%3c/svg%3e") !important;
-}
-
-.modal-content .form-control.is-invalid:focus {
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25) !important;
-}
-
 /* Truncates long HTML blocks safely without breaking tags */
 .md-quote-content {
     font-size: 0.85rem;
@@ -333,6 +238,38 @@
     -webkit-line-clamp: 3; Limits the preview to exactly 3 lines
     -webkit-box-orient: vertical;
     overflow: hidden; */
+}
+
+.md-quote-content p {
+    display: inline;
+    margin-right: 0.5rem;
+} 
+
+/* Target only images inside the feed content preview */
+.md-quote-content img {
+    max-width: 100%; /* Prevents horizontal overflow */
+    max-height: 120px; /* Restricts vertical height */
+    object-fit: cover; /* Crops the image proportionally without squishing it */
+    border-radius: 8px; /* Matches your modern UI aesthetic */
+    margin-top: 0.5rem;
+    display: inline-flex;
+}
+
+/* Update your existing .feed-image class */
+.feed-image {
+    max-height: 280px;
+    max-width: 100%;
+    border-radius: 8px;
+    
+    /* NEW: Interaction styles */
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Add a slight zoom and fade when hovering over the feed image */
+.feed-image:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
 }
 
 /* Style the conditional link */

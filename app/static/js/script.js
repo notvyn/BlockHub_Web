@@ -413,4 +413,105 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    document.querySelectorAll('.heart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const announcementId = this.getAttribute('data-id');
+            const icon = this.querySelector('.heart-icon');
+            const countSpan = this.querySelector('.heart-count');
+
+            fetch(`/toggle-heart/${announcementId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the total number
+                    countSpan.textContent = data.total_hearts;
+                    
+                    // Toggle the icon style between filled (solid red) and empty (regular)
+                    if (data.is_hearted) {
+                        icon.classList.remove('fa-regular');
+                        icon.classList.add('fa-solid', 'text-danger'); 
+                    } else {
+                        icon.classList.remove('fa-solid', 'text-danger');
+                        icon.classList.add('fa-regular');
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+
+    let announcementIdToDelete = null;
+    let cardToRemove = null;
+
+    // 1. When any trash can button is clicked...
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Save the ID and the specific HTML card so we can remove it later
+            announcementIdToDelete = this.getAttribute('data-id');
+            
+            // This targets the specific feed card we built earlier
+            cardToRemove = this.closest('.feed-card'); 
+        });
+    });
+
+    // 2. When the "Yes, Delete" button inside the modal is clicked...
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (!announcementIdToDelete) return;
+
+        // Send the invisible scout to delete it
+        fetch(`/delete-entry/announcement/${announcementIdToDelete}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide the Bootstrap modal
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                deleteModal.hide();
+
+                // Smoothly fade out the announcement card
+                cardToRemove.style.transition = 'opacity 0.4s ease';
+                cardToRemove.style.opacity = '0';
+                setTimeout(() => {
+                    cardToRemove.remove();
+                }, 400);
+            } else {
+                alert('Error deleting announcement: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    const lightboxModal = document.getElementById('imageLightboxModal');
+    
+    if (lightboxModal) {
+        // Listen for the exact moment the modal is triggered to open
+        lightboxModal.addEventListener('show.bs.modal', function (event) {
+            
+            // 1. Identify which specific image was clicked
+            const triggerImage = event.relatedTarget;
+            
+            // 2. Extract the Cloudinary URL from the data attribute we added
+            const imageUrl = triggerImage.getAttribute('data-img-url');
+            
+            // 3. Find the giant image tag inside the modal and update its source
+            const modalImageDisplay = document.getElementById('lightboxImage');
+            modalImageDisplay.src = imageUrl;
+        });
+    }
+
+    // 1. Target every single link specifically inside the announcement content
+    const contentLinks = document.querySelectorAll('.card-content a');
+    
+    contentLinks.forEach(link => {
+        // 2. Force the link to open in a new tab
+        link.setAttribute('target', '_blank');
+        
+        // 3. Security best practice: Prevents the new tab from maliciously hijacking your dashboard page
+        link.setAttribute('rel', 'noopener noreferrer');
+    });
+    
 });

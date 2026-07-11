@@ -104,11 +104,29 @@
                             {% endif %}
                         </div>
                         <div class="md-quote-content">
-                            <p>{{ a.content | markdown | striptags | truncate(400) }}
-                            {% if a.content|length > 400 %}
-                                <a href="{{ url_for('announcement', id=a.id) }}" class="read-more-link">read more</a>
+                            <!-- 1. Split the data using our new Python filters -->
+                            {% set images = a.content | extract_images %}
+                            {% set text_only = a.content | remove_images %}
+
+                            <!-- CONTENT: Truncated to prevent massive walls of text -->
+                            <div class="card-content">
+                                <!-- striptags removes Markdown/HTML formatting so it truncates cleanly -->
+                                {{ text_only | markdown | truncate(300, True, '...') }}
+                            </div>
+
+                            <!-- 3. Render the Image Gallery BELOW the text -->
+                            {% if images %}
+                                <div class="feed-image-gallery mb-3">
+                                    {% for alt, url in images %}
+                                        <img src="{{ url }}" 
+                                            alt="{{ alt }}" 
+                                            class="feed-image"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#imageLightboxModal" 
+                                            data-img-url="{{ url }}">
+                                    {% endfor %}
+                                </div>
                             {% endif %}
-                            </p>
                         </div>
 
                         
@@ -177,37 +195,5 @@
         </div>
     </div>
 
-    <div class="modal fade" id="addLinkModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLinkModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title md-h2 mb-0" id="addLinkModalLabel">Add Quick Link</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                <div class="modal-body">
-                    <form id="addLinkForm" novalidate>
-                        {{ link_form.hidden_tag() }}
-                        
-                        <div class="mb-3">
-                            <label class="form-label md-code border-0 bg-transparent mb-1">{{ link_form.title.label() }}</label>
-                            {{ link_form.title(class="form-control", placeholder="e.g., Student Portal") }}
-                            <div class="text-danger mt-2" id="title-error" style="font-size: 0.8rem; display: none;"></div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label md-code border-0 bg-transparent mb-1">{{ link_form.url.label() }}</label>
-                            {{ link_form.url(class="form-control", placeholder="https://...") }}
-                            <div class="text-danger mt-2" id="url-error" style="font-size: 0.8rem; display: none;"></div>
-                        </div>
-                        
-                        <div class="form-btn d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
-                            {{ link_form.submit(class="btn-modal-save") }}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 {% endblock %}
