@@ -24,26 +24,31 @@ def markdown_filter(text):
     # This converts the Markdown to HTML, and Markup() tells Jinja it is safe to render
     return Markup(markdown.markdown(text))
 
-# --- Add this new route anywhere in routes.py ---
 @app.route('/complete-deadline/<int:id>', methods=['POST'])
 def complete_deadline(id):
-    # Grab the JSON data sent by our JavaScript
     data = request.get_json()
+    is_completed = data.get('completed', False)
     
-    # Find the specific deadline in the database
     deadline = Deadline.query.get_or_404(id)
-
-    # Update the status based on whether the box was checked or unchecked
-    if data['completed']:
+    
+    # Update the status based on the checkbox
+    if is_completed:
         deadline.status = 'Done'
     else:
-        deadline.status = 'Upcoming'
-
-    # Save the changes
+        deadline.status = 'Pending'
+        
     db.session.commit()
+    
+    # NEW LOGIC: Calculate the true total of remaining deadlines in the database
+    remaining_deadlines = Deadline.query.filter(
+        Deadline.status.in_(['Upcoming', 'Pending'])
+    ).count()
 
-    # Send a success message back to the JavaScript
-    return jsonify({'success': True, 'new_status': deadline.status})
+    # Send that true total back to the JavaScript
+    return jsonify({    
+        'success': True, 
+        'new_total': remaining_deadlines
+    })
 
 @app.route('/mark-announcement-read/<int:id>', methods=['POST'])
 @login_required
@@ -94,25 +99,79 @@ def dashboard():
     announcement_form = AnnouncementForm()
     class_summary_form = DeadlineForm()
     deadline_form = DeadlineForm()
+    link_form = LinkForm()
     
-    announcement = Announcement.query.order_by(Announcement.date_posted.desc()).all()
+    # ---------------------------------------------------------
+    # 1. TOTAL COUNTS (The highly optimized database way)
+    # ---------------------------------------------------------
+    total_announcements = Announcement.query.count()
+    
+    total_deadlines = Deadline.query.filter(
+        Deadline.status.in_(['Upcoming', 'Pending'])
+    ).count()
 
-    # THE FIX: Only check read receipts if they are actually logged in
+    # ---------------------------------------------------------
+    # 2. THE HYBRID ANNOUNCEMENT LOGIC
+    # ---------------------------------------------------------
     read_announcement_ids = []
+    final_announcements = []
+
     if current_user.is_authenticated:
-        # Get a list of announcement IDs that THIS user has explicitly read
+        user = User.query.get(current_user.id)
+        
+        # Get IDs of what this user has read
         read_records = AnnouncementRead.query.filter_by(user_id=current_user.id).all()
         read_announcement_ids = [record.announcement_id for record in read_records]
 
-    upcoming_deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).all()
-    total_deadline = len(upcoming_deadline)
+        # Fetch ALL unread announcements for this user
+        unread_announcements = Announcement.query.filter(
+            ~Announcement.id.in_(read_announcement_ids)
+        ).all()
 
-    deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).limit(3).all()
+        # Fetch the absolute latest 3 announcements (for dashboard context)
+        latest_announcements = Announcement.query.order_by(
+            Announcement.date_posted.desc()
+        ).limit(3).all()
+
+        # Merge them using a dictionary to automatically remove duplicates
+        merged_dict = {a.id: a for a in unread_announcements}
+        for a in latest_announcements:
+            if a.id not in merged_dict:
+                merged_dict[a.id] = a
+
+        # Sort the final merged list by date (newest at the top)
+        final_announcements = sorted(merged_dict.values(), key=lambda x: x.date_posted, reverse=True)
+    else:
+        user = None
+        # Fallback for logged-out users
+        final_announcements = Announcement.query.order_by(Announcement.date_posted.desc()).limit(3).all()
+
+    # announcement = Announcement.query.order_by(Announcement.date_posted.desc()).limit(3).all()
+
+    # # THE FIX: Only check read receipts if they are actually logged in
+    # read_announcement_ids = []
+    # if current_user.is_authenticated:
+    #     # Get a list of announcement IDs that THIS user has explicitly read
+    #     read_records = AnnouncementRead.query.filter_by(user_id=current_user.id).all()
+    #     read_announcement_ids = [record.announcement_id for record in read_records]
+
+    # upcoming_deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).all()
+    # total_deadline = len(upcoming_deadline)
+
+    # deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).limit(3).all()
     
     # class_summary = ClassSummary.query.order_by(ClassSummary.scheduled_date).all()
 
-    link = Link.query.order_by(Link.date_added).all()
-    link_form = LinkForm()
+    # link = Link.query.order_by(Link.date_added).all()
+
+    # ---------------------------------------------------------
+    # 3. DEADLINES & OTHER DATA
+    # ---------------------------------------------------------
+    deadlines = Deadline.query.filter(
+        Deadline.status.in_(['Upcoming', 'Pending'])
+    ).order_by(Deadline.due_date).limit(3).all()
+    
+    links = Link.query.order_by(Link.date_added).all()
 
     today = date.today()
 
@@ -157,22 +216,22 @@ def dashboard():
             # If it's too old, trigger the "No recent summaries" UI
             target_record = None
 
-    if current_user.is_authenticated:
-        user = User.query.get(current_user.id)
-    else:
-        user = None
+    # if current_user.is_authenticated:
+    #     user = User.query.get(current_user.id)
+    # else:
+    #     user = None
 
     return render_template('dashboard.html',
         announcement_form=announcement_form,
         class_summary_form=class_summary_form,
         deadline_form=deadline_form,
-        announcement=announcement,
+        announcements=final_announcements,
         read_ids=read_announcement_ids,
-        deadline=deadline,
-        total_deadline=total_deadline,
+        deadlines=deadlines,
+        total_deadlines=total_deadlines,
         target_record=target_record,
         daily_summaries=daily_summaries,
-        link=link,
+        links=links,
         link_form=link_form,
         user=user,
         today=today,
@@ -345,24 +404,24 @@ def announcement(id):
 
 @app.route('/announcements')
 def announcements():
-    announcements = Announcement.query.order_by(Announcement.date_posted).all()
-    return render_template('announcements.html', announcements=announcements, is_entry=True)
+    announcements = Announcement.query.order_by(Announcement.date_posted.desc()).all()
+    return render_template('announcements.html', announcements=announcements, is_entry=True, is_dedicated_page=True)
 
 @app.route('/deadlines')
 def deadlines():
     deadlines = Deadline.query.order_by(Deadline.due_date).all()
     today = date.today()
-    return render_template('deadlines.html', deadlines=deadlines, today=today, is_entry=True)
+    return render_template('deadlines.html', deadlines=deadlines, today=today, is_entry=True, is_dedicated_page=True)
 
 @app.route('/courses')
 def courses():
     courses = Course.query.order_by(Course.date_added).all()
-    return render_template('courses.html', courses=courses, is_entry=True)
+    return render_template('courses.html', courses=courses, is_entry=True, is_dedicated_page=True)
 
 @app.route('/class-summaries')
 def summaries():
     summaries = ClassSummary.query.order_by(ClassSummary.date_added).all()
-    return render_template('summaries.html', summaries=summaries, is_entry=True)
+    return render_template('summaries.html', summaries=summaries, is_entry=True, is_dedicated_page=True)
 
 
 @app.route('/login', methods=['GET', 'POST'])

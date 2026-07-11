@@ -123,3 +123,39 @@
 [data-theme="dark"] .btn-delete:hover {
     background-color: #dc3545; 
 }
+
+/* --- TIMELINE FEED CARDS --- */
+.feed-card {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); /* Softer shadow than dashboard cards */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feed-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* --- DARK MODE ADAPTATIONS --- */
+[data-theme="dark"] .feed-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .feed-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .feed-card .text-dark {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .feed-footer.border-top {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .author-avatar {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}

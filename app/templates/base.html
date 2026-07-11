@@ -124,6 +124,11 @@
                         {% endif %}
                     </div>
                 </div>
+                {% if is_dedicated_page %}
+                    <div class="d-flex justify-content-end">
+                        <div style="color: var(--text-muted);">Total {% block total_num %}{% endblock %}</div>
+                    </div>
+                {% endif %}
 
                 {% block content %}{% endblock %}
             </main>

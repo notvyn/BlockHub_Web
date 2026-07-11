@@ -8,7 +8,7 @@
     </div>
 
     {% if announcement.url %}
-        <p>{{ announcement.url }}</p>
+        <a href="{{ announcement.url }}" target="_blank">{{ announcement.url }}</a>
     {% endif %}
     
 {% endblock %}

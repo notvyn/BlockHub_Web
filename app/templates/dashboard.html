@@ -28,7 +28,7 @@
                     <div class="md-h2-container d-flex justify-content-between">
                         <a href="{{ url_for('deadlines') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Upcoming Deadlines</div>
-                            <span id="deadline-badge" class="badge bg-danger rounded-pill">{{ total_deadline }}</span>
+                            <span id="deadline-badge" class="badge bg-danger rounded-pill">{{ total_deadlines }}</span>
                             <i class="fa-solid fa-chevron-right text-muted"></i>
                         </a>
                         <div class="d-flex align-items-center gap-3">
@@ -44,8 +44,8 @@
                         </div>
                     </div>
                     
-                    {% if deadline %}
-                        {% for d in deadline %}
+                    {% if deadlines %}
+                        {% for d in deadlines %}
                             {% set days_left = (d.due_date - today).days %}
                             {% set is_this_week = "true" if d.due_date <= end_of_week else "false" %}
 
@@ -56,8 +56,13 @@
                                     <i class="fa-solid fa-check"></i>
                                 </label>
                                 <div id="task-text-{{ d.id }}">
-                                    <div class="md-task-title">{{ d.description }}</div>
-                                    <div>
+                                    <div class="md-code-title">
+                                        <a href="#" class="md-task-title" data-id="{{ d.id }}">{{ d.description }}</a>
+                                        {% if d.due_date < today %}
+                                            <span class="md-code fw-bold text-white bg-danger border-0 ms-2 new-tag" id="tag-{{ d.id}}">OVERDUE</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="md-code-content">
                                         <span class="md-code">{{ d.course.code }} | {{ d.course.title }}</span>
                                         <span class="md-code">{{ d.category }}</span>
                                         
@@ -89,7 +94,7 @@
                         </a>
                     </div>
 
-                    {% for a in announcement %}
+                    {% for a in announcements %}
                     <div class="md-quote">
                         <div class="md-quote-title">
                             <a href="{{ url_for('announcement', id=a.id)}}" class="announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
@@ -126,7 +131,7 @@
                         </a>
                     </div>
                     <ul class="md-list">
-                        {% for l in link %}
+                        {% for l in links %}
                             <li>
                                 <a href="{{ l.url }}" target="_blank" class="md-link">{{ l.title }}</a>
                             </li>

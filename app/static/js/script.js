@@ -28,42 +28,15 @@ document.addEventListener('DOMContentLoaded', function() {
         mSearchInput.value = ''; // Clears the text when closed
     });
 
-    // Helper function to count visible tasks and update the badge
-    function updateDeadlineBadge() {
-        const badge = document.getElementById('deadline-badge');
-        let visibleCount = 0;
-
-        // Loop through all tasks and count the ones that aren't hidden
-        document.querySelectorAll('.deadline-item').forEach(item => {
-            if (item.style.display !== 'none') {
-                visibleCount++;
-            }
-        });
-
-        // Update the number, or hide the badge completely if they finished everything!
-        if (badge) {
-            if (visibleCount > 0) {
-                badge.textContent = visibleCount;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none'; 
-            }
-        }
-    }
-
-    updateDeadlineBadge();
-
     const checkboxes = document.querySelectorAll('.task-checkbox');
+    const badge = document.getElementById('deadline-badge');
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const deadlineId = this.getAttribute('data-id');
             const isCompleted = this.checked;
             
-            // Find the entire task block, not just the text container
             const taskContainer = this.closest('.deadline-item');
-
-            // Find ONLY the title inside this specific block
             const taskTitle = taskContainer.querySelector('.md-task-title');
 
             fetch(`/complete-deadline/${deadlineId}`, {
@@ -75,23 +48,30 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if(data.success) {
                     if (isCompleted) {
-                        // 3. Apply the strikethrough strictly to the title
+                        // 1. Strike through the title
                         if (taskTitle) {
                             taskTitle.style.textDecoration = 'line-through';
                         }
                         
-                        // 4. Smoothly fade the entire task container out
+                        // 2. Fade out the container
                         taskContainer.style.transition = 'opacity 0.6s ease';
                         taskContainer.style.opacity = '0';
                         
-                        // 5. Wait 600ms for the fade to finish, then remove it and count
+                        // 3. Remove it and update the badge directly from the backend data
                         setTimeout(() => {
                             taskContainer.style.display = 'none';
-                            updateDeadlineBadge();
+                            
+                            // NEW LOGIC: Use the true database count provided by Flask!
+                            if (badge && data.new_total !== undefined) {
+                                if (data.new_total > 0) {
+                                    badge.textContent = data.new_total;
+                                    badge.style.display = 'inline-block';
+                                } else {
+                                    badge.style.display = 'none'; 
+                                }
+                            }
                         }, 600);
                     } 
-                    // Note: Since the task vanishes, we don't really need an 'else' 
-                    // to un-strike the text anymore!
                 }
             })
             .catch(error => console.error('Error:', error));

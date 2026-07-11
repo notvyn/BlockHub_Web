@@ -37,6 +37,9 @@ A centralized class management system for CS 2103.
 - Created Summary, Deadline, and Course Form Page
 - Drafted dedicated pages of each content
 
+**July 11, 2026**
+- Added overdue tag for deadline task 
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [ ] Add password security and form validation.
@@ -46,7 +49,7 @@ A centralized class management system for CS 2103.
 - [ ] Build Search Feature.
 - [/] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
-- [ ] Fix total deadline visual number
+- [/] Fix total deadline visual number
 - [ ] Fix style and structure dedicated pages for each content (i.e. Announcement, Courses, Deadlines, Summaries)
 - [ ] Create new model for Courses' schedule
 - [ ] Include total number of content and other labels on each dedicated pages
