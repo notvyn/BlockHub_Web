@@ -1,0 +1,73 @@
+<div class="modal fade" id="addLinkModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLinkModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title md-h2 mb-0" id="addLinkModalLabel">Add Quick Link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="addLinkForm" novalidate>
+                    {{ link_form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        <label class="form-label md-code border-0 bg-transparent mb-1">{{ link_form.title.label() }}</label>
+                        {{ link_form.title(class="form-control", placeholder="e.g., Student Portal") }}
+                        <div class="text-danger mt-2" id="title-error" style="font-size: 0.8rem; display: none;"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label md-code border-0 bg-transparent mb-1">{{ link_form.url.label() }}</label>
+                        {{ link_form.url(class="form-control", placeholder="https://...") }}
+                        <div class="text-danger mt-2" id="url-error" style="font-size: 0.8rem; display: none;"></div>
+                    </div>
+                    
+                    <div class="form-btn d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
+                        {{ link_form.submit(class="btn-modal-save") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this announcement? This action cannot be undone.
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <!-- The actual confirmation button -->
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fullscreen Image Lightbox Modal -->
+<div class="modal fade" id="imageLightboxModal" tabindex="-1" aria-hidden="true">
+    <!-- modal-xl makes it as wide as possible, modal-dialog-centered keeps it in the middle -->
+    <div class="modal-dialog modal-dialog-centered modal-xl"> 
+        <div class="modal-content bg-transparent border-0 shadow-none">
+        
+            <div class="modal-header border-0 p-0 justify-content-end mb-2">
+                <!-- Close button positioned at the top right -->
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+            </div>
+            
+            <div class="modal-body p-0 text-center">
+                <!-- The empty image tag that JavaScript will fill -->
+                <img id="lightboxImage" src="" alt="Fullscreen View" class="img-fluid rounded shadow-lg" style="max-height: 85vh; object-fit: contain;">
+            </div>
+        
+        </div>
+    </div>
+</div>
