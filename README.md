@@ -45,7 +45,9 @@ A centralized class management system for CS 2103.
 - Enable image and file uploading
 - Made it so the back button redirects back to previous page (based on site history)
 - Separated modals into a single html file
-- 
+
+**July 12, 2026** 
+- Styled Deadlines Page
 
 
 ## TO-DO LIST

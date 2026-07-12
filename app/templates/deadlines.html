@@ -1,36 +1,50 @@
 {% extends 'base.html' %}
 
 {% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/deadline.css')}}" rel="stylesheet">
 {% endblock %}
 
 {% block page_title %}Deadlines{% endblock %}
 {% block page_title_txt %}Being productive right now! ;>{% endblock %}
-{% block total_num %}Total Announcements: {{ deadlines|length }} {% endblock %}
+{% block total_num %}Total Deadlines: {{ deadlines|length }} {% endblock %}
 
 {% block content %}
-    <div class="deadlines-list mt-4">
+    <div class="card-container">
         {% for d in deadlines %}
             {% set days_left = (d.due_date - today).days %}
 
             {% if days_left <= 2 %}
-                {% set urgency_color = '#dc3545' %} {% elif days_left <= 7 %}
-                {% set urgency_color = '#ffc107' %} {% else %}
-                {% set urgency_color = '#0dcaf0' %} {% endif %}
+                {% set urgency_color = 'var(--accent-red, var(--bs-danger))' %} 
+            {% elif days_left <= 7 %}
+                {% set urgency_color = 'var(--accent-yellow, var(--bs-warning))' %} 
+            {% else %}
+                {% set urgency_color = 'var(--accent-blue   , var(--bs-info))' %} 
+            {% endif %}
 
-            <div class="deadline-card d-flex flex-column flex-md-row justify-content-between gap-3 mb-3" style="border-right: 6px solid {{ urgency_color }};">
+            <div class="card-wrapper deadline-card d-flex flex-column flex-md-row justify-content-between" style="border-right: 6px solid {{ urgency_color }};">
+
+                <!-- THE CHECKBOX -->
+                <div class="mt-1 me-2"> <!-- Added me-2 for slightly better spacing from the text -->
+                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off">
+                    
+                    <!-- Changed the label class and added a specific size to the icon -->
+                    <label class="dl-checkbox" for="btn-check-{{ d.id }}">
+                        <i class="fa-solid fa-check"></i>
+                    </label>
+                </div>
                 
                 <div class="dl-core flex-grow-1">
                     <div class="md-code mb-1 border-0 bg-transparent p-0">{{ d.course.code }} | {{ d.category }}</div>
                     <div class="dl-title fs-5 fw-bold mb-1">{{ d.description }}</div>
-                    <div class="text-muted" style="font-size: 0.85rem;">
+                    <div class="dl-due" style="font-size: 0.85rem;">
                         Submission: {{ d.due_date.strftime("%A - %B %d, %Y") }}
                     </div>
                 </div>
 
                 <div class="dl-notes flex-grow-1 border-start px-md-4">
-                    <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
-                    <div style="font-size: 0.85rem; color: var(--text-dark);">
+                    <div class="fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
+                    <div class="" style="font-size: 0.85rem;">
                         {{ d.note if d.note else "No additional notes provided." }}
                     </div>
                 </div>
@@ -46,7 +60,7 @@
                             </button>
 
                     </div>
-                    <div class="text-muted" style="font-size: 0.8rem;">
+                    <div class="dl-status" style="font-size: 0.8rem;">
                         Status: <span class="fw-bold">{{ d.status }}</span>
                     </div>
                 </div>

@@ -2,6 +2,7 @@
 
 {% block head %}
     <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/announcement.css')}}" rel="stylesheet">
 {% endblock %}
 
 {% block page_title %}Announcements{% endblock %}
@@ -9,7 +10,7 @@
 {% block total_num %}Total Announcements: {{ announcements|length }} {% endblock %}
 
 {% block content %}
-    <div class="card-container" >
+    <div class="card-container announcement-container">
     
         {% for a in announcements %}
         <div class="card-wrapper announcement-card d-flex flex-column">

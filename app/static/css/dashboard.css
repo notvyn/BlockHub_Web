@@ -124,6 +124,7 @@
     border-color: var(--sidebar-bg);
     background-color: var(--sidebar-bg);
 }
+
 /* 1. Default State (Unchecked) */
 .btn-obsidian {
     color: var(--text-muted); /* Faded gray/violet icon */

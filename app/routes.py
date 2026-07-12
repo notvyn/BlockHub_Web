@@ -612,7 +612,8 @@ def delete_announcement(id):
 
 @app.route('/deadlines')
 def deadlines():
-    deadlines = Deadline.query.order_by(Deadline.due_date).all()
+    deadlines = Deadline.query.filter(
+        Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).all()
     today = date.today()
     return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True)
 
