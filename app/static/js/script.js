@@ -443,65 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    let announcementIdToDelete = null;
-    let cardToRemove = null;
-
-    // 1. When any trash can button is clicked...
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Save the ID and the specific HTML card so we can remove it later
-            announcementIdToDelete = this.getAttribute('data-id');
-            
-            // This targets the specific feed card we built earlier
-            cardToRemove = this.closest('.feed-card'); 
-        });
-    });
-
-    // 2. When the "Yes, Delete" button inside the modal is clicked...
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        if (!announcementIdToDelete) return;
-
-        // Send the invisible scout to delete it
-        fetch(`/delete-entry/announcement/${announcementIdToDelete}`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Hide the Bootstrap modal
-                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-                deleteModal.hide();
-
-                // Smoothly fade out the announcement card
-                cardToRemove.style.transition = 'opacity 0.4s ease';
-                cardToRemove.style.opacity = '0';
-                setTimeout(() => {
-                    cardToRemove.remove();
-                }, 400);
-            } else {
-                alert('Error deleting announcement: ' + data.error);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-
-    const lightboxModal = document.getElementById('imageLightboxModal');
     
-    if (lightboxModal) {
-        // Listen for the exact moment the modal is triggered to open
-        lightboxModal.addEventListener('show.bs.modal', function (event) {
-            
-            // 1. Identify which specific image was clicked
-            const triggerImage = event.relatedTarget;
-            
-            // 2. Extract the Cloudinary URL from the data attribute we added
-            const imageUrl = triggerImage.getAttribute('data-img-url');
-            
-            // 3. Find the giant image tag inside the modal and update its source
-            const modalImageDisplay = document.getElementById('lightboxImage');
-            modalImageDisplay.src = imageUrl;
-        });
-    }
 
     // 1. Target every single link specifically inside the announcement content
     const contentLinks = document.querySelectorAll('.card-content a');

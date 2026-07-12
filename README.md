@@ -48,7 +48,7 @@ A centralized class management system for CS 2103.
 
 **July 12, 2026** 
 - Styled Deadlines Page
-- Enabled Edit feature on Deadline Page
+- Enabled Edit and Delete feature on Deadline Page
 
 
 ## TO-DO LIST
@@ -66,3 +66,4 @@ A centralized class management system for CS 2103.
 - [/] Include total number of content and other labels on each dedicated pages
 - [ ] Add small red dot on sidebar for pages with new content
 - [ ] Fix Recent Announcements Total Count and refine Query 
+- [ ] Have a live update on the total content count for each action on a page

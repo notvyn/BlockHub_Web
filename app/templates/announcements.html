@@ -33,9 +33,9 @@
                         <a href="{{ url_for('update_announcement', id=a.id)}}" class="btn btn-icon-action" title="Edit">
                             <i class="fa-solid fa-pencil"></i>
                         </a>
-                        <a href="{{ url_for('delete_announcement', id=a.id) }}" type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" title="Delete">
+                        <button class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" data-type="announcement">
                             <i class="fa-solid fa-trash"></i>
-                        </a>
+                        </button>
                     </div>
                 {% endif %}
                 

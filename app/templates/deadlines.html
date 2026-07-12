@@ -55,9 +55,9 @@
                             <a href="{{ url_for('update_deadline', id=d.id)}}" class="btn btn-icon-action" title="Edit">
                                 <i class="fa-solid fa-pencil"></i>
                             </a>
-                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ d.id }}" title="Delete">
+                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ d.id }}" data-type="deadline" title="Delete">
                                 <i class="fa-solid fa-trash"></i>
-                            </button>
+                            </a>
 
                     </div>
                     <div class="dl-status" style="font-size: 0.8rem;">

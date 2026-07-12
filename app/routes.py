@@ -305,7 +305,7 @@ def add_announcement():
         db.session.add(new_announcement)
         db.session.commit()
 
-        return redirect(url_for('add_announcement'))
+        return redirect(url_for('announcements'))
 
     return render_template('add-announcement.html', form=form, has_back_btn=True, is_entry=True)
 
@@ -332,7 +332,8 @@ def add_summary():
         db.session.add(new_summary)
         db.session.commit()
 
-        return redirect(url_for('add_summary'))
+        return redirect(url_for('summaries'))
+    
     return render_template('add-summary.html', form=form, has_back_btn=True, is_entry=True)
 
 @app.route('/add-entry/course', methods=['GET', 'POST'])
@@ -357,7 +358,7 @@ def add_course():
 
         # flash("Course Added Successfully")
 
-        return redirect(url_for('add_course'))
+        return redirect(url_for('courses'))
     
     return render_template('add-course.html', form=form, has_back_btn=True, is_entry=True)
 
@@ -393,7 +394,7 @@ def add_deadline():
 
         # flash("Deadline Posted Successfully")
 
-        return redirect(url_for('add_deadline'))
+        return redirect(url_for('deadlines'))
 
     return render_template('add-deadline.html', form=form, has_back_btn=True, is_entry=True)
 
@@ -616,7 +617,7 @@ def deadlines():
     today = date.today()
     return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True)
 
-@app.route('/deadlines/<int:id>', methods=['GET', 'POST'])
+@app.route('/update-entry/deadline/<int:id>', methods=['GET', 'POST'])
 def update_deadline(id):
     deadline_to_update = Deadline.query.get_or_404(id)
     form = DeadlineForm()
@@ -649,6 +650,23 @@ def update_deadline(id):
 
     return render_template('update-deadline.html', form=form, has_back_btn=True, is_entry=True)
 
+@app.route('/delete-entry/deadline/<int:id>', methods=['POST', 'DELETE'])
+def delete_deadline(id):
+    # Only allow the author (or an admin) to delete it
+    deadline_to_delete = Deadline.query.get_or_404(id)
+    
+    # if current_user.id != deadline_to_delete.user_id:
+    #     return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    try:
+        db.session.delete(deadline_to_delete)
+        db.session.commit()
+
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @app.route('/courses')
 def courses():
@@ -659,8 +677,6 @@ def courses():
 def summaries():
     summaries = ClassSummary.query.order_by(ClassSummary.date_added).all()
     return render_template('summaries.html', summaries=summaries, is_dedicated_page=True)
-
-
 
 
 
