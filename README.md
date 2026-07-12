@@ -48,6 +48,7 @@ A centralized class management system for CS 2103.
 
 **July 12, 2026** 
 - Styled Deadlines Page
+- Enabled Edit feature on Deadline Page
 
 
 ## TO-DO LIST

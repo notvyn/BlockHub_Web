@@ -608,7 +608,6 @@ def delete_announcement(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
-    
 
 @app.route('/deadlines')
 def deadlines():
@@ -616,6 +615,40 @@ def deadlines():
         Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).all()
     today = date.today()
     return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True)
+
+@app.route('/deadlines/<int:id>', methods=['GET', 'POST'])
+def update_deadline(id):
+    deadline_to_update = Deadline.query.get_or_404(id)
+    form = DeadlineForm()
+
+    if form.validate_on_submit():
+        # POST REQUEST: The form is valid, save the new data
+        deadline_to_update.course = form.course.data
+        deadline_to_update.description = form.description.data
+        deadline_to_update.category = form.category.data
+        deadline_to_update.date_given = form.date_given.data
+        deadline_to_update.due_date = form.due_date.data
+        deadline_to_update.status = form.status.data
+        deadline_to_update.note = form.note.data
+
+        db.session.commit()
+        return redirect(url_for('deadlines'))
+        
+    elif request.method == 'GET':
+        # GET REQUEST: Pre-fill the form fields with the existing database data
+        form.course.data = deadline_to_update.course
+        form.description.data = deadline_to_update.description
+        form.category.data = deadline_to_update.category
+        deadline_to_update.date_given = form.date_given.data
+        deadline_to_update.due_date = form.due_date.data
+        deadline_to_update.status = form.status.data
+        deadline_to_update.note = form.note.data
+    else:
+        # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!
+        print("FORM VALIDATION FAILED:", form.errors)
+
+    return render_template('update-deadline.html', form=form, has_back_btn=True, is_entry=True)
+
 
 @app.route('/courses')
 def courses():
