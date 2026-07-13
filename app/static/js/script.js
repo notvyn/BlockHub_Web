@@ -30,20 +30,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const checkboxes = document.querySelectorAll('.task-checkbox');
     const badge = document.getElementById('deadline-badge');
+    const pageTotal = document.getElementById('page-total-count');
+    const toastContainer = document.getElementById('toast-container');
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const deadlineId = this.getAttribute('data-id');
             const isCompleted = this.checked;
             
-            // Scope DOM queries strictly to the parent card of the clicked checkbox
             const taskContainer = this.closest('.deadline-item');
             const taskTitle = taskContainer.querySelector('.md-task-title');
             const statusText = taskContainer.querySelector('.status-text');
             
-            // Sync BOTH desktop and mobile checkboxes so they always match
             const allCheckboxesForTask = taskContainer.querySelectorAll('.task-checkbox');
             allCheckboxesForTask.forEach(cb => cb.checked = isCompleted);
+
+            taskContainer.style.transition = 'all 0.4s ease';
+            taskContainer.style.overflow = 'hidden';
 
             fetch(`/complete-deadline/${deadlineId}`, {
                 method: 'POST',
@@ -55,36 +58,154 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(data.success) {
                     
                     if (isCompleted) {
-                        // 1. Strike through the title and update status text to Done
+                        // 1. Strike through text
                         if (taskTitle) taskTitle.style.textDecoration = 'line-through';
                         if (statusText) statusText.textContent = 'Done';
                         
-                        /* NOTE: If you decide you DO want completed tasks to fade out and hide 
-                           after marking them done, uncomment these lines: */
-                        // taskContainer.style.transition = 'opacity 0.6s ease';
-                        // taskContainer.style.opacity = '0';
-                        // setTimeout(() => { taskContainer.style.display = 'none'; }, 600);
+                        // 2. Crush the card
+                        // taskContainer.classList.remove('p-3', 'p-md-3', 'mb-2');
+                        // taskContainer.style.maxHeight = taskContainer.scrollHeight + 'px';
+                        // void taskContainer.offsetWidth; 
                         
+                        // taskContainer.style.maxHeight = '0px';
+                        // taskContainer.style.padding = '0px';
+                        // taskContainer.style.margin = '0px';
+                        // taskContainer.style.borderWidth = '0px';
+
+                        taskContainer.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            taskContainer.classList.remove('d-flex');
+                            taskContainer.classList.add('d-none');
+                        }, 400);
+
+                        // 3. BUILD THE DYNAMIC STACKING TOAST
+                        const titleText = taskTitle ? taskTitle.textContent.trim() : 'Task';
+                        
+                        // Create the physical toast box
+                        const toast = document.createElement('div');
+                        toast.className = 'bg-dark text-white rounded shadow-lg overflow-hidden';
+                        toast.style.minWidth = '300px';
+                        toast.style.transform = 'translateY(100%)';
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+
+                        // Inject the specific task title inside
+                        toast.innerHTML = `
+                            <div class="p-3 d-flex justify-content-between align-items-center">
+                                <div class="pe-3">
+                                    <i class="fa-solid fa-circle-check text-success me-2"></i>
+                                    <span style="font-size: 0.9rem;"><strong>${titleText}</strong> marked done.</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-light undo-btn" style="font-weight: 600;">UNDO</button>
+                            </div>
+                            <div style="height: 4px; background: rgba(255,255,255,0.2);">
+                                <div class="undo-progress" style="height: 100%; width: 100%; background: var(--accent-purple, #8e44ad);"></div>
+                            </div>
+                        `;
+
+                        // Add it to the screen
+                        toastContainer.appendChild(toast);
+                        
+                        // Force browser reflow to animate it popping up
+                        void toast.offsetWidth;
+                        toast.style.transform = 'translateY(0)';
+                        toast.style.opacity = '1';
+
+                        // Animate the progress bar
+                        const progress = toast.querySelector('.undo-progress');
+                        setTimeout(() => {
+                            progress.style.transition = 'width 5s linear';
+                            progress.style.width = '0%';
+                        }, 50);
+
+                        // 4. The 5-Second Deletion Timer
+                        const undoTimer = setTimeout(() => {
+                            // Fade toast out and delete it from HTML
+                            toast.style.opacity = '0';
+                            toast.style.transform = 'translateY(20px)';
+                            setTimeout(() => toast.remove(), 300);
+                        }, 5000);
+
+                        // 5. The UNDO Button Logic (specific to THIS toast!)
+                        toast.querySelector('.undo-btn').addEventListener('click', function() {
+                            clearTimeout(undoTimer); // Stop the 5-second timer
+                            
+                            // Remove the toast gracefully
+                            toast.style.opacity = '0';
+                            setTimeout(() => toast.remove(), 300);
+
+                            // Tell backend to uncheck it
+                            fetch(`/complete-deadline/${deadlineId}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ completed: false })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if(data.success) {
+                                    allCheckboxesForTask.forEach(cb => cb.checked = false);
+                                    restoreCard(taskContainer, taskTitle, statusText);
+                                    updateBadges(data.new_total);
+                                }
+                            });
+                        });
+
                     } else {
-                        // 2. Unmark the task (Remove strikethrough, revert status)
-                        if (taskTitle) taskTitle.style.textDecoration = 'none';
-                        if (statusText) statusText.textContent = 'Upcoming';
+                        // In case they manually uncheck it during a weird state
+                        restoreCard(taskContainer, taskTitle, statusText);
                     }
                     
-                    // 3. Update the global deadline badge directly from the backend data
-                    if (badge && data.new_total !== undefined) {
-                        if (data.new_total > 0) {
-                            badge.textContent = data.new_total;
-                            badge.style.display = 'inline-block';
-                        } else {
-                            badge.style.display = 'none'; 
-                        }
-                    }
+                    updateBadges(data.new_total);
                 }
             })
             .catch(error => console.error('Error updating task:', error));
         });
     });
+
+    // Helper function to restore a crushed card perfectly
+    function restoreCard(container, title, status) {
+        if (title) title.style.textDecoration = 'none';
+        if (status) status.textContent = 'Upcoming';
+        
+        // 1. Remove the hide class and restore flex structure
+        container.classList.remove('d-none');
+        container.classList.add('d-flex');
+        
+        // 2. Force the browser to acknowledge the element is back in the DOM
+        // void container.offsetWidth;
+        
+        // 3. Setup the animation
+        container.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        // 4. Restore the inline styles so the card physically expands
+        // container.style.maxHeight = '1000px'; // Allows it to grow back to its natural height
+        // container.style.padding = ''; 
+        // container.style.margin = '';
+        // container.style.borderWidth = '';
+        
+        // 5. Restore opacity
+        container.style.opacity = '1';
+    }
+
+    // Helper function to update the red numbers smoothly
+    function updateBadges(newTotal) {
+        if (badge && newTotal !== undefined) {
+            if (newTotal > 0) {
+                badge.textContent = newTotal;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none'; 
+            }
+        }
+        if (pageTotal && newTotal !== undefined) {
+            pageTotal.style.opacity = '0';
+            setTimeout(() => {
+                pageTotal.textContent = newTotal;
+                pageTotal.style.opacity = '1';
+            }, 150);
+        }
+    }
     
     // Grab all our new filter buttons
     const filterButtons = document.querySelectorAll('.filter-btn');

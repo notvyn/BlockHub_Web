@@ -52,6 +52,8 @@ A centralized class management system for CS 2103.
 
 **July 13, 2026**
 - Refined positioning of Deadline Page Cards
+- Fixed deadline task checkbox interaction
+- Added undo button for marking task as done
 
 
 ## TO-DO LIST

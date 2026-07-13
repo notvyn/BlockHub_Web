@@ -1,3 +1,8 @@
+/* Force elements to respect the rigid column walls without blowing out the layout */
+.deadline-card > .d-flex, .dl-notes, .dl-actions, .dl-core {
+    min-width: 0;
+}
+
 /* --- DEADLINE FLEX CARDS --- */
 .deadline-card {
     border-top-right-radius: 3px;
@@ -85,8 +90,12 @@
 /* 1. Locks the entire Left Section (Checkbox + Core Info) to exactly 45% */
 .deadline-card > .d-flex.align-items-start, 
 .dl-core {
-    flex: 1 1 40%;
+    flex: 1 1 55%;
     min-width: 0; 
+}
+
+.dl-footer {
+    flex: 1 1 45%;
 }
 
 /* 2. Locks the Notes section to exactly 35% */
