@@ -45,6 +45,12 @@ main {
     display: flex;
     flex-direction: column;
     background-color: var(--sidebar-bg);
+    height: 100dvh;
+    /* 1. Kill the horizontal scrollbar entirely */
+    overflow-x: hidden; 
+    
+    /* 2. Allow vertical scrolling ONLY if content overflows (for mobile) */
+    overflow-y: auto;
 }
 
 #sidebar.expand {
@@ -89,6 +95,7 @@ main {
 
 .sidebar-footer {
     background-color: var(--sidebar-footer);
+    margin-top: auto;
     padding: 12px 0;
 }
 

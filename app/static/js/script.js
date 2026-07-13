@@ -36,8 +36,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const deadlineId = this.getAttribute('data-id');
             const isCompleted = this.checked;
             
+            // Scope DOM queries strictly to the parent card of the clicked checkbox
             const taskContainer = this.closest('.deadline-item');
             const taskTitle = taskContainer.querySelector('.md-task-title');
+            const statusText = taskContainer.querySelector('.status-text');
+            
+            // Sync BOTH desktop and mobile checkboxes so they always match
+            const allCheckboxesForTask = taskContainer.querySelectorAll('.task-checkbox');
+            allCheckboxesForTask.forEach(cb => cb.checked = isCompleted);
 
             fetch(`/complete-deadline/${deadlineId}`, {
                 method: 'POST',
@@ -47,37 +53,39 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
+                    
                     if (isCompleted) {
-                        // 1. Strike through the title
-                        if (taskTitle) {
-                            taskTitle.style.textDecoration = 'line-through';
+                        // 1. Strike through the title and update status text to Done
+                        if (taskTitle) taskTitle.style.textDecoration = 'line-through';
+                        if (statusText) statusText.textContent = 'Done';
+                        
+                        /* NOTE: If you decide you DO want completed tasks to fade out and hide 
+                           after marking them done, uncomment these lines: */
+                        // taskContainer.style.transition = 'opacity 0.6s ease';
+                        // taskContainer.style.opacity = '0';
+                        // setTimeout(() => { taskContainer.style.display = 'none'; }, 600);
+                        
+                    } else {
+                        // 2. Unmark the task (Remove strikethrough, revert status)
+                        if (taskTitle) taskTitle.style.textDecoration = 'none';
+                        if (statusText) statusText.textContent = 'Upcoming';
+                    }
+                    
+                    // 3. Update the global deadline badge directly from the backend data
+                    if (badge && data.new_total !== undefined) {
+                        if (data.new_total > 0) {
+                            badge.textContent = data.new_total;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none'; 
                         }
-                        
-                        // 2. Fade out the container
-                        taskContainer.style.transition = 'opacity 0.6s ease';
-                        taskContainer.style.opacity = '0';
-                        
-                        // 3. Remove it and update the badge directly from the backend data
-                        setTimeout(() => {
-                            taskContainer.style.display = 'none';
-                            
-                            // NEW LOGIC: Use the true database count provided by Flask!
-                            if (badge && data.new_total !== undefined) {
-                                if (data.new_total > 0) {
-                                    badge.textContent = data.new_total;
-                                    badge.style.display = 'inline-block';
-                                } else {
-                                    badge.style.display = 'none'; 
-                                }
-                            }
-                        }, 600);
-                    } 
+                    }
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error updating task:', error));
         });
     });
-
+    
     // Grab all our new filter buttons
     const filterButtons = document.querySelectorAll('.filter-btn');
     // Grab all the task containers

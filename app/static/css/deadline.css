@@ -1,35 +1,16 @@
-/* Mobile Responsive Fixes */
-@media (max-width: 768px) {
-    .dl-notes.border-start {
-        /* Removes the vertical divider line on mobile and turns it into a horizontal one */
-        border-left: none !important;
-        border-top: 2px solid rgba(0,0,0,0.1);
-        padding-top: 1rem;
-        margin-top: 0.5rem;
-        padding-left: 0 !important;
-    }
-}
-
-/* --- DARK MODE ADAPTATIONS --- */
-[data-theme="dark"] .deadline-card {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .deadline-card:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="dark"] .dl-notes.border-start {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-
 /* --- DEADLINE FLEX CARDS --- */
 .deadline-card {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     margin-bottom: 0.5rem;
+}
+
+[data-theme="dark"] .deadline-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .deadline-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .deadline-checkbox {
@@ -77,14 +58,7 @@
     font-size: 0.85rem;
 }
 
-/* --- COLUMN LOCKS (Prevents Overlap) --- */
-.dl-core {
-    flex: 1 1 40%; /* Always takes up 45% of the card */
-    min-width: 0;  /* Crucial: Prevents long titles from pushing the column wider */
-    padding-right: 1rem;
-}
-
-.dl-core .md-code {
+.dl-core .md-code, .dl-notes {
     color: var(--text-muted);
 }
 
@@ -96,26 +70,52 @@
     color: var(--accent-purple);
 }
 
-.dl-notes {
-    flex: 1 1 40%; /* Always takes up 35% of the card */
-    min-width: 0; 
-    color: var(--text-muted);
+.dl-footer.border-start {
+    border-left: 2px solid rgba(0, 0, 0, 0.1) !important;
 }
 
-.dl-actions {
-    flex: 1 1 20%; /* Always takes up 20% of the card */
-    min-width: 120px; /* Guarantees the buttons never get crushed */
+[data-theme="dark"] .dl-footer.border-start {
+    border-left: 2px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .dl-status {
     color: var(--text-muted);
 }
 
-/* --- DARK MODE OVERRIDES (Keep these exactly the same) --- */
-[data-theme="dark"] .deadline-card {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.1);
+/* 1. Locks the entire Left Section (Checkbox + Core Info) to exactly 45% */
+.deadline-card > .d-flex.align-items-start, 
+.dl-core {
+    flex: 1 1 40%;
+    min-width: 0; 
 }
-[data-theme="dark"] .deadline-card:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+
+/* 2. Locks the Notes section to exactly 35% */
+.dl-notes {
+    flex: 1 1 40%;
+    min-width: 0; 
+}
+
+/* 3. Locks the Action buttons and Status to exactly 20% */
+.dl-actions {
+    flex: 1 1 20%;
+    min-width: 0;
+}
+
+/* Mobile Responsive Fixes */
+@media (max-width: 768px) {
+    .dl-footer.border-start {
+        /* Removes the vertical divider line on mobile and turns it into a horizontal one */
+        border-left: none !important;
+        border-top: 2px solid rgba(0,0,0,0.1);
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        padding-left: 0 !important;
+    }
+    [data-theme="dark"] .dl-footer.border-start {
+        border-left: none !important;
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    .dl-actions {
+        display: flex;
+    }
 }

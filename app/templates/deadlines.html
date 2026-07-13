@@ -19,50 +19,70 @@
             {% elif days_left <= 7 %}
                 {% set urgency_color = 'var(--accent-yellow, var(--bs-warning))' %} 
             {% else %}
-                {% set urgency_color = 'var(--accent-blue   , var(--bs-info))' %} 
+                {% set urgency_color = 'var(--accent-blue, var(--bs-info))' %} 
             {% endif %}
 
-            <div class="card-wrapper deadline-card d-flex flex-column flex-md-row justify-content-between" style="border-right: 6px solid {{ urgency_color }};">
+            <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
+            <div class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3" style="border-right: 6px solid {{ urgency_color }};">
 
-                <!-- THE CHECKBOX -->
-                <div class="mt-1 me-2"> <!-- Added me-2 for slightly better spacing from the text -->
-                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off">
-                    
-                    <!-- Changed the label class and added a specific size to the icon -->
-                    <label class="dl-checkbox" for="btn-check-{{ d.id }}">
+                <!-- 1. MOBILE CHECKBOX (Top Right, Hidden on Desktop) -->
+                <div class="d-md-none position-absolute" style="top: 1rem; right: 1rem; z-index: 5;">
+                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-mob-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.status == 'Done' %}checked{% endif %}>
+                    <label class="dl-checkbox m-0" for="btn-check-mob-{{ d.id }}">
                         <i class="fa-solid fa-check"></i>
                     </label>
                 </div>
-                
-                <div class="dl-core flex-grow-1">
-                    <div class="md-code mb-1 border-0 bg-transparent p-0">{{ d.course.code }} | {{ d.category }}</div>
-                    <div class="dl-title fs-5 fw-bold mb-1">{{ d.description }}</div>
-                    <div class="dl-due" style="font-size: 0.85rem;">
-                        Submission: {{ d.due_date.strftime("%A - %B %d, %Y") }}
+
+                <!-- 2. LEFT COLUMN: Desktop Checkbox + Core Info -->
+                <div class="d-flex align-items-start gap-3 flex-grow-1" style="min-width: 0;">
+                    
+                    <!-- DESKTOP CHECKBOX (Hidden on Mobile) -->
+                    <div class="d-none d-md-block mt-1">
+                        <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.status == 'Done' %}checked{% endif %}>
+                        <label class="dl-checkbox m-0" for="btn-check-{{ d.id }}">
+                            <i class="fa-solid fa-check"></i>
+                        </label>
+                    </div>
+                    
+                    <div class="dl-core flex-grow-1 pe-5 pe-md-0 me-2">
+                        <div class="md-code mb-1 border-0 bg-transparent p-0">{{ d.course.code }} | {{ d.category }}</div>
+                        <div class="dl-title md-task-title fs-5 fw-bold mb-1" {% if d.status == 'Done' %}style="text-decoration: line-through;"{% endif %}>{{ d.description }}</div>
+                        <div class="dl-due" style="font-size: 0.85rem;">
+                            Submission: {{ d.due_date.strftime("%A - %B %d, %Y") }}
+                        </div>
                     </div>
                 </div>
 
-                <div class="dl-notes flex-grow-1 border-start px-md-4">
-                    <div class="fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
-                    <div class="" style="font-size: 0.85rem;">
-                        {{ d.note if d.note else "No additional notes provided." }}
+                <div class="dl-footer d-flex flex-grow-1 border-start px-md-4 mt-3 mt-md-0 align-items-start" style="min-width: 0;">
+
+                    <!-- 3. MIDDLE COLUMN: Notes -->
+                    <div class="dl-notes flex-grow-1 w-100 pe-3">
+                        <div class="fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
+                        <div class="" style="font-size: 0.85rem;">
+                            {{ d.note if d.note else "No additional notes provided." }}
+                        </div>
                     </div>
-                </div>
 
-                <div class="dl-actions d-flex flex-column align-items-md-end justify-content-center mt-3 mt-md-0 ps-md-3">
-                    <div class="d-flex gap-2 mb-2">
-
+                    <!-- 4. RIGHT COLUMN: Actions & Status -->
+                    <div class="dl-actions flex-shrink-0 d-flex flex-column align-items-end justify-content-end ms-2">
+                        {% if current_user.is_authenticated %}                        
+                        <div class="d-flex gap-2 mb-1">
                             <a href="{{ url_for('update_deadline', id=d.id)}}" class="btn btn-icon-action" title="Edit">
                                 <i class="fa-solid fa-pencil"></i>
                             </a>
                             <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ d.id }}" data-type="deadline" title="Delete">
                                 <i class="fa-solid fa-trash"></i>
-                            </a>
+                            </button>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="dl-status text-end" style="font-size: 0.8rem;">
+                            <!-- Added 'status-text' class here so JS can easily grab and update it -->
+                            Status: <span class="fw-bold status-text">{{ d.status }}</span><br>
+                            Days Left: <span class="fw-bold status-text">{{ days_left }}</span>
+                        </div>
+                    </div>
 
-                    </div>
-                    <div class="dl-status" style="font-size: 0.8rem;">
-                        Status: <span class="fw-bold">{{ d.status }}</span>
-                    </div>
                 </div>
 
             </div>

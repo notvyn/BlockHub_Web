@@ -10,6 +10,11 @@
     .sidebar-logo {
         margin-left: 0.5rem; 
     }
+    
+    .sidebar-footer {
+        /* Temporary Fix */
+        margin-bottom: 4rem;
+    }
 
     #m-search-trigger, .theme-toggle-btn, .entry-toggle {
         width: 40px; 
@@ -136,6 +141,8 @@
         pointer-events: none; /* Prevents accidentally clicking dashboard buttons through the blur */
         user-select: none; /* Prevents accidental text highlighting */
     }
+
+    #sidebar
 }
 
 /* --- MOBILE RESPONSIVE OVERRIDES --- */
