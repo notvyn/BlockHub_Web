@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const checkboxes = document.querySelectorAll('.task-checkbox');
     const badge = document.getElementById('deadline-badge');
-    const pageTotal = document.getElementById('page-total-count');
+    const deadlinePageTotal = document.getElementById('deadline-page-total-count');
     const toastContainer = document.getElementById('toast-container');
 
     checkboxes.forEach(checkbox => {
@@ -198,11 +198,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 badge.style.display = 'none'; 
             }
         }
-        if (pageTotal && newTotal !== undefined) {
-            pageTotal.style.opacity = '0';
+        if (deadlinePageTotal && newTotal !== undefined) {
+            deadlinePageTotal.style.opacity = '0';
             setTimeout(() => {
-                pageTotal.textContent = newTotal;
-                pageTotal.style.opacity = '1';
+                deadlinePageTotal.textContent = newTotal;
+                deadlinePageTotal.style.opacity = '1';
             }, 150);
         }
     }

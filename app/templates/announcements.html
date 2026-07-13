@@ -7,7 +7,12 @@
 
 {% block page_title %}Announcements{% endblock %}
 {% block page_title_txt %}New Sagap Around the Corner ;P{% endblock %}
-{% block total_num %}Total Announcements: {{ announcements|length }} {% endblock %}
+
+{% block extra_header %}
+    <div class="d-flex justify-content-end">
+        <div style="color: var(--text-muted);">Total Announcements: {{ announcements|length }}</div>
+    </div> 
+{% endblock %}
 
 {% block content %}
     <div class="card-container announcement-container">

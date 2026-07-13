@@ -8,8 +8,12 @@
 {% block page_title %}Deadlines{% endblock %}
 {% block page_title_txt %}Being productive right now! ;>{% endblock %}
 
-{% block total_num %}
-    Total Deadlines: <span id="page-total-count" style="transition: all 0.3s ease;">{{ deadlines|length }}</span> 
+{% block extra_header %}
+<div class="d-flex justify-content-end">
+    <div style="color: var(--text-muted);">
+        Total Deadlines: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ deadlines|length }}</span>
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}

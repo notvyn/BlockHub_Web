@@ -6,7 +6,12 @@
 
 {% block page_title %}Courses{% endblock %}
 {% block page_title_txt %}Success is one step ahead! :}{% endblock %}
-{% block total_num %}Total Courses: {{ courses|length }} {% endblock %}
+
+{% block extra_header %}
+    <div class="d-flex justify-content-end">
+        <div style="color: var(--text-muted);">Total Courses: {{ courses|length }}</div>
+    </div> 
+{% endblock %}
 
 {% block content %}
     <div class="courses-list mt-4">
