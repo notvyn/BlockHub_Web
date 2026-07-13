@@ -5,26 +5,14 @@
     <link href="{{ url_for('static', filename='css/deadline.css')}}" rel="stylesheet">
 {% endblock %}
 
-{% block page_title %}Deadlines{% endblock %}
-{% block page_title_txt %}Being productive right now! ;>{% endblock %}
+{% block page_title %}Deadlines Archive{% endblock %}
+{% block page_title_txt %}So much productivity! ;>{% endblock %}
 
 {% block extra_header %}
 <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3">
-    <a href="{{ url_for('deadlines_archive')}}" class="btn fw-medium" style="background-color: var(--text-muted) !important; color: var(--main-bg);">View Archive</a>
+    <a href="{{ url_for('deadlines')}}" class="btn fw-medium" style="background-color: var(--accent-purple) !important; color: var(--main-bg);">View Upcoming</a>
     <div style="color: var(--text-muted);">
-        Total Deadlines: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ deadlines|length }}</span>
-    </div>
-    <div class="d-flex flex-row-reverse gap-2" style="font-size: 0.8rem; color: var(--text-muted);">
-        <div class="d-flex align-items-center justify-content-center gap-2">
-            <div style="width: 12px; height: 12px; background-color: var(--accent-blue);"></div>
-            <span>> 7 days</span>
-        </div>
-        <div class="d-flex align-items-center justify-content-center gap-2">
-            <div style="width: 12px; height: 12px; background-color: var(--accent-yellow);"></div>
-            < 7 days</div>
-        <div class="d-flex align-items-center justify-content-center gap-2">
-            <div style="width: 12px; height: 12px; background-color: var(--accent-red);"></div>
-            < 2 days</div>
+        Total Archived: <span id="deadline-archive-page-total-count" style="transition: all 0.3s ease;">{{ deadlines|length }}</span>
     </div>
 </div>
 {% endblock %}
@@ -32,18 +20,8 @@
 {% block content %}
     <div class="card-container">
         {% for d in deadlines %}
-            {% set days_left = (d.due_date - today).days %}
-
-            {% if days_left <= 2 %}
-                {% set urgency_color = 'var(--accent-red, var(--bs-danger))' %} 
-            {% elif days_left <= 7 %}
-                {% set urgency_color = 'var(--accent-yellow, var(--bs-warning))' %} 
-            {% else %}
-                {% set urgency_color = 'var(--accent-blue, var(--bs-info))' %} 
-            {% endif %}
-
             <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
-            <div class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid {{ urgency_color }};">
+            <div class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid var(--accent-purple); filter: grayscale(0.5);">
 
                 <!-- 1. MOBILE CHECKBOX (Top Right, Hidden on Desktop) -->
                 <div class="d-md-none position-absolute" style="top: 1rem; right: 1rem; z-index: 5;">
@@ -98,8 +76,7 @@
                         
                         <div class="dl-status text-end" style="font-size: 0.8rem;">
                             <!-- Added 'status-text' class here so JS can easily grab and update it -->
-                            Status: <span class="fw-bold status-text">{{ d.status }}</span><br>
-                            Days Left: <span class="fw-bold status-text">{{ days_left }}</span>
+                            Status: <span class="fw-bold status-text">{{ d.status }}</span>
                         </div>
                     </div>
 

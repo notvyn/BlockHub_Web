@@ -128,9 +128,7 @@
                     </div>
                 </div>
                 {% if is_dedicated_page %}
-                    <div class="d-flex justify-content-end">
-                        <div style="color: var(--text-muted);">{% block total_num %}{% endblock %}</div>
-                    </div>
+                    {% block extra_header %}{% endblock %}
                 {% endif %}
 
                 {% block content %}{% endblock %}

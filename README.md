@@ -54,6 +54,7 @@ A centralized class management system for CS 2103.
 - Refined positioning of Deadline Page Cards
 - Fixed deadline task checkbox interaction
 - Added undo button for marking task as done
+- Created deadlines-archive page and refined task status update logic 
 
 
 ## TO-DO LIST

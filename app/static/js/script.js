@@ -32,6 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const badge = document.getElementById('deadline-badge');
     const deadlinePageTotal = document.getElementById('deadline-page-total-count');
     const toastContainer = document.getElementById('toast-container');
+    const deadlineArchivePageTotal = document.getElementById('deadline-archive-page-total-count');
+
+    // NEW: Determine which page the user is currently on by checking which total count exists
+    const isArchivePage = !!deadlineArchivePageTotal;
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
@@ -48,6 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
             taskContainer.style.transition = 'all 0.4s ease';
             taskContainer.style.overflow = 'hidden';
 
+            // NEW LOGIC: Should this card disappear?
+            // If on Archive Page: hide when UNCHECKED (false). If on Main Page: hide when CHECKED (true).
+            const shouldHide = isArchivePage ? !isCompleted : isCompleted;
+
             fetch(`/complete-deadline/${deadlineId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -57,12 +65,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if(data.success) {
                     
+                    // 1. Immediately update the physical text to match the new status
                     if (isCompleted) {
-                        // 1. Strike through text
                         if (taskTitle) taskTitle.style.textDecoration = 'line-through';
                         if (statusText) statusText.textContent = 'Done';
+                    } else {
+                        if (taskTitle) taskTitle.style.textDecoration = 'none';
+                        if (statusText) statusText.textContent = 'Upcoming';
+                    }
+
+                    // 2. Do we hide the card and show the toast?
+                    if (shouldHide) {
                         
-                        // 2. Crush the card
+                        // Crush the card smoothly
                         // taskContainer.classList.remove('p-3', 'p-md-3', 'mb-2');
                         // taskContainer.style.maxHeight = taskContainer.scrollHeight + 'px';
                         // void taskContainer.offsetWidth; 
@@ -71,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         // taskContainer.style.padding = '0px';
                         // taskContainer.style.margin = '0px';
                         // taskContainer.style.borderWidth = '0px';
-
                         taskContainer.style.opacity = '0';
                         
                         setTimeout(() => {
@@ -79,10 +93,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             taskContainer.classList.add('d-none');
                         }, 400);
 
-                        // 3. BUILD THE DYNAMIC STACKING TOAST
+                        // BUILD THE DYNAMIC STACKING TOAST
                         const titleText = taskTitle ? taskTitle.textContent.trim() : 'Task';
                         
-                        // Create the physical toast box
+                        // Dynamic Toast Text based on the page
+                        const actionText = isArchivePage ? 'moved to Upcoming' : 'marked done';
+                        
                         const toast = document.createElement('div');
                         toast.className = 'bg-dark text-white rounded shadow-lg overflow-hidden';
                         toast.style.minWidth = '300px';
@@ -90,12 +106,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         toast.style.opacity = '0';
                         toast.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
 
-                        // Inject the specific task title inside
                         toast.innerHTML = `
                             <div class="p-3 d-flex justify-content-between align-items-center">
                                 <div class="pe-3">
                                     <i class="fa-solid fa-circle-check text-success me-2"></i>
-                                    <span style="font-size: 0.9rem;"><strong>${titleText}</strong> marked done.</span>
+                                    <span style="font-size: 0.9rem;"><strong>${titleText}</strong> ${actionText}.</span>
                                 </div>
                                 <button class="btn btn-sm btn-outline-light undo-btn" style="font-weight: 600;">UNDO</button>
                             </div>
@@ -104,15 +119,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         `;
 
-                        // Add it to the screen
                         toastContainer.appendChild(toast);
                         
-                        // Force browser reflow to animate it popping up
                         void toast.offsetWidth;
                         toast.style.transform = 'translateY(0)';
                         toast.style.opacity = '1';
 
-                        // Animate the progress bar
                         const progress = toast.querySelector('.undo-progress');
                         setTimeout(() => {
                             progress.style.transition = 'width 5s linear';
@@ -121,42 +133,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         // 4. The 5-Second Deletion Timer
                         const undoTimer = setTimeout(() => {
-                            // Fade toast out and delete it from HTML
                             toast.style.opacity = '0';
                             toast.style.transform = 'translateY(20px)';
                             setTimeout(() => toast.remove(), 300);
                         }, 5000);
 
-                        // 5. The UNDO Button Logic (specific to THIS toast!)
+                        // 5. The UNDO Button Logic
                         toast.querySelector('.undo-btn').addEventListener('click', function() {
-                            clearTimeout(undoTimer); // Stop the 5-second timer
+                            clearTimeout(undoTimer); 
                             
-                            // Remove the toast gracefully
                             toast.style.opacity = '0';
                             setTimeout(() => toast.remove(), 300);
 
-                            // Tell backend to uncheck it
+                            // We send the OPPOSITE of what it currently is to undo the action
+                            const undoState = !isCompleted;
+
                             fetch(`/complete-deadline/${deadlineId}`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ completed: false })
+                                body: JSON.stringify({ completed: undoState })
                             })
                             .then(response => response.json())
                             .then(data => {
                                 if(data.success) {
-                                    allCheckboxesForTask.forEach(cb => cb.checked = false);
-                                    restoreCard(taskContainer, taskTitle, statusText);
-                                    updateBadges(data.new_total);
+                                    allCheckboxesForTask.forEach(cb => cb.checked = undoState);
+                                    restoreCard(taskContainer, taskTitle, statusText, undoState);
+                                    updateBadges(data.new_total, data.archive_total);
                                 }
                             });
                         });
 
                     } else {
-                        // In case they manually uncheck it during a weird state
-                        restoreCard(taskContainer, taskTitle, statusText);
+                        // User manually un-did their action before the toast timer ended without using the button
+                        restoreCard(taskContainer, taskTitle, statusText, isCompleted);
                     }
                     
-                    updateBadges(data.new_total);
+                    updateBadges(data.new_total, data.archive_total);
                 }
             })
             .catch(error => console.error('Error updating task:', error));
@@ -164,32 +176,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Helper function to restore a crushed card perfectly
-    function restoreCard(container, title, status) {
-        if (title) title.style.textDecoration = 'none';
-        if (status) status.textContent = 'Upcoming';
+    // Added 'isCompleted' parameter so it knows whether to restore a crossed-out title or a normal one
+    function restoreCard(container, title, status, isCompleted) {
+        if (title) title.style.textDecoration = isCompleted ? 'line-through' : 'none';
+        if (status) status.textContent = isCompleted ? 'Done' : 'Upcoming';
         
-        // 1. Remove the hide class and restore flex structure
         container.classList.remove('d-none');
         container.classList.add('d-flex');
         
-        // 2. Force the browser to acknowledge the element is back in the DOM
         // void container.offsetWidth;
         
-        // 3. Setup the animation
-        container.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        
-        // 4. Restore the inline styles so the card physically expands
-        // container.style.maxHeight = '1000px'; // Allows it to grow back to its natural height
+        // container.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        // container.style.maxHeight = '1000px'; 
         // container.style.padding = ''; 
         // container.style.margin = '';
         // container.style.borderWidth = '';
-        
-        // 5. Restore opacity
         container.style.opacity = '1';
     }
 
     // Helper function to update the red numbers smoothly
-    function updateBadges(newTotal) {
+    // Added 'archiveTotal' to smoothly update the number on the Archive page
+    function updateBadges(newTotal, archiveTotal) {
         if (badge && newTotal !== undefined) {
             if (newTotal > 0) {
                 badge.textContent = newTotal;
@@ -198,11 +205,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 badge.style.display = 'none'; 
             }
         }
+        
         if (deadlinePageTotal && newTotal !== undefined) {
             deadlinePageTotal.style.opacity = '0';
             setTimeout(() => {
                 deadlinePageTotal.textContent = newTotal;
                 deadlinePageTotal.style.opacity = '1';
+            }, 150);
+        }
+
+        if (deadlineArchivePageTotal && archiveTotal !== undefined) {
+            deadlineArchivePageTotal.style.opacity = '0';
+            setTimeout(() => {
+                deadlineArchivePageTotal.textContent = archiveTotal;
+                deadlineArchivePageTotal.style.opacity = '1';
             }, 150);
         }
     }

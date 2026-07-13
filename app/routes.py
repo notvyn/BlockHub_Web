@@ -43,15 +43,19 @@ def complete_deadline(id):
         
     db.session.commit()
     
-    # NEW LOGIC: Calculate the true total of remaining deadlines in the database
+    # Count the remaining active deadlines
     remaining_deadlines = Deadline.query.filter(
         Deadline.status.in_(['Upcoming', 'Pending'])
     ).count()
 
-    # Send that true total back to the JavaScript
+    # Count the totally completed deadlines
+    archived_deadlines = Deadline.query.filter_by(status='Done').count()
+
+    # Send BOTH totals back to the JavaScript
     return jsonify({    
         'success': True, 
-        'new_total': remaining_deadlines
+        'new_total': remaining_deadlines,
+        'archive_total': archived_deadlines
     })
 
 @app.route('/mark-announcement-read/<int:id>', methods=['POST'])
@@ -616,6 +620,13 @@ def deadlines():
         Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).all()
     today = date.today()
     return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True)
+
+@app.route('/deadlines/archive')
+def deadlines_archive():
+    deadlines = Deadline.query.filter(
+        Deadline.status.in_(['Done', 'Dropped'])).order_by(Deadline.due_date).all()
+    today = date.today()
+    return render_template('deadlines-archive.html', deadlines=deadlines, today=today, is_dedicated_page=True)
 
 @app.route('/update-entry/deadline/<int:id>', methods=['GET', 'POST'])
 def update_deadline(id):
