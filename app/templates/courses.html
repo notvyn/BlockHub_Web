@@ -89,8 +89,20 @@
                 <div class="course-core flex-grow-1">
                     <div class="course-code fw-bold mb-1">Course Code: {{ c.code }}</div>
                     <div class="course-title fs-5 fw-bold mb-1" title="{{ c.title }}">{{ c.title }}</div>
-                    <div class="course-instructor">
-                        Instructor: <span class="fw-medium  ">{{ c.instructor }}</span>
+                    <div class="course-instructor d-flex align-items-center gap-2">
+                        <div>Instructor: <span class="fw-medium">{{ c.instructor }}</span></div>
+                        
+                        <!-- Only show the email button if an email actually exists in the database -->
+                        {% if c.instructor_email %}
+                            <a href="mailto:{{ c.instructor_email }}?subject={{ c.code }} - Student Inquiry" 
+                            class="badge rounded-pill text-decoration-none" 
+                            style="background-color: rgba(142,68,173,0.1); color: var(--accent-purple); padding: 0.4em 0.8em; font-size: 0.75rem; transition: background-color 0.2s;"
+                            onmouseover="this.style.backgroundColor='var(--accent-purple)'; this.style.color='white';"
+                            onmouseout="this.style.backgroundColor='rgba(142,68,173,0.1)'; this.style.color='var(--accent-purple)';"
+                            title="Email Instructor" target="_blank">
+                                <i class="fa-regular fa-envelope me-1"></i> Email
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
 

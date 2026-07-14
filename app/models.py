@@ -49,6 +49,7 @@ class Course(db.Model):
     code = db.Column(db.String(50), nullable=False)
     title = db.Column(db.String(200), nullable=False)
     instructor = db.Column(db.String(200), nullable=False)
+    instructor_email = db.Column(db.String(200), nullable=True)
     units = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 

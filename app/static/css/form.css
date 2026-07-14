@@ -20,6 +20,7 @@
     font-size: 1.25rem;
     font-weight: 600;
 }
+
 .form-control::placeholder, .form-label{
     color: var(--text-muted);
 }

@@ -61,6 +61,7 @@ A centralized class management system for CS 2103.
 - Added delete logic for orphans of relational database model
 - Enabled edit and delete feature of both course and schedule
 - Added a master schedule accordion above course card, and a total units
+- Added instructor email and mailto href value
 
 
 ## TO-DO LIST
@@ -80,3 +81,8 @@ A centralized class management system for CS 2103.
 - [ ] Fix Recent Announcements Total Count and refine Query (Dashboard) 
 - [/] Have a live update on the total content count for each action on a page
 - [ ] Fix mobile sidebar screen UI issue 
+- [ ] Fix Total Units live update count
+- [ ] Have conditional text for no entry pages
+
+
+- Add Room to the Master Schedule and Model

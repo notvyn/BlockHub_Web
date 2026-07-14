@@ -30,9 +30,14 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div class="mb-4">
                         <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE INSTRUCTOR</label>
                         {{ form.instructor(class="form-control custom-date-input", autocomplete="off", placeholder="e.g. Dr. Ada Lovelace") }}
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">INSTRUCTOR EMAIL</label>
+                        {{ form.instructor_email(class="form-control custom-date-input", autocomplete="off", placeholder="e.g. ada.lovelave@g.batstate-u.edu.ph") }}
                     </div>
 
                 </div>

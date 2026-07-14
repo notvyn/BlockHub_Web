@@ -349,12 +349,14 @@ def add_course():
             code=form.code.data,
             title=form.title.data,
             instructor=form.instructor.data,
+            instructor_email=form.instructor_email.data,
             units=form.units.data,
         )
 
         form.code.data = ''
         form.title.data = ''
         form.instructor.data = ''
+        form.instructor_email.data = ''
         form.units.data = ''
 
         db.session.add(new_course)
@@ -768,6 +770,7 @@ def update_course(id):
         course_to_update.code = form.code.data
         course_to_update.title = form.title.data
         course_to_update.instructor = form.instructor.data
+        course_to_update.instructor_email = form.instructor_email.data
         course_to_update.units = form.units.data
 
         db.session.commit()
@@ -778,6 +781,7 @@ def update_course(id):
         form.code.data = course_to_update.code
         form.title.data = course_to_update.title
         form.instructor.data = course_to_update.instructor
+        form.instructor_email.data = course_to_update.instructor_email
         form.units.data = course_to_update.units
     else:
         # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!

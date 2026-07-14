@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField, TimeField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField, TimeField, FloatField
 from wtforms.validators import DataRequired, Email, EqualTo, URL, Optional
 from wtforms.widgets import TextArea
 from datetime import date, timedelta, time
@@ -21,7 +21,8 @@ class CourseForm(FlaskForm):
     code = StringField("Course Code", validators=[DataRequired()])
     title = StringField("Course Title", validators=[DataRequired()])
     instructor = StringField("Course Instructor", validators=[DataRequired()])
-    units = IntegerField("Course Units", validators=[DataRequired()])
+    instructor_email = StringField("Instructor Email", validators=[Optional(), Email()])
+    units = FloatField("Course Units", validators=[DataRequired()])
     submit = SubmitField()
 
 class CourseScheduleForm(FlaskForm):
