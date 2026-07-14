@@ -1,25 +1,75 @@
 /* --- COURSE FLEX CARDS --- */
-.course-card {
-    background-color: #ffffff; 
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); 
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+.course-core {
+    flex: 1 1 45%; 
+    min-width: 0;
 }
 
 .course-title {
     color: var(--text-dark);
 }
 
+.course-code {
+    color: var(--accent-purple);
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+}
+
+.course-instructor {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.course-schedules {
+    color: var(--text-muted);
+    flex: 1 1 60%; 
+    min-width: 0;
+}
+
+.course-footer {
+    flex: 1 1 55%;
+    min-width: 0;
+}
+
+.course-footer.border-start {
+    border-left: 2px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="dark"] .course-footer.border-start {
+    border-left: 2px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.course-actions {
+    flex: 1 1 40%; 
+    min-width: 0;
+}
+
+.btn-add-schedule {
+    width: 32px; 
+    height: 32px; 
+    border: 1.5px dashed rgba(0,0,0,0.3); 
+    color: var(--text-muted); 
+    transition: 0.2s;
+    background-color: transparent;
+}
+
+[data-theme='dark'] .btn-add-schedule {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-add-schedule:hover {
+    border-color: var(--accent-purple);
+    color: var(--accent-purple);
+    background-color: rgba(142,68,173,0.1);
+}
+
+.btn-add-schedule:active {
+    transform: scale(0.9);
+}
+
 /* Mobile Responsive Fixes for Columns */
 @media (max-width: 768px) {
-    .course-schedules.border-start {
+    .course-footer.border-start {
         /* Flips the vertical border to a horizontal divider on mobile */
         border-left: none !important;
         border-top: 1px solid rgba(0,0,0,0.1);
@@ -27,31 +77,9 @@
         margin-top: 0.5rem;
         padding-left: 0 !important;
     }
-    
-    .course-actions {
-        align-items: flex-start !important; /* Aligns buttons to the left on mobile */
+
+    [data-theme="dark"] .course-footer.border-start {
+        border-left: none !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
     }
-}
-
-/* --- DARK MODE ADAPTATIONS --- */
-[data-theme="dark"] .course-card {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .course-card:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="dark"] .course-title {
-    color: #ffffff;
-}
-
-[data-theme="dark"] .course-schedules.border-start {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Ensure the instructor name turns white in dark mode */
-[data-theme="dark"] .course-card span.text-dark {
-    color: #ffffff !important;
 }

@@ -72,11 +72,10 @@
 
 /* Specific hover effect for the trash delete icon */
 .btn-delete:hover {
-    background-color: var(--accent-red);
+    background-color: var(--accent-red) !important;
     color: #ffffff;
-    border-color: var(--accent-red);
+    border-color: var(--accent-red) !important;
 }
-
 
 /* Typography matching the old design */
 .card-title {

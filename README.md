@@ -56,6 +56,9 @@ A centralized class management system for CS 2103.
 - Added undo button for marking task as done
 - Created deadlines-archive page and refined task status update logic 
 
+**July 14, 2026**
+- Aligned Course Page styling 
+
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
