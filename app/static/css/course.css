@@ -67,6 +67,126 @@
     transform: scale(0.9);
 }
 
+/* --- MASTER SCHEDULE ROW BACKGROUNDS --- */
+.accordion-item {
+    border: 1px solid rgba(0,0,0,0.1) !important;
+}
+
+[data-theme="dark"] .accordion-item {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* --- ACCORDION DIVIDER FIX --- */
+
+/* Light mode: Soften the active accordion shadow to a faint gray */
+.accordion-button:not(.collapsed) {
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Dark mode: Soften the active accordion shadow to a faint white */
+[data-theme="dark"] .accordion-button:not(.collapsed) {
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* --- ACCORDION FOCUS RING FIX --- */
+
+/* Overrides the default Bootstrap blue glow with your accent purple */
+.accordion-button:focus {
+    border-color: var(--accent-purple, #8e44ad) !important;
+    /* The 0.25rem creates the thickness, the rgba sets the purple color with 25% opacity */
+    box-shadow: 0 0 0 0.25rem rgba(142, 68, 173, 0.2) !important;
+}
+
+/* Optional: Dark mode adaptation for the focus ring */
+[data-theme="dark"] .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(142, 68, 173, 0.2) !important;
+}
+
+/* 1. Strip Bootstrap's default cell backgrounds so the row color shines through */
+.table .schedule-row > th,
+.table .schedule-row > td {
+    background-color: transparent !important;
+}
+
+/* 2. Apply the background directly to the row (Reverting your red test color back to white!) */
+.schedule-row {
+    background-color: var(--card-bg);
+    transition: background-color 0.3s ease;
+}
+
+/* 4. Hover effect for the inner rows */
+.schedule-row.data-row:hover {
+    background-color: rgba(255, 255, 255, 0.08); /* Faint purple hover */
+}
+
+[data-theme="dark"] .schedule-row.data-row:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- TABLE BORDER FIX --- */
+
+/* Light mode: Faint dark gray line */
+.table > :not(caption) > * > * {
+    border-bottom-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Dark mode: Faint white line instead of harsh solid white */
+[data-theme="dark"] .table > :not(caption) > * > * {
+    border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* --- CONFLICT WARNING STYLES --- */
+.conflict-row {
+    position: relative;
+    border-left: 4px solid var(--accent-red, #e74c3c) !important;
+}
+
+/* Tooltip warning on hover */
+.conflict-row::after {
+    content: "Schedule Conflict!";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--accent-red, #e74c3c);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.conflict-row:hover::after {
+    opacity: 1;
+}
+
+[data-theme="dark"] .accordion-button {
+    background-color: rgba(255,255,255,0.03) !important;
+}
+[data-theme="dark"] .table-danger {
+    background-color: rgba(231, 76, 60, 0.15) !important;
+    color: #ffcccc !important;
+}
+
+.mini-action-btn {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: none;
+    padding: 0.1rem;
+    transition: all 0.2s ease;
+}
+
+.mini-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.mini-action-btn:active {
+    transform: scale(0.9);
+}
+
 /* Mobile Responsive Fixes for Columns */
 @media (max-width: 768px) {
     .course-footer.border-start {

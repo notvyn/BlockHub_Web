@@ -130,6 +130,12 @@
     filter: invert(1) opacity(0.6);
 }
 
+/* Tells the browser's native UI to use its dark theme */
+[data-theme="dark"] input[type="time"],
+[data-theme="dark"] input[type="date"] {
+    color-scheme: dark;
+}
+
 /* Mobile responsive fallback for the dates */
 @media (max-width: 768px) {
     .date-grid {

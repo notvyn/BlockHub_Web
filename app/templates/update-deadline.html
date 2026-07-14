@@ -67,8 +67,8 @@
                 </div>
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
-                    {{ form.submit(value="Post Deadline", class="btn btn-modal-save px-4") }}
+                    <a href="javascript:history.back()" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                    {{ form.submit(value="Save", class="btn btn-modal-save px-4") }}
                 </div>
             </form>
         </div>

@@ -10,7 +10,7 @@
 
 {% block extra_header %}
     <div class="d-flex justify-content-end">
-        <div style="color: var(--text-muted);">Total Announcements: {{ announcements|length }}</div>
+        <div style="color: var(--text-muted);">Total Announcements: <span id="announcement-page-total-count" style="transition: all 0.3s ease;">{{ announcements|length }}</span></div>
     </div> 
 {% endblock %}
 

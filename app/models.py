@@ -52,11 +52,23 @@ class Course(db.Model):
     units = db.Column(db.Numeric(precision=3, scale=2), nullable=False)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 
-    deadline = db.relationship('Deadline', backref='course', lazy=True)
-    class_summary = db.relationship('ClassSummary', backref='course', lazy=True)
+    deadline = db.relationship('Deadline', backref='course', lazy=True, cascade="all, delete-orphan")
+    class_summary = db.relationship('ClassSummary', backref='course', lazy=True, cascade="all, delete-orphan")
+    schedules = db.relationship('CourseSchedule', backref='course', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Course {self.code}>'
+
+class CourseSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    day = db.Column(db.String(50), nullable=False)
+    
+    # CHANGED: These must be db.Time to accept WTForms TimeField data
+    start_time = db.Column(db.Time, nullable=False) 
+    end_time = db.Column(db.Time, nullable=False)
+    
+    date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 
 class Deadline(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -91,7 +103,7 @@ class User(db.Model, UserMixin):
     
     password_hash = db.Column(db.String(200), nullable=False)
 
-    announcements = db.relationship('Announcement', backref='author', lazy=True)
+    announcements = db.relationship('Announcement', backref='author', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"User('{self.name}')"

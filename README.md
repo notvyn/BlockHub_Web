@@ -57,7 +57,10 @@ A centralized class management system for CS 2103.
 - Created deadlines-archive page and refined task status update logic 
 
 **July 14, 2026**
-- Aligned Course Page styling 
+- Aligned Course Page styling
+- Added delete logic for orphans of relational database model
+- Enabled edit and delete feature of both course and schedule
+- Added a master schedule accordion above course card, and a total units
 
 
 ## TO-DO LIST
@@ -74,6 +77,6 @@ A centralized class management system for CS 2103.
 - [ ] Create new model for Courses' schedule
 - [/] Include total number of content and other labels on each dedicated pages
 - [ ] Add small red dot on sidebar for pages with new content
-- [ ] Fix Recent Announcements Total Count and refine Query 
-- [ ] Have a live update on the total content count for each action on a page
-- [ ] Fix mobile sidebar screen UI issue
+- [ ] Fix Recent Announcements Total Count and refine Query (Dashboard) 
+- [/] Have a live update on the total content count for each action on a page
+- [ ] Fix mobile sidebar screen UI issue 

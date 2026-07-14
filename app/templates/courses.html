@@ -9,12 +9,79 @@
 {% block page_title_txt %}Success is one step ahead! :}{% endblock %}
 
 {% block extra_header %}
-    <div class="d-flex justify-content-end">
-        <div style="color: var(--text-muted);">Total Courses: {{ courses|length }}</div>
+    <div class="d-flex justify-content-end gap-3">
+        <div style="color: var(--text-muted);">Total Units: {{ courses|sum(attribute='units') }}</div>
+        <div style="color: var(--text-muted);">Total Courses: <span id="course-page-total-count" style="transition: all 0.3s ease;">{{ courses|length }}</span></div>
     </div> 
 {% endblock %}
 
 {% block content %}
+    <!-- MASTER SCHEDULE ACCORDION -->
+    <div class="accordion my-3 shadow-sm" id="scheduleAccordion">
+        <div class="accordion-item" style="background-color: var(--main-bg);">
+            <h2 class="accordion-header border-0" id="headingOne">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSchedule" aria-expanded="false" aria-controls="collapseSchedule" style="background-color: rgba(142,68,173,0.05); color: var(--accent-purple);">
+                    <i class="fa-regular fa-calendar-check me-2"></i> View Master Schedule
+                </button>
+            </h2>
+            <div id="collapseSchedule" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#scheduleAccordion">
+                <div class="accordion-body p-0">
+                    
+                    {% if master_schedule %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                                {% for day, schedules in master_schedule.items() %}
+                                    <!-- Day Header -->
+                                    <thead>
+                                        <!-- Added schedule-row here -->
+                                        <tr class="schedule-row">
+                                            <th colspan="3" class="text-uppercase py-2 ps-4 fw-bold" style="color: var(--text-muted); letter-spacing: 1.5px; font-size: 0.75rem;">
+                                                {{ day }}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    
+                                    <!-- Class Rows -->
+                                    <tbody style="border-top: none;">
+                                        {% for s in schedules %}
+                                        <!-- Added schedule-row and data-row here -->
+                                        <tr class="align-middle schedule-row data-row {% if s.conflict %}table-danger conflict-row{% endif %}">
+                                            
+                                            <!-- 1. TIME COLUMN -->
+                                            <td class="ps-4 fw-medium py-2" style="color: var(--accent-purple, #5c2c7a); font-size: 0.9rem;">
+                                                {{ s.start_time.strftime('%I:%M %p') }} - {{ s.end_time.strftime('%I:%M %p') }}
+                                            </td>
+                                            
+                                            <!-- 2. COURSE COLUMN -->
+                                            <td class="py-3">
+                                                <div class="fw-bold mb-1" style="color: var(--accent-purple, #8e44ad); font-size: 0.8rem;">{{ s.course_code }}</div>
+                                                <div class="text-truncate" style="font-size: 0.9rem; color: var(--text-dark);">
+                                                    {{ s.course_title }}
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- 3. INSTRUCTOR COLUMN -->
+                                            <td class="py-3" style="font-size: 0.9rem; color: var(--text-muted);">
+                                                <i class="fa-solid fa-user-tie me-2" style="font-size: 0.85rem; color: var(--text-muted)"></i> {{ s.instructor }}
+                                            </td>
+                                            
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted fst-italic">
+                            No schedules have been added yet.
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card-container courses-list">
         {% for c in courses %}
             <div class="card-wrapper course-card d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
@@ -39,9 +106,23 @@
                             {% if c.schedules %}
                                 {% for sched in c.schedules %}
                                     <!-- Individual Schedule Block -->
-                                    <div class="d-flex flex-column" style="line-height: 1.2;">
-                                        <span class="fw-bold" style="color: var(--text-dark); font-size: 0.85rem;">{{ sched.day }}</span>
-                                        <span class="text-muted" style="font-size: 0.8rem;">{{ sched.start_time }} - {{ sched.end_time }}</span>
+                                    <div class="d-flex flex-column schedule-item" style="line-height: 1.2;">
+                                        <span class="fw-medium" style="color: var(--text-dark); font-size: 0.85rem;">{{ sched.day }}</span>
+                                        <span class="" style="font-size: 0.8rem; color: var(--text-muted);">
+                                            {{ sched.start_time.strftime('%I:%M %p') }} - {{ sched.end_time.strftime('%I:%M %p') }}
+                                        </span>
+
+                                        <!-- The Mini Edit/Delete Icons -->
+                                        <div class="d-flex gap-2 mt-1">
+                                            <!-- Make sure to create an 'update_course_schedule' route in Python later! -->
+                                            <a href="{{ url_for('update_course_schedule', id=sched.id) }}" class="mini-action-btn edit-btn" title="Edit Schedule">
+                                                <i class="fa-solid fa-pencil"></i>
+                                            </a>
+                                            <button type="button" class="mini-action-btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteScheduleModal" data-type="course-schedule" data-id="{{ sched.id }}" title="Delete Schedule">
+                                                
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 {% endfor %}
                             {% else %}
@@ -50,7 +131,7 @@
 
                             <!-- The Circular Add Button -->
                             <!-- Using inline hover styles here for ease, but you can move these to course.css! -->
-                            <a href="#" class="btn-add-schedule btn rounded-circle d-flex align-items-center justify-content-center p-0 ms-1" title="Add Schedule">
+                            <a href="{{ url_for('add_course_schedule', id=c.id) }}" class="btn-add-schedule btn rounded-circle d-flex align-items-center justify-content-center p-0 ms-1" title="Add Schedule">
                                 <i class="fa-solid fa-plus"></i>
                             </a>
                             
@@ -59,14 +140,16 @@
 
                     <!-- 4. RIGHT COLUMN: Actions & Units -->
                     <div class="course-actions d-flex flex-column align-items-end justify-content-center ps-3">
+                        {% if current_user.is_authenticated %}
                         <div class="d-flex gap-2 mb-2">
-                            <a href="#" class="btn btn-icon-action" title="Edit">
+                            <a href="{{ url_for('update_course', id=c.id) }}" class="btn btn-icon-action" title="Edit">
                                 <i class="fa-solid fa-pencil"></i>
                             </a>
-                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ c.id }}" title="Delete">
+                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ c.id }}" data-type="course" title="Delete">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
+                        {% endif %}
                         <div class="fw-bold mt-1 text-end" style="color: var(--accent-purple); font-size: 0.9rem;">
                             Units: {{ "%.2f"|format(c.units) }}
                         </div>

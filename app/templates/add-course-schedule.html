@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}New Schedule{% endblock %}
+{% block page_title_txt %}Knowledge is Power! :D{% endblock %}
+
+{% block content %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <form method="POST" class="add-entry-form">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-5">
+                    <h2 class="course-title fw-medium">{{ course.code }} - {{ course.title }}</h2>
+                </div>
+
+                <div class="form-container">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DAY</label>
+                        <div class="d-flex flex-wrap gap-2 pill-group">
+                            {% for subfield in form.day %}
+                                {{ subfield(class="btn-check") }}
+                                <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="date-grid mb-4">
+                        <div>
+                            <label for="start-time" class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">START TIME</label>
+                            {{ form.start_time(class="form-control", id="start-time", autocomplete="off", onclick="this.showPicker()", style="cursor: pointer;") }}
+                        </div>
+                        <div>
+                            <label for="end-time" class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">END TIME</label>
+                            {{ form.end_time(class="form-control", id="end-time", autocomplete="off", onclick="this.showPicker()", style="cursor: pointer;") }}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-btn d-flex justify-content-end gap-3 mt-5">
+                    <a href="javascript:history.back()" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                    {{ form.submit(value="Add Schedule", class="btn btn-modal-save px-4") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

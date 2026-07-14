@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField, TimeField
 from wtforms.validators import DataRequired, Email, EqualTo, URL, Optional
 from wtforms.widgets import TextArea
-from datetime import date, timedelta
+from datetime import date, timedelta, time
 
 class AnnouncementForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
@@ -22,6 +22,12 @@ class CourseForm(FlaskForm):
     title = StringField("Course Title", validators=[DataRequired()])
     instructor = StringField("Course Instructor", validators=[DataRequired()])
     units = IntegerField("Course Units", validators=[DataRequired()])
+    submit = SubmitField()
+
+class CourseScheduleForm(FlaskForm):
+    day = RadioField("Day", validators=[DataRequired()], choices=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
+    start_time = TimeField("Start Time", default=time, validators=[DataRequired()])
+    end_time = TimeField("End Time", default=time, validators=[DataRequired()])
     submit = SubmitField()
 
 def get_tomorrow():

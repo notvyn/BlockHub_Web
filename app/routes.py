@@ -11,8 +11,8 @@ from app import app, login_manager, db
 import cloudinary
 import cloudinary.uploader
 
-from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, Deadline, Link
-from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, DeadlineForm, LinkForm, LoginForm, SignupForm
+from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link
+from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm
 from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter
 
 @login_manager.user_loader
@@ -503,7 +503,8 @@ def announcement(id):
                            user_hearted=user_hearted,
                            read_stats=read_stats,
                            has_back_btn=True, 
-                           is_dedicated_page=True)
+                           is_dedicated_page=True,
+                           page_title="Announcement")
 
 @app.route('/announcements')
 def announcements():
@@ -563,7 +564,8 @@ def announcements():
                            user_hearted_ids=user_hearted_ids,
                            read_stats=read_stats,
                            read_ids=read_ids, # <-- Pass the list to the template
-                           is_dedicated_page=True)
+                           is_dedicated_page=True,
+                           page_title="Announcement")
 
 @app.route('/update-entry/announcement/<int:id>', methods=['GET', 'POST'])
 def update_announcement(id):
@@ -604,12 +606,14 @@ def delete_announcement(id):
         
         # 2. Delete all attached Hearts first
         AnnouncementHeart.query.filter_by(announcement_id=id).delete()
+
+        remaining_announcement = Announcement.query.count()
         
         # 3. NOW it is safe to delete the actual announcement
         db.session.delete(announcement_to_delete)
         db.session.commit()
 
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'new_total': remaining_announcement})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -619,14 +623,14 @@ def deadlines():
     deadlines = Deadline.query.filter(
         Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).all()
     today = date.today()
-    return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True)
+    return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True, page_title="Deadline")
 
 @app.route('/deadlines/archive')
 def deadlines_archive():
     deadlines = Deadline.query.filter(
         Deadline.status.in_(['Done', 'Dropped'])).order_by(Deadline.due_date).all()
     today = date.today()
-    return render_template('deadlines-archive.html', deadlines=deadlines, today=today, is_dedicated_page=True)
+    return render_template('deadlines-archive.html', deadlines=deadlines, today=today, is_dedicated_page=True, page_title="Deadline")
 
 @app.route('/update-entry/deadline/<int:id>', methods=['GET', 'POST'])
 def update_deadline(id):
@@ -673,7 +677,9 @@ def delete_deadline(id):
         db.session.delete(deadline_to_delete)
         db.session.commit()
 
-        return jsonify({'success': True})
+        remaining_deadline = Deadline.query.count()
+
+        return jsonify({'success': True, 'new_total': remaining_deadline})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -681,15 +687,173 @@ def delete_deadline(id):
 
 @app.route('/courses')
 def courses():
-    courses = Course.query.order_by(Course.date_added).all()
-    return render_template('courses.html', courses=courses, is_dedicated_page=True)
+    courses_list = Course.query.order_by(Course.date_added).all()
+    
+    # 1. Setup a dictionary to hold schedules grouped by the days of the week
+    days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    master_schedule = {day: [] for day in days_order}
+    
+    # 2. Fetch ALL schedules and join them with their Course data
+    all_schedules = CourseSchedule.query.join(Course).all()
+    
+    # 3. Populate the dictionary
+    for sched in all_schedules:
+        master_schedule[sched.day].append({
+            'course_code': sched.course.code,
+            'course_title': sched.course.title,
+            'instructor': sched.course.instructor,
+            'start_time': sched.start_time,
+            'end_time': sched.end_time,
+            'conflict': False # Default state
+        })
+        
+    # 4. Sort and Check for Conflicts
+    for day in days_order:
+        # Sort the day's schedules chronologically by start_time
+        master_schedule[day].sort(key=lambda x: x['start_time'])
+        
+        # Compare each schedule to the next one to find overlaps
+        day_scheds = master_schedule[day]
+        for i in range(len(day_scheds) - 1):
+            current_class = day_scheds[i]
+            next_class = day_scheds[i+1]
+            
+            # The Conflict Formula
+            if current_class['start_time'] < next_class['end_time'] and current_class['end_time'] > next_class['start_time']:
+                current_class['conflict'] = True
+                next_class['conflict'] = True
+
+    # 5. Clean up empty days so we don't render blank tables
+    master_schedule = {day: scheds for day, scheds in master_schedule.items() if scheds}
+
+    return render_template(
+        'courses.html', 
+        courses=courses_list, 
+        master_schedule=master_schedule,
+        is_dedicated_page=True, 
+        page_title="Course"
+    )
+
+@app.route('/courses/<int:id>/add-schedule', methods=['GET', 'POST'])
+def add_course_schedule(id):
+    course = Course.query.get_or_404(id)
+    form = CourseScheduleForm()
+
+    if form.validate_on_submit():
+        new_course_schedule = CourseSchedule(
+            course_id = course.id,
+            day = form.day.data,
+            start_time = form.start_time.data,
+            end_time = form.end_time.data
+        )
+
+        form.day.data = ''
+        form.start_time.data = ''
+        form.end_time.data = ''
+
+        db.session.add(new_course_schedule)
+        db.session.commit()
+
+        return redirect(url_for('courses'))
+
+    return render_template('add-course-schedule.html', course=course, form=form, has_back_btn=True, is_entry=True)
+
+@app.route('/update-entry/course/<int:id>', methods=['GET', 'POST'])
+def update_course(id):
+    course_to_update = Course.query.get_or_404(id)
+    form = CourseForm()
+
+    if form.validate_on_submit():
+        # POST REQUEST: The form is valid, save the new data
+        course_to_update.code = form.code.data
+        course_to_update.title = form.title.data
+        course_to_update.instructor = form.instructor.data
+        course_to_update.units = form.units.data
+
+        db.session.commit()
+        return redirect(url_for('courses'))
+        
+    elif request.method == 'GET':
+        # GET REQUEST: Pre-fill the form fields with the existing database data
+        form.code.data = course_to_update.code
+        form.title.data = course_to_update.title
+        form.instructor.data = course_to_update.instructor
+        form.units.data = course_to_update.units
+    else:
+        # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!
+        print("FORM VALIDATION FAILED:", form.errors)
+
+    return render_template('update-course.html', form=form, has_back_btn=True, is_entry=True)
+
+@app.route('/delete-entry/course/<int:id>', methods=['POST', 'DELETE'])
+def delete_course(id):
+    # Only allow the author (or an admin) to delete it
+    course_to_delete = Course.query.get_or_404(id)
+    
+    # if current_user.id != course_to_delete.user_id:
+    #     return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    try:
+        db.session.delete(course_to_delete)
+        db.session.commit()
+
+        remaining_course = Course.query.count()
+
+        return jsonify({'success': True, 'new_total': remaining_course})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/courses/<int:id>/update-schedule', methods=['GET', 'POST'])
+def update_course_schedule(id):
+    form = CourseScheduleForm()
+    schedule_to_update = CourseSchedule.query.get_or_404(id)
+    course = Course.query.get_or_404(schedule_to_update.course_id)
+
+    if form.validate_on_submit():
+        # POST REQUEST: The form is valid, save the new data
+        schedule_to_update.day = form.day.data
+        schedule_to_update.start_time = form.start_time.data
+        schedule_to_update.end_time = form.end_time.data
+
+        db.session.commit()
+        return redirect(url_for('courses'))
+        
+    elif request.method == 'GET':
+        # GET REQUEST: Pre-fill the form fields with the existing database data
+        form.day.data = schedule_to_update.day
+        form.start_time.data = schedule_to_update.start_time
+        form.end_time.data = schedule_to_update.end_time
+    else:
+        # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!
+        print("FORM VALIDATION FAILED:", form.errors)
+
+    return render_template('update-course-schedule.html', schedule_to_update=schedule_to_update, form=form, course=course, has_back_btn=True, is_entry=True)
+
+@app.route('/delete-entry/course-schedule/<int:id>', methods=['POST', 'DELETE'])
+def delete_course_schedule(id):
+    # Only allow the author (or an admin) to delete it
+    schedule_to_delete = CourseSchedule.query.get_or_404(id)
+    
+    # if current_user.id != schedule_to_delete.user_id:
+    #     return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    try:
+        db.session.delete(schedule_to_delete)
+        db.session.commit()
+
+        remaining_schedule = CourseSchedule.query.count()
+
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @app.route('/class-summaries')
 def summaries():
     summaries = ClassSummary.query.order_by(ClassSummary.date_added).all()
-    return render_template('summaries.html', summaries=summaries, is_dedicated_page=True)
-
-
+    return render_template('summaries.html', summaries=summaries, is_dedicated_page=True, page_title="Class Summary")
 
 
 @app.route('/login', methods=['GET', 'POST'])
