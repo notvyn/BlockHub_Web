@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             cardToRemove.style.transition = 'opacity 0.4s ease';
                             cardToRemove.style.opacity = '0';
                             updateCount(data.new_total);
+
+                            if (itemToDeleteType === 'course') { updateUnits(data.new_units) }
+
                             setTimeout(() => {
                                 cardToRemove.remove();
                             }, 400);
@@ -91,6 +94,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     badge.style.display = 'none';
                 }
             }
+        }
+    }
+
+    function updateUnits(newUnits) {
+        const pageUnits = document.getElementById('course-page-total-units')
+
+        if (pageUnits) {
+            pageUnits.style.opacity = '0';
+            setTimeout(() => {
+                pageUnits.textContent = newUnits;
+                pageUnits.style.opacity = '1';
+            }, 150);
         }
     }
 

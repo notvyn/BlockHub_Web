@@ -10,7 +10,7 @@
 
 {% block extra_header %}
     <div class="d-flex justify-content-end gap-3">
-        <div style="color: var(--text-muted);">Total Units: {{ courses|sum(attribute='units') }}</div>
+        <div style="color: var(--text-muted);">Total Units: <span id="course-page-total-units" style="transition: all 0.3s ease;">{{ courses|sum(attribute='units') }}</span></div>
         <div style="color: var(--text-muted);">Total Courses: <span id="course-page-total-count" style="transition: all 0.3s ease;">{{ courses|length }}</span></div>
     </div> 
 {% endblock %}
@@ -35,7 +35,7 @@
                                     <thead>
                                         <!-- Added schedule-row here -->
                                         <tr class="schedule-row">
-                                            <th colspan="3" class="text-uppercase py-2 ps-4 fw-bold" style="color: var(--text-muted); letter-spacing: 1.5px; font-size: 0.75rem;">
+                                            <th colspan="4" class="text-uppercase py-2 ps-4 fw-bold" style="color: var(--text-muted); letter-spacing: 1.5px; font-size: 0.75rem;">
                                                 {{ day }}
                                             </th>
                                         </tr>
@@ -48,20 +48,24 @@
                                         <tr class="align-middle schedule-row data-row {% if s.conflict %}table-danger conflict-row{% endif %}">
                                             
                                             <!-- 1. TIME COLUMN -->
-                                            <td class="ps-4 fw-medium py-2" style="color: var(--accent-purple, #5c2c7a); font-size: 0.9rem;">
+                                            <td class="ps-4 fw-medium py-2" style="width: 20%; color: var(--accent-purple, #5c2c7a); font-size: 0.9rem;">
                                                 {{ s.start_time.strftime('%I:%M %p') }} - {{ s.end_time.strftime('%I:%M %p') }}
+                                            </td>
+                                            
+                                            <td class="fw-medium py-2" style="width: 10%; color: var(--accent-purple, #5c2c7a); font-size: 0.8rem;">
+                                                {{ s.room }}
                                             </td>
                                             
                                             <!-- 2. COURSE COLUMN -->
                                             <td class="py-3">
-                                                <div class="fw-bold mb-1" style="color: var(--accent-purple, #8e44ad); font-size: 0.8rem;">{{ s.course_code }}</div>
+                                                <div class="fw-bold mb-1" style="width: 40%; color: var(--accent-purple, #8e44ad); font-size: 0.8rem;">{{ s.course_code }}</div>
                                                 <div class="text-truncate" style="font-size: 0.9rem; color: var(--text-dark);">
                                                     {{ s.course_title }}
                                                 </div>
                                             </td>
                                             
                                             <!-- 3. INSTRUCTOR COLUMN -->
-                                            <td class="py-3" style="font-size: 0.9rem; color: var(--text-muted);">
+                                            <td class="py-3" style="width: 30%; font-size: 0.9rem; color: var(--text-muted);">
                                                 <i class="fa-solid fa-user-tie me-2" style="font-size: 0.85rem; color: var(--text-muted)"></i> {{ s.instructor }}
                                             </td>
                                             
@@ -119,7 +123,7 @@
                                 {% for sched in c.schedules %}
                                     <!-- Individual Schedule Block -->
                                     <div class="d-flex flex-column schedule-item" style="line-height: 1.2;">
-                                        <span class="fw-medium" style="color: var(--text-dark); font-size: 0.85rem;">{{ sched.day }}</span>
+                                        <span class="fw-medium mb-1" style="color: var(--text-dark); font-size: 0.85rem;">{{ sched.day }} - {{ sched.room }}</span>
                                         <span class="" style="font-size: 0.8rem; color: var(--text-muted);">
                                             {{ sched.start_time.strftime('%I:%M %p') }} - {{ sched.end_time.strftime('%I:%M %p') }}
                                         </span>

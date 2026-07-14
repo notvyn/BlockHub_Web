@@ -68,6 +68,8 @@ class CourseSchedule(db.Model):
     # CHANGED: These must be db.Time to accept WTForms TimeField data
     start_time = db.Column(db.Time, nullable=False) 
     end_time = db.Column(db.Time, nullable=False)
+
+    room = db.Column(db.String(50), nullable=False, server_default='TBA')
     
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 

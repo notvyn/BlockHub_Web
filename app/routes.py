@@ -706,6 +706,7 @@ def courses():
             'instructor': sched.course.instructor,
             'start_time': sched.start_time,
             'end_time': sched.end_time,
+            'room' : sched.room,
             'conflict': False # Default state
         })
         
@@ -746,12 +747,14 @@ def add_course_schedule(id):
             course_id = course.id,
             day = form.day.data,
             start_time = form.start_time.data,
-            end_time = form.end_time.data
+            end_time = form.end_time.data,
+            room = form.room.data
         )
 
         form.day.data = ''
         form.start_time.data = ''
         form.end_time.data = ''
+        form.room.data = ''
 
         db.session.add(new_course_schedule)
         db.session.commit()
@@ -802,8 +805,9 @@ def delete_course(id):
         db.session.commit()
 
         remaining_course = Course.query.count()
+        units_total = sum(course.units for course in Course.query.all())
 
-        return jsonify({'success': True, 'new_total': remaining_course})
+        return jsonify({'success': True, 'new_total': remaining_course, 'new_units': units_total })
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -819,6 +823,7 @@ def update_course_schedule(id):
         schedule_to_update.day = form.day.data
         schedule_to_update.start_time = form.start_time.data
         schedule_to_update.end_time = form.end_time.data
+        schedule_to_update.room = form.room.data
 
         db.session.commit()
         return redirect(url_for('courses'))
@@ -828,6 +833,7 @@ def update_course_schedule(id):
         form.day.data = schedule_to_update.day
         form.start_time.data = schedule_to_update.start_time
         form.end_time.data = schedule_to_update.end_time
+        form.room.data = schedule_to_update.room
     else:
         # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!
         print("FORM VALIDATION FAILED:", form.errors)
