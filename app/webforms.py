@@ -12,8 +12,9 @@ class AnnouncementForm(FlaskForm):
 
 class ClassSummaryForm(FlaskForm):
     course = RadioField("Course", validators=[DataRequired()], coerce=int)
+    schedule = RadioField("Select Schedule", validators=[DataRequired()], coerce=int)
     content = StringField("Content", validators=[DataRequired()], widget=TextArea())
-    scheduled_date = DateField("Scheduled Date",  default=date.today, validators=[DataRequired()])
+    date_held = DateField("Date Held",  default=date.today, validators=[DataRequired()])
     note = StringField("Note", widget=TextArea())
     submit = SubmitField()
 

@@ -35,9 +35,12 @@ class ClassSummary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    schedule_id = db.Column(db.Integer, db.ForeignKey('course_schedule.id'), nullable=True)
+
+    schedule = db.relationship('CourseSchedule', backref='summaries', lazy=True)
 
     content = db.Column(db.Text, nullable=False)
-    scheduled_date = db.Column(db.DateTime, nullable=False)
+    date_held = db.Column(db.Date, nullable=False)
     note = db.Column(db.Text, nullable=True)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 

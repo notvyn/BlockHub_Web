@@ -168,7 +168,7 @@
                         </div>
                         
                         {% if target_record %}
-                            <div class="md-date md-code">Date: {{ target_record.scheduled_date.strftime("%a - %b %d, %Y") }}</div>
+                            <div class="md-date md-code">Date: {{ target_record.date_held.strftime("%a - %b %d, %Y") }}</div>
                         {% else %}
                             <div class="md-date md-code border-0 bg-transparent ">No recent summaries.</div>
                         {% endif %}

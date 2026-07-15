@@ -2,9 +2,9 @@
 
 from flask import render_template, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from sqlalchemy.orm import joinedload
-from datetime import date, timedelta
+from datetime import date, timedelta, time
 
 from app import app, login_manager, db
 
@@ -212,7 +212,7 @@ def dashboard():
 
     # deadline = Deadline.query.filter(Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).limit(3).all()
     
-    # class_summary = ClassSummary.query.order_by(ClassSummary.scheduled_date).all()
+    # class_summary = ClassSummary.query.order_by(ClassSummary.date_held).all()
 
     # link = Link.query.order_by(Link.date_added).all()
 
@@ -234,14 +234,14 @@ def dashboard():
     end_of_week = today + timedelta(days=days_until_sunday)
 
     # 1. Grab the absolute newest record, regardless of time.
-    target_record = ClassSummary.query.order_by(ClassSummary.scheduled_date.desc()).first()
+    target_record = ClassSummary.query.order_by(ClassSummary.date_held.desc()).first()
     
     # 2. Create an empty dictionary to hold our grouped data
     daily_summaries = {}
     
     if target_record:
         # 2. Extract just the calendar date from the newest record
-        record_date = target_record.scheduled_date
+        record_date = target_record.date_held
         if hasattr(record_date, 'date'):
             record_date = record_date.date()
             
@@ -252,7 +252,7 @@ def dashboard():
         if days_old <= 3:
             # 1. Fetch the raw summaries just like before
             raw_summaries = ClassSummary.query.options(joinedload(ClassSummary.course)).filter(
-                func.date(ClassSummary.scheduled_date) == record_date
+                func.date(ClassSummary.date_held) == record_date
             ).all()
 
             for summary in raw_summaries:
@@ -312,33 +312,6 @@ def add_announcement():
         return redirect(url_for('announcements'))
 
     return render_template('add-announcement.html', form=form, has_back_btn=True, is_entry=True)
-
-@app.route('/add-entry/class-summary', methods=['GET', 'POST'])
-def add_summary():
-    form = ClassSummaryForm()
-
-    course = Course.query.all()
-    form.course.choices = [(c.id, f"{c.code} | {c.title}") for c in course]
-
-    if form.validate_on_submit():
-        new_summary = ClassSummary(
-            course_id=form.course.data,
-            content=form.content.data,
-            scheduled_date=form.scheduled_date.data,
-            note=form.note.data
-        )
-
-        form.course.data = ''
-        form.content.data = ''
-        form.scheduled_date.data = ''
-        form.note.data = ''
-
-        db.session.add(new_summary)
-        db.session.commit()
-
-        return redirect(url_for('summaries'))
-    
-    return render_template('add-summary.html', form=form, has_back_btn=True, is_entry=True)
 
 @app.route('/add-entry/course', methods=['GET', 'POST'])
 def add_course():
@@ -862,8 +835,99 @@ def delete_course_schedule(id):
 
 @app.route('/class-summaries')
 def summaries():
-    summaries = ClassSummary.query.order_by(ClassSummary.date_added).all()
-    return render_template('summaries.html', summaries=summaries, is_dedicated_page=True, page_title="Class Summary")
+    # 1. Fetch ALL summaries, ordering by newest date first
+    raw_summaries = ClassSummary.query.options(joinedload(ClassSummary.course))\
+        .order_by(ClassSummary.date_held.desc()).all()
+
+    # 2. Dictionary to hold our grouped data: { Date: [summaries_sorted_by_time] }
+    grouped_summaries = {}
+
+    for summary in raw_summaries:
+        # Extract the pure calendar date (e.g., 2026-07-15)
+        record_date = summary.date_held.date() if hasattr(summary.date_held, 'date') else summary.date_held
+        
+        # Figure out what day of the week this specific date was (e.g., "Wednesday")
+        day_of_week = record_date.strftime('%A')
+        
+        # Look at this course's schedules and find the one that matches this day
+        # (This relies on the db.relationship('CourseSchedule', backref='course') in your models)
+        matching_schedule = next((s for s in summary.course.schedules if s.day == day_of_week), None)
+        
+        # Grab the start time. If no schedule exists for this day, use a dummy "late" time 
+        # so it gets pushed safely to the bottom of the list instead of crashing.
+        start_time = matching_schedule.start_time if matching_schedule else time.max
+        
+        # Temporarily attach the time to the object so we can sort with it
+        summary._sort_time = start_time
+
+        # Create the list for this date if it doesn't exist yet
+        if record_date not in grouped_summaries:
+            grouped_summaries[record_date] = []
+            
+        # Add the summary to the date's list
+        grouped_summaries[record_date].append(summary)
+
+    # 3. Sort the lists inside the dictionary by the start time
+    for date_key in grouped_summaries:
+        grouped_summaries[date_key].sort(key=lambda x: x._sort_time)
+
+    # Pass 'grouped_summaries' to the template instead of the old variables
+    return render_template('summaries.html', grouped_summaries=grouped_summaries, is_dedicated_page=True, page_title="Class Summary")
+
+@app.route('/add-entry/class-summary', methods=['GET', 'POST'])
+def add_summary():
+    form = ClassSummaryForm()
+
+    # 1. Populate the Course choices
+    courses = Course.query.all()
+    form.course.choices = [(c.id, f"{c.code} | {c.title}") for c in courses]
+    
+    # 2. Populate ALL schedules so WTForms validation passes on POST
+    # (We will use JavaScript to hide/show the correct ones on the front-end)
+    all_schedules = CourseSchedule.query.all()
+    form.schedule.choices = [(s.id, f"{s.day} {s.start_time.strftime('%I:%M %p')} - {s.end_time.strftime('%I:%M %p')}") for s in all_schedules]
+
+    if form.validate_on_submit():
+        new_summary = ClassSummary(
+            course_id=form.course.data,
+            schedule_id=form.schedule.data,
+            content=form.content.data,
+            date_held=form.date_held.data, 
+            note=form.note.data
+        )
+
+        form.course.data = ''
+        form.schedule.data = ''
+        form.content.data = ''
+        form.date_held.data = ''
+        form.note.data = ''
+
+        db.session.add(new_summary)
+        db.session.commit()
+
+        return redirect(url_for('summaries'))
+    else:
+        print(form.errors)
+    
+    return render_template('add-summary.html', form=form, has_back_btn=True, is_entry=True)
+
+# --- NEW API ROUTE ---
+# JavaScript will fetch data from here when a course is clicked
+@app.route('/api/get-schedules/<int:course_id>')
+def get_schedules(course_id):
+    schedules = CourseSchedule.query.filter_by(course_id=course_id).all()
+    
+    # Package the data into a JSON dictionary
+    schedule_data = []
+    for s in schedules:
+        schedule_data.append({
+            'id': s.id, 
+            'label': f"{s.day} | {s.start_time.strftime('%I:%M %p')} - {s.end_time.strftime('%I:%M %p')}"
+        })
+        
+    return jsonify({'schedules': schedule_data})
+
+
 
 
 @app.route('/login', methods=['GET', 'POST'])

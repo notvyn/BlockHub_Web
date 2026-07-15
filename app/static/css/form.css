@@ -24,6 +24,12 @@
 .form-control::placeholder, .form-label{
     color: var(--text-muted);
 }
+
+.form-control, .form-control:focus-within {
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1)
+}
+
 .form-btn * {
     padding: 0.5rem 0.9rem;
     transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;

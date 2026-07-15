@@ -25,14 +25,22 @@
                     
                     <div class="summary-card d-flex flex-column h-100">
                         
-                        <div class="summary-title mb-3">
+                        <div class="summary-title">
                             <span class="fw-bold" style="color: var(--accent-purple);">{{ s.course.code }}</span>
                             <span class="text-muted px-1">|</span>
                             <span class="fw-bold text-dark summary-course-title">{{ s.course.title }}</span>
                         </div>
 
+                        <div class="summary-sched mb-3" style="font-size: 0.9rem;">
+                            {% if s.schedule %}
+                                {{ s.schedule.start_time.strftime('%I:%M %p') }} - {{ s.schedule.end_time.strftime('%I:%M %p') }}
+                            {% else %}
+                                No Time Set
+                            {% endif %}
+                        </div>
+
                         <div class="summary-content flex-grow-1 text-muted" style="font-size: 0.9rem;">
-                            {{ s.content | markdown | striptags | truncate(120) }}
+                            {{ s.content | markdown | striptags | truncate(120, True, "...") }}
                         </div>
 
                         {% if s.note %}
@@ -43,16 +51,14 @@
                         {% endif %}
 
                         <div class="d-flex justify-content-end gap-2 mt-4 pt-2">
-                            <a href="{{ url_for('summary', id=s.id) }}" class="btn btn-view-post">Read More</a>
+                            <a href="#" class="btn btn-view-post">Read More</a>
                             
-                            {% if current_user.id == s.author.id %}
-                                <a href="{{ url_for('edit_summary', id=s.id) }}" class="btn btn-icon-action" title="Edit">
+                                <a href="#" class="btn btn-icon-action" title="Edit">
                                     <i class="fa-solid fa-pencil"></i>
                                 </a>
                                 <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ s.id }}">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
-                            {% endif %}
                         </div>
                         
                     </div>

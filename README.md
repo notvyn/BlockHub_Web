@@ -65,6 +65,9 @@ A centralized class management system for CS 2103.
 - Added room to CourseSchedule model
 - Fixed updating of total units
 
+**July 15, 2026**
+- Fixed ClassSummary page query
+- Fixed Add Summary Forms 
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
