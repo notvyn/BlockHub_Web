@@ -69,6 +69,8 @@ A centralized class management system for CS 2103.
 - Fixed ClassSummary page query
 - Fixed Add Summary Forms
 - Enabled Read more feature on ClassSummary Page
+- Added Pagination for ClassSummary Page
+- Added Links page
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

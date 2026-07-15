@@ -158,11 +158,6 @@
     border-top: solid 1px var(--text-muted);
 }
 
-
-
-/* --- DARK MODE ADAPTATIONS --- */
-
-
 /* [data-theme="dark"] .card-attached.border-top {
     border-top-color: rgba(255, 255, 255, 0.1) !important;
 } */

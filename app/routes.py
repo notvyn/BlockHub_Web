@@ -825,7 +825,7 @@ def delete_course_schedule(id):
         db.session.delete(schedule_to_delete)
         db.session.commit()
 
-        remaining_schedule = CourseSchedule.query.count()
+        # remaining_schedule = CourseSchedule.query.count()
 
         return jsonify({'success': True})
     except Exception as e:
@@ -840,48 +840,77 @@ def summary(id):
 
     return render_template('summary.html', summary=summary, is_dedicated_page=True, page_title="Class Summary", has_back_btn=True)
 
+@app.route('/delete-entry/class-summary/<int:id>', methods=['POST', 'DELETE'])
+def delete_summary(id):
+    # Only allow the author (or an admin) to delete it
+    summary_to_delete = ClassSummary.query.get_or_404(id)
+    
+    # if current_user.id != summary_to_delete.user_id:
+    #     return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    try:
+        db.session.delete(summary_to_delete)
+        db.session.commit()
+
+        remaining_summary = ClassSummary.query.count()
+
+        return jsonify({'success': True, 'new_total': remaining_summary})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/class-summaries')
 def summaries():
-    # 1. Fetch ALL summaries, ordering by newest date first
+    # 1. Get the requested year and week from the URL. 
+    # If they aren't provided (like when you first click the sidebar), default to the current week.
+    today = date.today()
+    current_year, current_week, _ = today.isocalendar()
+
+    req_year = request.args.get('year', default=current_year, type=int)
+    req_week = request.args.get('week', default=current_week, type=int)
+
+    # 2. Calculate the exact calendar dates for Monday and Sunday of this specific week
+    # .fromisocalendar() takes (Year, Week Number, Day of Week: 1=Monday, 7=Sunday)
+    monday = date.fromisocalendar(req_year, req_week, 1)
+    sunday = date.fromisocalendar(req_year, req_week, 7)
+
+    # 3. Fetch ONLY the summaries that fall between this Monday and Sunday
     raw_summaries = ClassSummary.query.options(joinedload(ClassSummary.course))\
+        .filter(ClassSummary.date_held >= monday, ClassSummary.date_held <= sunday)\
         .order_by(ClassSummary.date_held.desc()).all()
-    
+
     total_count = len(raw_summaries)
 
-    # 2. Dictionary to hold our grouped data: { Date: [summaries_sorted_by_time] }
+    # 4. Your exact existing logic for grouping them by day goes here!
     grouped_summaries = {}
-
     for summary in raw_summaries:
-        # Extract the pure calendar date (e.g., 2026-07-15)
-        record_date = summary.date_held.date() if hasattr(summary.date_held, 'date') else summary.date_held
+        record_date = summary.date_held
         
-        # Figure out what day of the week this specific date was (e.g., "Wednesday")
-        day_of_week = record_date.strftime('%A')
+        # (Keep your existing _sort_time logic here)
         
-        # Look at this course's schedules and find the one that matches this day
-        # (This relies on the db.relationship('CourseSchedule', backref='course') in your models)
-        matching_schedule = next((s for s in summary.course.schedules if s.day == day_of_week), None)
-        
-        # Grab the start time. If no schedule exists for this day, use a dummy "late" time 
-        # so it gets pushed safely to the bottom of the list instead of crashing.
-        start_time = matching_schedule.start_time if matching_schedule else time.max
-        
-        # Temporarily attach the time to the object so we can sort with it
-        summary._sort_time = start_time
-
-        # Create the list for this date if it doesn't exist yet
         if record_date not in grouped_summaries:
             grouped_summaries[record_date] = []
-            
-        # Add the summary to the date's list
         grouped_summaries[record_date].append(summary)
 
-    # 3. Sort the lists inside the dictionary by the start time
     for date_key in grouped_summaries:
-        grouped_summaries[date_key].sort(key=lambda x: x._sort_time)
+        grouped_summaries[date_key].sort(key=lambda x: getattr(x, '_sort_time', 0))
 
-    # Pass 'grouped_summaries' to the template instead of the old variables
-    return render_template('summaries.html', grouped_summaries=grouped_summaries, total_count=total_count, is_dedicated_page=True, page_title="Class Summary")
+    # 5. Calculate the dates for the "Previous" and "Next" buttons
+    prev_monday = monday - timedelta(days=7)
+    next_monday = monday + timedelta(days=7)
+
+    prev_year, prev_week, _ = prev_monday.isocalendar()
+    next_year, next_week, _ = next_monday.isocalendar()
+
+    return render_template('summaries.html', 
+                           grouped_summaries=grouped_summaries, 
+                           total_count=total_count,
+                           monday=monday, sunday=sunday,
+                           req_week=req_week,
+                           prev_year=prev_year, prev_week=prev_week,
+                           next_year=next_year, next_week=next_week,
+                           is_dedicated_page=True, 
+                           page_title="Class Summary")
 
 @app.route('/add-entry/class-summary', methods=['GET', 'POST'])
 def add_summary():
@@ -920,6 +949,44 @@ def add_summary():
     
     return render_template('add-summary.html', form=form, has_back_btn=True, is_entry=True)
 
+@app.route('/update-entry/class-summary/<int:id>', methods=['GET', 'POST'])
+def update_summary(id):
+    form = ClassSummaryForm()
+    summary_to_update = ClassSummary.query.get_or_404(id)
+
+    # 1. Populate the Course choices
+    courses = Course.query.all()
+    form.course.choices = [(c.id, f"{c.code} | {c.title}") for c in courses]
+    
+    # 2. Populate ALL schedules so WTForms validation passes on POST
+    # (We will use JavaScript to hide/show the correct ones on the front-end)
+    all_schedules = CourseSchedule.query.all()
+    form.schedule.choices = [(s.id, f"{s.day} {s.start_time.strftime('%I:%M %p')} - {s.end_time.strftime('%I:%M %p')}") for s in all_schedules]
+
+    if form.validate_on_submit():
+        # POST REQUEST: The form is valid, save the new data
+        summary_to_update.course_id =  form.course.data
+        summary_to_update.schedule_id = form.schedule.data
+        summary_to_update.content = form.content.data
+        summary_to_update.date_held = form.date_held.data 
+        summary_to_update.note = form.note.data
+
+        db.session.commit()
+        return redirect(url_for('summaries'))
+        
+    elif request.method == 'GET':
+        # GET REQUEST: Pre-fill the form fields with the existing database data
+        form.course.data = summary_to_update.course_id
+        form.schedule.data = summary_to_update.schedule_id
+        form.content.data = summary_to_update.content
+        form.date_held.data = summary_to_update.date_held 
+        form.note.data = summary_to_update.note
+    else:
+        # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!
+        print("FORM VALIDATION FAILED:", form.errors)
+    
+    return render_template('update-summary.html', summary_to_update=summary_to_update, form=form, has_back_btn=True, is_entry=True)
+
 # --- NEW API ROUTE ---
 # JavaScript will fetch data from here when a course is clicked
 @app.route('/api/get-schedules/<int:course_id>')
@@ -937,7 +1004,11 @@ def get_schedules(course_id):
     return jsonify({'schedules': schedule_data})
 
 
+@app.route('/links')
+def links():
+    links = Link.query.all()
 
+    return render_template('links.html', links=links, is_dedicated_page=True)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

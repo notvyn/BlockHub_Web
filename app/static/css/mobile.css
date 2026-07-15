@@ -1,5 +1,5 @@
 /* --- MOBILE RESPONSIVE OVERRIDES --- */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     /* Mobile Header Base Styling */
     .m-nav {
         background-color: var(--sidebar-bg);
@@ -141,12 +141,10 @@
         pointer-events: none; /* Prevents accidentally clicking dashboard buttons through the blur */
         user-select: none; /* Prevents accidental text highlighting */
     }
-
-    #sidebar
 }
 
 /* --- MOBILE RESPONSIVE OVERRIDES --- */
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
     #quick-links {
         order: 2;
     }

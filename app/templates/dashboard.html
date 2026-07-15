@@ -177,11 +177,16 @@
                             <div class="md-quote">
                                 <div class="md-quote-title">{{ course_header }}</div>
                                 {% for summary in summaries %}
-                                    <p style="font-size: 0.85rem; margin-bottom: 0.3rem;">{{ summary.content }}</p>
+                                    <p style="font-size: 0.85rem; margin-bottom: 0.3rem;">{{ summary.content | markdown | striptags | truncate(80, True, '...') }}</p>
 
                                     {% if summary.note %}
                                         <p style="font-size: 0.85rem; font-style: italic; opacity: 0.8;">Note: {{ summary.note }}</p>
                                     {% endif %}
+
+                                    <!-- FIX: The link is now tied directly to the individual summary loop -->
+                                    <a href="{{ url_for('summary', id=summary.id) }}" style="font-size: 0.8rem; font-weight: 600;">
+                                        Read Full Summary <i class="fa-solid fa-arrow-right ms-1"></i>
+                                    </a>
 
                                     {% if not loop.last %}
                                         <hr style="margin: 0.5rem 0; border-color: var(--text-muted); opacity: 0.2;">

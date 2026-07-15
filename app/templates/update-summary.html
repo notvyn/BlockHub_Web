@@ -15,7 +15,7 @@
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 {% endblock %}
 
-{% block page_title %}New Class Summary{% endblock %}
+{% block page_title %}Update Class Summary{% endblock %}
 {% block page_title_txt %}What's the haps today? Everybody needs to know !{% endblock %}
 
 {% block content %}
@@ -38,13 +38,13 @@
                     
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">2. SELECT SCHEDULE</label>
-                        <div id="dynamic-date-container" class="d-flex flex-wrap gap-2 pill-group">
+                        <div id="dynamic-date-container" class="d-flex flex-wrap gap-2 pill-group" data-saved-schedule="{{ form.schedule.data }}">
                             <span class="" style="font-size: 0.85rem; font-style: italic; color: var(--text-muted);">Select a course above to view available dates...</span>
                         </div>
                     </div>
 
                     <div>
-                        <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px; color:">3. DATE HELD</label>
+                        <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">3. DATE HELD</label>
                             {{ form.date_held(class="form-control custom-date-input") }}
                         </div>
                     </div>
@@ -62,7 +62,7 @@
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
                     <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
-                    {{ form.submit(value="Post Summary", class="btn btn-modal-save px-4") }}
+                    {{ form.submit(value="Save", class="btn btn-modal-save px-4") }}
                 </div>
             </form>
         </div>

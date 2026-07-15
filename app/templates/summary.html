@@ -11,17 +11,17 @@
 {% block content %}
     <div class="col-12">
             
-        <div class="card-wrapper p-4 p-md-5 d-flex flex-column shadow-sm" style="background: var(--surface-color); border-radius: 12px;">
+        <div class="card-wrapper p-4 p-md-5">
             
             <!-- 1. HEADER SECTION -->
-            <div class="summary-header mb-2 border-bottom pb-2">
+            <div class="summary-header mb-2 pb-2">
                 <h2 class="mb-2" style="color: var(--accent-purple);">
                     <span class="fw-bold">{{ summary.course.code }}</span>
                     <span class="px-2 fw-light">|</span>
                     <span class="fw-bold">{{ summary.course.title }}</span>
                 </h2>
                 
-                <div class="d-flex flex-wrap align-items-center gap-3 text-muted" style="font-size: 1rem;">
+                <div class="d-flex flex-wrap align-items-center gap-3">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fa-regular fa-calendar"></i>
                         <span>{{ summary.date_held.strftime("%A | %B %d, %Y") }}</span>
@@ -49,17 +49,17 @@
             <!-- 3. EXTRA NOTE SECTION -->
             {% if summary.note %}
             <div class="summary-note rounded mb-2">
-                <div class="fw-bold mb-2" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Extra Note</div>
+                <div class="fw-bold mb-1 pt-3" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Extra Note</div>
                 <div style="font-size: 0.95rem;">{{ summary.note }}</div>
             </div>
             {% endif %}
 
             <!-- 4. ACTION BUTTONS -->
-            <div class="d-flex justify-content-end gap-3 mt-auto pt-4 border-top">
-                <a href="#" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+            <div class="d-flex justify-content-end gap-3 mt-auto pt-4">
+                <a href="{{ url_for('update_summary', id=summary.id) }}" class="btn btn btn-icon-action" title="Edit">
                     <i class="fa-solid fa-pencil"></i> Edit
                 </a>
-                <button type="button" class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 py-2" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ summary.id }}">
+                <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ summary.id }}" data-redirect="{{ url_for('summaries') }}" data-type="class-summary" title="Delete">
                     <i class="fa-solid fa-trash"></i> Delete
                 </button>
             </div>

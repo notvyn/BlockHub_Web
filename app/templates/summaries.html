@@ -9,11 +9,43 @@
 {% block page_title_txt %}The past is worth looking into :P{% endblock %}
 {% block extra_header %}
     <div class="d-flex justify-content-end gap-3">
-        <div style="color: var(--text-muted);">Total Summaries: <span id="summaries-page-total-count" style="transition: all 0.3s ease;">{{ total_count }}</span></div>
+        <div style="color: var(--text-muted);">Total Summaries: <span id="class-summary-page-total-count" style="transition: all 0.3s ease;">{{ total_count }}</span></div>
     </div> 
 {% endblock %}
 
 {% block content %}
+    <!-- WEEK PAGINATION CONTROLS -->
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-2 px-3">
+        
+        <!-- Previous Week Button -->
+        <a href="{{ url_for('summaries', year=prev_year, week=prev_week) }}" class="btn btn-outline-secondary shadow-sm d-flex align-items-center gap-2">
+            <i class="fa-solid fa-chevron-left"></i> <span class="d-none d-sm-inline">Prev Week</span>
+        </a>
+
+        <!-- Current Week Display -->
+        <div class="text-center">
+            <h4 class="mb-0 fw-bold" style="color: var(--accent-purple);">
+                {{ monday.strftime('%b %d') }} - {{ sunday.strftime('%b %d, %Y') }}
+            </h4>
+            <small class="fw-bold" style="color: var(--text-muted);">WEEK {{ req_week }}</small>
+        </div>
+
+        <!-- Next Week Button -->
+        <a href="{{ url_for('summaries', year=next_year, week=next_week) }}" class="btn btn-outline-secondary shadow-sm d-flex align-items-center gap-2">
+            <span class="d-none d-sm-inline">Next Week</span> <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        
+    </div>
+
+    <!-- EMPTY STATE (If a week has zero summaries) -->
+    {% if not grouped_summaries %}
+        <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+            <i class="fa-regular fa-folder-open mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+            <h5>No summaries recorded for this week.</h5>
+            <p style="font-size: 0.9rem;">Enjoy the free time!</p>
+        </div>
+    {% endif %}
+    
     <div class="summaries-container mt-4">
     
         {% for date, day_summaries in grouped_summaries.items() %}
@@ -59,10 +91,10 @@
                             <a href="{{ url_for('summary', id=s.id) }}" class="btn btn-view-post">Read More</a>
                             
                             {% if current_user.is_authenticated %}
-                            <a href="#" class="btn btn-icon-action" title="Edit">
+                            <a href="{{ url_for('update_summary', id=s.id) }}" class="btn btn-icon-action" title="Edit">
                                 <i class="fa-solid fa-pencil"></i>
                             </a>
-                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-type="summaries" data-id="{{ s.id }}">
+                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-type="class-summary" data-id="{{ s.id }}" title="Delete">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                             {% endif %}

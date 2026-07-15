@@ -588,8 +588,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    
-
     // 1. Target every single link specifically inside the announcement content
     const contentLinks = document.querySelectorAll('.card-content a');
     
@@ -611,28 +609,27 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', function() {
             const selectedCourseId = this.value;
             
-            // Show a loading state
             scheduleContainer.innerHTML = '<span class="text-muted" style="font-size: 0.85rem; font-style: italic;">Loading schedules...</span>';
             
-            // 3. Fetch the specific schedules from Python
             fetch(`/api/get-schedules/${selectedCourseId}`)
                 .then(response => response.json())
                 .then(data => {
-                    
-                    // Clear the container
                     scheduleContainer.innerHTML = '';
                     
-                    // If no schedules exist for this course
                     if (data.schedules.length === 0) {
                         scheduleContainer.innerHTML = '<span class="text-danger fw-bold" style="font-size: 0.85rem;">No schedules found for this course.</span>';
                         return;
                     }
+
+                    // NEW: Grab the hidden saved ID from the HTML
+                    const savedScheduleId = scheduleContainer.getAttribute('data-saved-schedule');
                     
-                    // 4. Build the new schedule radio buttons dynamically
                     data.schedules.forEach(sched => {
-                        // The name="schedule" attribute is crucial! It ensures WTForms can read it on POST.
+                        // NEW: If the current loop matches the saved ID, add the 'checked' attribute
+                        const isChecked = (savedScheduleId == sched.id) ? 'checked' : '';
+                        
                         const htmlString = `
-                            <input class="btn-check" id="schedule-${sched.id}" name="schedule" required type="radio" value="${sched.id}">
+                            <input class="btn-check" id="schedule-${sched.id}" name="schedule" required type="radio" value="${sched.id}" ${isChecked}>
                             <label class="btn-pill" for="schedule-${sched.id}">${sched.label}</label>
                         `;
                         scheduleContainer.insertAdjacentHTML('beforeend', htmlString);
@@ -641,6 +638,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 .catch(error => console.error('Error fetching schedules:', error));
         });
     });
+
+    // NEW: Auto-trigger the loading process when the page first opens!
+    // If WTForms pre-selected a course, we simulate a click on it so the schedules load instantly.
+    const preSelectedCourse = document.querySelector('.course-radio:checked');
+    if (preSelectedCourse) {
+        preSelectedCourse.dispatchEvent(new Event('change'));
+    }
     
     // 2. Listen for any clicks inside this container
     scheduleContainer.addEventListener('change', function(e) {

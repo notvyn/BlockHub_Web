@@ -211,7 +211,7 @@
 }
 
 /* Mobile Responsive Fixes for Columns */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .course-footer.border-start {
         /* Flips the vertical border to a horizontal divider on mobile */
         border-left: none !important;
