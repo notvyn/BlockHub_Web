@@ -832,12 +832,21 @@ def delete_course_schedule(id):
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/class-summaries/<int:id>', methods=['GET', 'POST'])
+def summary(id):
+    # 1. Fetch ALL summaries, ordering by newest date first
+    summary = ClassSummary.query.options(joinedload(ClassSummary.course))\
+        .get_or_404(id)
+
+    return render_template('summary.html', summary=summary, is_dedicated_page=True, page_title="Class Summary", has_back_btn=True)
 
 @app.route('/class-summaries')
 def summaries():
     # 1. Fetch ALL summaries, ordering by newest date first
     raw_summaries = ClassSummary.query.options(joinedload(ClassSummary.course))\
         .order_by(ClassSummary.date_held.desc()).all()
+    
+    total_count = len(raw_summaries)
 
     # 2. Dictionary to hold our grouped data: { Date: [summaries_sorted_by_time] }
     grouped_summaries = {}
@@ -872,7 +881,7 @@ def summaries():
         grouped_summaries[date_key].sort(key=lambda x: x._sort_time)
 
     # Pass 'grouped_summaries' to the template instead of the old variables
-    return render_template('summaries.html', grouped_summaries=grouped_summaries, is_dedicated_page=True, page_title="Class Summary")
+    return render_template('summaries.html', grouped_summaries=grouped_summaries, total_count=total_count, is_dedicated_page=True, page_title="Class Summary")
 
 @app.route('/add-entry/class-summary', methods=['GET', 'POST'])
 def add_summary():

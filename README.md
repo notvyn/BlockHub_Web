@@ -67,7 +67,8 @@ A centralized class management system for CS 2103.
 
 **July 15, 2026**
 - Fixed ClassSummary page query
-- Fixed Add Summary Forms 
+- Fixed Add Summary Forms
+- Enabled Read more feature on ClassSummary Page
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

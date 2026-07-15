@@ -86,21 +86,25 @@
                     
                     <!-- Scenario A: The links were formatted with [Title](URL) -->
                     {% if attached_links %}
-                        <div class="d-flex justify-content-start gap-3">
+                        <!-- Added 'flex-wrap' here so multiple buttons wrap to the next line -->
+                        <div class="d-flex justify-content-start flex-wrap">
                             {% for title, link_url in attached_links %}
-                                <a href="{{ link_url }}" target="_blank" class="attached-link-card">
-                                    <i class="fa-solid fa-link me-2"></i>
-                                    <span>{{ title }}</span>
+                                <!-- Added 'mw-100' so the card never exceeds the container's width -->
+                                <a href="{{ link_url }}" target="_blank" class="attached-link-card mw-100 d-inline-flex align-items-center">
+                                    <!-- Added 'flex-shrink-0' so the icon doesn't get squished -->
+                                    <i class="fa-solid fa-link me-2 flex-shrink-0"></i>
+                                    <!-- Added 'text-truncate' to add '...' if the title is too long -->
+                                    <span class="text-truncate">{{ title }}</span>
                                 </a>
                             {% endfor %}
                         </div>
                         
                     <!-- Scenario B: Fallback for raw URLs already in the database -->
                     {% else %}
-                        <a href="{{ a.url }}" target="_blank" class="attached-link-card">
-                            <i class="fa-solid fa-link me-2"></i>
-                            <span>{{ a.url }}</span>
-                            </div>
+                        <a href="{{ a.url }}" target="_blank" class="attached-link-card mw-100 d-inline-flex align-items-center">
+                            <i class="fa-solid fa-link me-2 flex-shrink-0"></i>
+                            <!-- Added 'text-break' so a massive URL forces itself to the next line -->
+                            <span class="text-break">{{ a.url }}</span>
                         </a>
                     {% endif %}
                     
@@ -150,7 +154,7 @@
                         
                     </button>
                     
-                    <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-view-post">View Full Post</a>
+                    <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-view-post">View Post</a>
                 </div>
             </div>
 

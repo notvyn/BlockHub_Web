@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/summary.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Class Summaries{% endblock %}
+{% block page_title_txt %}The past is worth looking into :P{% endblock %}
+
+{% block content %}
+    <div class="col-12">
+            
+        <div class="card-wrapper p-4 p-md-5 d-flex flex-column shadow-sm" style="background: var(--surface-color); border-radius: 12px;">
+            
+            <!-- 1. HEADER SECTION -->
+            <div class="summary-header mb-2 border-bottom pb-2">
+                <h2 class="mb-2" style="color: var(--accent-purple);">
+                    <span class="fw-bold">{{ summary.course.code }}</span>
+                    <span class="px-2 fw-light">|</span>
+                    <span class="fw-bold">{{ summary.course.title }}</span>
+                </h2>
+                
+                <div class="d-flex flex-wrap align-items-center gap-3 text-muted" style="font-size: 1rem;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span>{{ summary.date_held.strftime("%A | %B %d, %Y") }}</span>
+                    </div>
+                    <span class="d-none d-sm-inline">•</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-regular fa-clock"></i>
+                        <span>
+                            {% if summary.schedule %}
+                                {{ summary.schedule.start_time.strftime('%I:%M %p') }} - {{ summary.schedule.end_time.strftime('%I:%M %p') }}
+                            {% else %}
+                                No Time Set
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. MAIN CONTENT SECTION -->
+            <!-- Removed striptags and truncate. Added 'safe' to render your EasyMDE formatting -->
+            <div class="summary-content mb-3" style="font-size: 1.05rem; line-height: 1.8;">
+                {{ summary.content | markdown | safe }}
+            </div>
+
+            <!-- 3. EXTRA NOTE SECTION -->
+            {% if summary.note %}
+            <div class="summary-note rounded mb-2">
+                <div class="fw-bold mb-2" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Extra Note</div>
+                <div style="font-size: 0.95rem;">{{ summary.note }}</div>
+            </div>
+            {% endif %}
+
+            <!-- 4. ACTION BUTTONS -->
+            <div class="d-flex justify-content-end gap-3 mt-auto pt-4 border-top">
+                <a href="#" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+                    <i class="fa-solid fa-pencil"></i> Edit
+                </a>
+                <button type="button" class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 py-2" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ summary.id }}">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}

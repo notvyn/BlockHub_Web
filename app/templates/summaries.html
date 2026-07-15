@@ -1,20 +1,25 @@
 {% extends 'base.html' %}
 
 {% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/summary.css')}}" rel="stylesheet">
 {% endblock %}
 
-{% block page_title %}Courses{% endblock %}
-{% block page_title_txt %}Success is one step ahead! :}{% endblock %}
-{% block total_num %}Total Summaries: {{ grouped_summaries|length }} {% endblock %}
+{% block page_title %}Class Summaries{% endblock %}
+{% block page_title_txt %}The past is worth looking into :P{% endblock %}
+{% block extra_header %}
+    <div class="d-flex justify-content-end gap-3">
+        <div style="color: var(--text-muted);">Total Summaries: <span id="summaries-page-total-count" style="transition: all 0.3s ease;">{{ total_count }}</span></div>
+    </div> 
+{% endblock %}
 
 {% block content %}
     <div class="summaries-container mt-4">
     
         {% for date, day_summaries in grouped_summaries.items() %}
-        <div class="summary-group mb-5">
+        <div class="summary-group mb-5 px-3">
             
-            <h5 class="text-muted fw-bold mb-4 pb-2 border-bottom" style="letter-spacing: 0.5px;">
+            <h5 class="summary-date fw-bold mb-3 pb-3" style="letter-spacing: 0.5px;">
                 {{ date.strftime("%A | %B %d, %Y") }}
             </h5>
 
@@ -23,12 +28,12 @@
                 
                 <div class="col-12 col-md-6 col-xl-4">
                     
-                    <div class="summary-card d-flex flex-column h-100">
+                    <div class="card-wrapper summary-card d-flex flex-column h-100">
                         
                         <div class="summary-title">
-                            <span class="fw-bold" style="color: var(--accent-purple);">{{ s.course.code }}</span>
-                            <span class="text-muted px-1">|</span>
-                            <span class="fw-bold text-dark summary-course-title">{{ s.course.title }}</span>
+                            <span class="fw-bold">{{ s.course.code }}</span>
+                            <span class="px-1">|</span>
+                            <span class="fw-bold summary-course-title">{{ s.course.title }}</span>
                         </div>
 
                         <div class="summary-sched mb-3" style="font-size: 0.9rem;">
@@ -39,26 +44,28 @@
                             {% endif %}
                         </div>
 
-                        <div class="summary-content flex-grow-1 text-muted" style="font-size: 0.9rem;">
+                        <div class="summary-content flex-grow-1" style="font-size: 0.9rem;">
                             {{ s.content | markdown | striptags | truncate(120, True, "...") }}
                         </div>
 
                         {% if s.note %}
-                        <div class="summary-note mt-3 pt-3 border-top">
-                            <div class="fw-bold mb-1 text-dark" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
-                            <div class="text-muted" style="font-size: 0.85rem;">{{ s.note }}</div>
+                        <div class="summary-note pt-3">
+                            <div class="fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
+                            <div class="" style="font-size: 0.85rem;">{{ s.note }}</div>
                         </div>
                         {% endif %}
 
-                        <div class="d-flex justify-content-end gap-2 mt-4 pt-2">
-                            <a href="#" class="btn btn-view-post">Read More</a>
+                        <div class="d-flex justify-content-end gap-2 mt-2 pt-2">
+                            <a href="{{ url_for('summary', id=s.id) }}" class="btn btn-view-post">Read More</a>
                             
-                                <a href="#" class="btn btn-icon-action" title="Edit">
-                                    <i class="fa-solid fa-pencil"></i>
-                                </a>
-                                <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ s.id }}">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
+                            {% if current_user.is_authenticated %}
+                            <a href="#" class="btn btn-icon-action" title="Edit">
+                                <i class="fa-solid fa-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-type="summaries" data-id="{{ s.id }}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            {% endif %}
                         </div>
                         
                     </div>

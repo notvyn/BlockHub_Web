@@ -128,6 +128,7 @@
                                             {{ sched.start_time.strftime('%I:%M %p') }} - {{ sched.end_time.strftime('%I:%M %p') }}
                                         </span>
 
+                                        {% if current_user.is_authenticated %}
                                         <!-- The Mini Edit/Delete Icons -->
                                         <div class="d-flex gap-2 mt-1">
                                             <!-- Make sure to create an 'update_course_schedule' route in Python later! -->
@@ -139,18 +140,20 @@
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </div>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
                             {% else %}
                                 <span class="fst-italic" style="font-size: 0.85rem; color: var(--text-muted);">No schedule set</span>
                             {% endif %}
 
+                            {% if current_user.is_authenticated %}
                             <!-- The Circular Add Button -->
                             <!-- Using inline hover styles here for ease, but you can move these to course.css! -->
                             <a href="{{ url_for('add_course_schedule', id=c.id) }}" class="btn-add-schedule btn rounded-circle d-flex align-items-center justify-content-center p-0 ms-1" title="Add Schedule">
                                 <i class="fa-solid fa-plus"></i>
                             </a>
-                            
+                            {% endif %}
                         </div>
                     </div>
 
