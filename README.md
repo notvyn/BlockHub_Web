@@ -71,6 +71,8 @@ A centralized class management system for CS 2103.
 - Enabled Read more feature on ClassSummary Page
 - Added Pagination for ClassSummary Page
 - Added Links page
+- Enabled Edit and Delete Feature of Links Page
+- Refined logic of LinkForm Modal
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

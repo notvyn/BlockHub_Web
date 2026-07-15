@@ -418,45 +418,77 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /* =========================================
-       8. MODAL AJAX SUBMISSION (QUICK LINKS)
-       ========================================= */
-    const addLinkForm = document.getElementById('addLinkForm');
-    
-    if (addLinkForm) {
-        addLinkForm.addEventListener('submit', function(e) {
-            // 1. STOP the page from reloading!
-            e.preventDefault();
+    UNIFIED MODAL AJAX SUBMISSION (ADD & UPDATE)
+    ========================================= */
+    const linkModal = document.getElementById('addLinkModal');
+    const linkForm = document.getElementById('addLinkForm');
+
+    if (linkModal) {
+        // 1. SHAPESHIFT THE MODAL WHEN IT OPENS
+        linkModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
             
-            // 2. Clear any old error messages
+            // Check if we are adding or editing (default to add if no attribute exists)
+            const mode = button.getAttribute('data-mode') || 'add';
+            
+            const modalTitle = linkModal.querySelector('.modal-title');
+            const titleInput = document.getElementById('title');
+            const urlInput = document.getElementById('url');
+            
+            // Hide any lingering error messages
+            document.getElementById('title-error').style.display = 'none';
+            document.getElementById('url-error').style.display = 'none';
+
+            if (mode === 'edit') {
+                // Transform into an UPDATE modal
+                modalTitle.textContent = 'Update Quick Link';
+                titleInput.value = button.getAttribute('data-title');
+                urlInput.value = button.getAttribute('data-url');
+                
+                // Tell the form it is in edit mode and give it the specific ID
+                linkForm.setAttribute('data-form-mode', 'edit');
+                linkForm.setAttribute('data-target-id', button.getAttribute('data-id'));
+            } else {
+                // Transform into an ADD modal
+                modalTitle.textContent = 'Add Quick Link';
+                linkForm.reset(); // Clear the text boxes
+                
+                // Tell the form it is in add mode
+                linkForm.setAttribute('data-form-mode', 'add');
+                linkForm.removeAttribute('data-target-id');
+            }
+        });
+    }
+
+    if (linkForm) {
+        // 2. HANDLE THE FORM SUBMISSION
+        linkForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Stop page reload
+            
             document.getElementById('title-error').style.display = 'none';
             document.getElementById('url-error').style.display = 'none';
             
-            // 3. Package the form data (automatically grabs CSRF and inputs)
             const formData = new FormData(this);
+            const mode = this.getAttribute('data-form-mode');
             
-            // 4. Send it silently to Flask
-            fetch('/api/add-link', {
+            // Dynamically set the correct Python route based on the mode
+            let fetchUrl = '/api/add-link';
+            if (mode === 'edit') {
+                const targetId = this.getAttribute('data-target-id');
+                fetchUrl = `/api/update-link/${targetId}`;
+            }
+            
+            fetch(fetchUrl, {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // SUCCESS! 
-                    // 1. Close the modal using Bootstrap's JS API
-                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('addLinkModal'));
-                    modalInstance.hide();
-                    
-                    // 3. Instantly inject the new link into the Quick Links list!
-                    const linkList = document.querySelector('#quick-links .md-list');
-                    if (linkList) {
-                        const newLi = document.createElement('li');
-                        newLi.innerHTML = `<a href="${data.link.url}" target="_blank" class="md-link">${data.link.title}</a>`;
-                        linkList.appendChild(newLi);
-                    }
+                    // The easiest way to show the new/updated data is a clean reload
+                    window.location.reload();
                 } else {
-                    // ERROR! (e.g., Invalid URL format)
-                    // Inject the WTForms error messages directly under the inputs
+                    // Show errors
                     if (data.errors.title) {
                         const err = document.getElementById('title-error');
                         err.textContent = data.errors.title[0];

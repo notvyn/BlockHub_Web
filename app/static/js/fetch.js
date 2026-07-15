@@ -89,14 +89,25 @@ document.addEventListener('DOMContentLoaded', function() {
                             // --- END NEW LOGIC ---
 
                             // Default removal logic for all other page types (Announcements, Courses, etc.)
-                            cardToRemove.style.transition = 'opacity 0.4s ease';
-                            cardToRemove.style.opacity = '0';
+                            let targetElement = cardToRemove;
+
+                            // --- NEW LOGIC: Prevent empty grid gaps for Links ---
+                            // If it's a link, target the outer column wrapper instead of just the inner card
+                            if (itemToDeleteType === 'link') {
+                                const colWrapper = cardToRemove.closest('.col-12');
+                                if (colWrapper) {
+                                    targetElement = colWrapper;
+                                }
+                            }
+
+                            targetElement.style.transition = 'opacity 0.4s ease';
+                            targetElement.style.opacity = '0';
                             updateCount(data.new_total);
 
                             if (itemToDeleteType === 'course') { updateUnits(data.new_units); }
 
                             setTimeout(() => {
-                                cardToRemove.remove();
+                                targetElement.remove();
                             }, 400);
                         }
                     } else {

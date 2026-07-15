@@ -423,6 +423,25 @@ def add_link_api():
         'errors': form.errors
     }), 400
 
+@app.route('/api/update-link/<int:id>', methods=['POST'])
+def update_link(id):
+    form = LinkForm() # Or whatever your form is named
+    
+    if form.validate_on_submit():
+        # 1. Fetch the EXISTING link
+        link_to_update = Link.query.get_or_404(id)
+        
+        # 2. Overwrite its data
+        link_to_update.title = form.title.data
+        link_to_update.url = form.url.data
+        
+        # 3. Commit (DO NOT use db.session.add() here)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+        
+    return jsonify({'success': False, 'errors': form.errors})
+
 @app.route('/announcements/<int:id>')
 def announcement(id):
     announcement = Announcement.query.get_or_404(id)
@@ -1009,6 +1028,25 @@ def links():
     links = Link.query.all()
 
     return render_template('links.html', links=links, is_dedicated_page=True)
+
+@app.route('/delete-entry/link/<int:id>', methods=['POST', 'DELETE'])
+def delete_link(id):
+    # Only allow the author (or an admin) to delete it
+    link_to_delete = Link.query.get_or_404(id)
+    
+    # if current_user.id != link_to_delete.user_id:
+    #     return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    try:
+        db.session.delete(link_to_delete)
+        db.session.commit()
+
+        remaining_link = Link.query.count()
+
+        return jsonify({'success': True, 'new_total': remaining_link})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

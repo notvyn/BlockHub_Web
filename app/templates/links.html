@@ -8,6 +8,12 @@
 {% block page_title %}Links{% endblock %}
 {% block page_title_txt %}Portal to a Whole New World! {% endblock %}
 
+{% block extra_header %}
+    <div class="d-flex justify-content-end mb-3">
+        <div style="color: var(--text-muted);">Total Links: <span id="link-page-total-count" style="transition: all 0.3s ease;">{{ links|length }}</span></div>
+    </div> 
+{% endblock %}
+
 {% block content %}
     <div class="row">
         {% for link in links %}
@@ -26,7 +32,7 @@
                     <div class="link-info flex-grow-1 overflow-hidden pe-2">
                         <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="d-block">
                             <!-- text-truncate ensures long titles don't break the layout -->
-                            <div class="fw-bold text-truncate mb-1" style="color: var(--text-dark); font-size: 1.05rem;">
+                            <div class="fw-bold text-wrap mb-1" style="color: var(--text-dark); font-size: 1.05rem;">
                                 {{ link.title }}
                             </div>
                             <div class="text-truncate" style="color: var(--text-muted); font-size: 0.8rem;">
@@ -36,18 +42,17 @@
                     </div>
 
                     <!-- 3. Action Buttons -->
-                    <div class="link-actions d-flex flex-column gap-2 ms-auto border-start ps-3 py-1">
-                        {% if current_user.is_authenticated %}
-                            <a href="#" class="btn btn-sm btn-icon-action" title="Edit" style="padding: 2px 6px;">
+                    {% if current_user.is_authenticated %}
+                        <div class="link-actions d-flex flex-column gap-2 ms-auto ps-3 py-1">
+                            <a href="#" class="btn btn-sm btn-icon-action" title="Edit" data-bs-toggle="modal" data-bs-target="#addLinkModal" data-mode="edit" data-id="{{ link.id }}" data-title="{{ link.title }}" data-url="{{ link.url }}" style="padding: 2px 6px;">
                                 <i class="fa-solid fa-pencil" style="font-size: 0.85rem;"></i>
                             </a>
                             <!-- You can hook this right into your existing global delete modal! -->
-                            <button type="button" class="btn btn-sm btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ link.id }}" data-type="quick-link" title="Delete" style="padding: 2px 6px;">
+                            <button type="button" class="btn btn-sm btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ link.id }}" data-type="link" title="Delete" style="padding: 2px 6px;">
                                 <i class="fa-solid fa-trash" style="font-size: 0.85rem;"></i>
                             </button>
-                        {% endif %}
-                    </div>
-                    
+                        </div>
+                    {% endif %}                    
                 </div>
             </div>
         {% endfor %}

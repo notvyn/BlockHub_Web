@@ -13,3 +13,11 @@
     background: rgba(142, 68, 173, 0.2) !important;
     transition: all 0.3s ease-in;
 }
+
+.link-actions {
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .link-actions {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
