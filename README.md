@@ -74,13 +74,16 @@ A centralized class management system for CS 2103.
 - Enabled Edit and Delete Feature of Links Page
 - Refined logic of LinkForm Modal
 
+**July 16, 2026**
+- Enabled Search Feature for mobile and desktop
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [ ] Add password security and form validation.
 - [/] Limit content for Announcement.
 - [/] Enable Dark Mode.
 - [/] Enable dropdown for adding entry.
-- [ ] Build Search Feature.
+- [/] Build Search Feature.
 - [/] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
 - [/] Fix total deadline visual number

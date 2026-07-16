@@ -88,7 +88,7 @@
 
     <div class="card-container courses-list">
         {% for c in courses %}
-            <div class="card-wrapper course-card d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+            <div id="course-{{ c.id }}" class="card-wrapper course-card d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
                 
                 <div class="course-core flex-grow-1">
                     <div class="course-code fw-bold mb-1">Course Code: {{ c.code }}</div>

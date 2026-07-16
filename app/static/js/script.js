@@ -721,7 +721,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-
-
-
 });

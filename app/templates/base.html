@@ -76,11 +76,16 @@
 
                 <div id="m-search-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center px-3">
                     <i class="bi bi-search text-white me-2"></i>
-                    <input type="text" class="form-control border-0 " placeholder="Search announcements, deadlines..." autofocus>
+                    
+                    <input type="text" id="mobile-search-input" class="form-control border-0 live-search-input" autocomplete="off" placeholder="Search announcements, deadlines..." autofocus>
+                    
                     <button id="m-search-close" class="btn text-white p-0 ms-3 border-0 fs-4">
                         <i class="bi bi-x"></i>
                     </button>
-                </div>
+                </div> <!-- <-- Notice the overlay closes right here! -->
+
+                <!-- FIX: Move this line OUTSIDE the overlay container! -->
+                <div id="mobile-search-results" class="search-dropdown shadow-lg rounded" style="display: none; top: 100%; left: 0; width: 100%;"></div>
 
             </div>
 
@@ -102,9 +107,15 @@
                         
                     </div>
                     <div class="tb-btn d-none d-md-flex align-items-center justify-content-evenly">
-                        <div class="search-box">
+                        <!-- ADDED: position-relative -->
+                        <div class="search-box position-relative">
                             <i class="bi bi-search"></i>
-                            <input type="text" placeholder="e.g. Online Enrollment...">
+                            
+                            <!-- ADDED: id="desktop-search-input", class="live-search-input", and autocomplete="off" -->
+                            <input type="text" id="desktop-search-input" class="live-search-input" autocomplete="off" placeholder="e.g. Online Enrollment...">
+                            
+                            <!-- ADDED: The Desktop Results Dropdown -->
+                            <div id="desktop-search-results" class="search-dropdown shadow-lg rounded" style="display: none;"></div>
                         </div>
                         
                         <button class="theme-toggle-btn" id="theme-toggle-desktop"><i class="fa-solid fa-moon"></i></button>

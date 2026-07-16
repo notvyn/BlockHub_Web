@@ -82,13 +82,20 @@ h1 {
     
 } */
 
+/* 1. Lock down the HTML tag entirely */
+html {
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+/* 2. Upgrade body to 100dvh */
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--main-bg);
     color: var(--text-dark);
     margin: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh; /* <-- Changed to dvh */
     overflow: hidden;
     transition: all 0.2s ease-in-out;
 }
@@ -99,11 +106,18 @@ main {
     max-height: 100vh;
     max-width: 100vw;
     overflow-y: auto;
+
+    /* ADD THIS HERE: The bumper for the scrollable container! */
+    scroll-padding-top: 100px; 
+    scroll-behavior: smooth;
 }
 
+/* 3. Upgrade main-content to 100dvh */
 .main-content {
-    min-height: 100vh;
+    height: 100dvh; /* <-- Changed to dvh */
     width: 100%;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
 }
@@ -279,6 +293,106 @@ main {
 }
 
 
+/* --- LIVE SEARCH DROPDOWN --- */
+.search-dropdown {
+    position: absolute;
+    top: 120%; /* Pushes it just below the input box */
+    left: 0;
+    width: 100%;
+    min-width: 250px; /* Ensures desktop search doesn't get too skinny */
+    max-height: 400px;
+    background-color: var(--card-bg); /* Use your existing blockhub theme variable */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 1050; 
+}
+
+.search-box {
+    overflow: visible !important; 
+}
+
+/* Dark mode border adjustment */
+[data-theme='dark'] .search-dropdown {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Individual Search Results */
+.search-result-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: var(--main-bg);
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    display: block;
+}
+
+[data-theme='dark'] .search-result-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.search-result-item:hover {
+    background-color: var(--text-muted); /* Soft accent purple tint */
+    cursor: pointer;
+}
+
+.search-result-item:focus {
+    background-color: rgb(15, 9, 37);
+
+}
+
+/* Hide the last bottom border so it looks clean */
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+
+/* THE BULLETPROOF HIGHLIGHT */
+.highlight-glow {
+    animation: target-highlight 2s ease-out !important;
+    border: 2px solid var(--accent-purple) !important;
+    overflow: visible !important;
+}
+
+[data-theme='dark'] .highlight-glow {
+    /* Increased duration to 3s makes the transition feel more premium and visible */
+    animation: dark-target-highlight 3s ease-out !important;
+    border: 2px solid var(--accent-purple) !important;
+}
+
+@keyframes target-highlight {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(142, 68, 173, 0);
+        /* border: 2px solid #b44ce1 !important;   */
+        background-color: transparent; 
+    }
+    15% { 
+        box-shadow: 0 0 20px 8px rgba(142, 68, 173, 0.6); 
+        background-color: rgba(142, 68, 173, 0.1); /* Adds a soft purple background tint */
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(142, 68, 173, 0); 
+        background-color: transparent; 
+    }
+}
+
+@keyframes dark-target-highlight {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(180, 76, 225, 0); 
+        background-color: transparent; 
+    }
+    15% { 
+        /* Layered shadows create a "bloom" effect instead of a harsh glow */
+        box-shadow: 0 0 20px 8px rgba(186, 53, 243, 0.6) !important;
+        background-color: rgba(186, 53, 243, 0.15); 
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(180, 76, 225, 0); 
+        background-color: var(--card-bg); 
+    }
+}
+
+
+
 /* =========================================
    CUSTOM SCROLLBAR
    ========================================= */
@@ -317,3 +431,4 @@ main {
     scrollbar-width: thin;
     scrollbar-color: var(--text-muted) transparent;
 }
+

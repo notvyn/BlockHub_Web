@@ -2,7 +2,7 @@
 
 from flask import render_template, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, or_
 from sqlalchemy.orm import joinedload
 from datetime import date, timedelta, time
 
@@ -27,6 +27,47 @@ def inject_global_forms():
     so our global modal.html never crashes.
     """
     return dict(link_form=LinkForm())
+
+@app.route('/api/search')
+# @login_required # Keeps search data private to logged-in users
+def global_search():
+    query = request.args.get('q', '').strip()
+    
+    if not query:
+        return jsonify({'results': []})
+        
+    search_term = f"%{query}%"
+    results = []
+
+    # 1. Search Links
+    links = Link.query.filter(Link.title.ilike(search_term)).limit(3).all()
+    for link in links:
+        results.append({'type': 'Link', 'title': link.title, 'url': f"{url_for('links')}#link-{link.id}", 'icon': 'fa-link'})
+
+    # 2. Search Announcements
+    announcements = Announcement.query.filter(
+        or_(Announcement.title.ilike(search_term), Announcement.content.ilike(search_term))
+    ).limit(3).all()
+    for a in announcements:
+        results.append({'type': 'Announcement', 'title': a.title, 'url': url_for('announcement', id=a.id), 'icon': 'fa-bullhorn'})
+
+    # 3. Search Deadlines
+    deadlines = Deadline.query.filter(Deadline.description.ilike(search_term)).limit(3).all()
+    for d in deadlines:
+        results.append({'type': 'Deadline', 'title': d.description, 'url': f"{url_for('deadlines')}#deadline-{d.id}", 'icon': 'fa-clock'})
+
+    # 4. Search Class Summaries
+    summaries = ClassSummary.query.filter(ClassSummary.content.ilike(search_term)).limit(3).all()
+    for s in summaries:
+        results.append({'type': 'Summary', 'title': f"{s.course.code} Summary", 'url': url_for('summary', id=s.id), 'icon': 'fa-book-open'})
+
+    courses = Course.query.filter(
+        or_(Course.code.ilike(search_term), Course.title.ilike(search_term), or_(Course.instructor.ilike(search_term)))
+    ).limit(3).all()
+    for c in courses:
+        results.append({'type': 'Course', 'title': f"{c.code} | {c.title}", 'url': f"{url_for('courses')}#course-{c.id}", 'icon': 'fa-address-book'})
+
+    return jsonify({'results': results})
 
 @app.route('/complete-deadline/<int:id>', methods=['POST'])
 def complete_deadline(id):

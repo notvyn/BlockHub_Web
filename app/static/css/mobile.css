@@ -5,6 +5,10 @@
         background-color: var(--sidebar-bg);
         height: 60px; /* Gives the header a sturdy, touch-friendly height */
         padding: 0 0.5rem;
+        z-index: 1020;
+        flex-shrink: 0;
+        position: sticky;
+        top: 0;
     }
 
     .sidebar-logo {

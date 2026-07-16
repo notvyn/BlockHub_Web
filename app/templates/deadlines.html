@@ -43,7 +43,7 @@
             {% endif %}
 
             <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
-            <div class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid {{ urgency_color }};">
+            <div id="deadline-{{ d.id }}" class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid {{ urgency_color }};">
 
                 <!-- 1. MOBILE CHECKBOX (Top Right, Hidden on Desktop) -->
                 <div class="d-md-none position-absolute" style="top: 1rem; right: 1rem; z-index: 5;">

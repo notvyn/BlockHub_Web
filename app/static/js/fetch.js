@@ -170,4 +170,148 @@ document.addEventListener('DOMContentLoaded', function() {
             modalImageDisplay.src = imageUrl;
         });
     }
+
+
+    /* =========================================
+    11. LIVE SEARCH FUNCTIONALITY
+    ========================================= */
+    const searchInputs = document.querySelectorAll('.live-search-input');
+    let debounceTimer;
+
+    searchInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const query = this.value.trim();
+            // Identify which dropdown to use based on the input ID
+            const containerId = this.id === 'desktop-search-input' ? 'desktop-search-results' : 'mobile-search-results';
+            const resultsContainer = document.getElementById(containerId);
+            
+            clearTimeout(debounceTimer);
+            
+            // if (query.length < 2) {
+            //     resultsContainer.style.display = 'none';
+            //     return;
+            // }
+            
+            debounceTimer = setTimeout(() => {
+                fetch(`/api/search?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultsContainer.innerHTML = '';
+                        
+                        if (data.results.length === 0) {
+                            resultsContainer.innerHTML = '<div class="search-result-item">No results found.</div>';
+                        } else {
+                            data.results.forEach(item => {
+                                resultsContainer.innerHTML += `
+                                    <a href="${item.url}" class="search-result-item">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-solid ${item.icon}"></i>
+                                            <div>
+                                                <div class="fw-bold" style="font-size: 0.9rem; color: var(--text-dark)">${item.title}</div>
+                                                <div class="" style="font-size: 0.75rem; color: var(--text-muted)">${item.type}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                        }
+                        resultsContainer.style.display = 'block';
+                    })
+                    .catch(err => console.error('Search error:', err));
+            }, 300);
+        });
+
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            // We now check if the click was outside the input AND outside the dropdown box
+            const containerId = input.id === 'desktop-search-input' ? 'desktop-search-results' : 'mobile-search-results';
+            const resultsContainer = document.getElementById(containerId);
+
+            if (!input.contains(e.target) && !resultsContainer.contains(e.target)) {
+                resultsContainer.style.display = 'none';
+            }
+        });
+
+        /* =========================================
+        CUSTOM HASH SCROLLING & HIGHLIGHTING
+        ========================================= */
+
+        /* =========================================
+        DEBUGGING SEARCH HIGHLIGHT
+        ========================================= */
+
+        function triggerHighlight(targetId) {
+            // Debug: Print the ID we are looking for
+            console.log("Looking for element with selector:", targetId);
+            
+            const targetEl = document.querySelector(targetId);
+            
+            // Debug: Tell us if we found it or not
+            if (targetEl) {
+                console.log("SUCCESS: Found element:", targetEl);
+                targetEl.classList.remove('highlight-glow');
+                void targetEl.offsetWidth; 
+                targetEl.classList.add('highlight-glow');
+
+                setTimeout(() => targetEl.classList.remove('highlight-glow'), 5000);
+            } else {
+                console.error("ERROR: Could not find element with ID:", targetId);
+                // Hint: This usually means the ID in your HTML doesn't match the ID in the URL
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('.search-result-item');
+            
+            if (link) {
+                console.log("Search result clicked:", link.href);
+                const url = new URL(link.href);
+                
+                const currentPath = window.location.pathname.replace(/\/$/, '');
+                const targetPath = url.pathname.replace(/\/$/, '');
+                
+                if (currentPath === targetPath && url.hash) {
+                    e.preventDefault(); 
+                    
+                    console.log("Attempting to scroll to hash:", url.hash);
+                    
+                    const targetEl = document.querySelector(url.hash);
+                    
+                    if (targetEl) {
+                        document.querySelectorAll('.search-dropdown').forEach(el => el.style.display = 'none');
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        triggerHighlight(url.hash);
+                    } else {
+                        console.error("Could not find element for hash:", url.hash);
+                    }
+                }
+            }
+        });
+
+        // A more robust loader that waits for full page rendering
+        window.addEventListener('load', () => {
+            // Check if there is a hash in the URL
+            if (window.location.hash) {
+                const targetId = window.location.hash;
+                
+                // Safety: Try up to 3 times to find the element, in case of slow animations
+                let attempts = 0;
+                const interval = setInterval(() => {
+                    const targetEl = document.querySelector(targetId);
+                    attempts++;
+                    
+                    if (targetEl || attempts > 5) {
+                        clearInterval(interval);
+                        if (targetEl) {
+                            console.log("Found element on load:", targetEl);
+                            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            triggerHighlight(targetId);
+                        } else {
+                            console.error("Could not find element after 5 attempts:", targetId);
+                        }
+                    }
+                }, 200); // Check every 200ms
+            }
+        });
+    });
 });
