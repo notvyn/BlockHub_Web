@@ -138,6 +138,7 @@
                         {% endif %}
                     </div>
                 </div>
+                
                 {% if is_dedicated_page %}
                     {% block extra_header %}{% endblock %}
                 {% endif %}
@@ -156,6 +157,7 @@
     <!-- Local JS -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/fetch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sw.js') }}"></script>
 
     <!-- FontAwesome Icons -->
     <script src="https://kit.fontawesome.com/43ca258483.js" crossorigin="anonymous"></script>

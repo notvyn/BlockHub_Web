@@ -18,7 +18,7 @@
     <div class="card-container announcement-container">
     
         {% for a in announcements %}
-        <div class="card-wrapper announcement-card d-flex flex-column">
+        <div id="announcement-{{ a.id }}" class="card-wrapper announcement-card d-flex flex-column">
             
             <!-- HEADER: Author, Date, and Badges -->
             <div class="d-flex justify-content-between align-items-start mb-3">

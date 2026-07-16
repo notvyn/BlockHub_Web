@@ -3,6 +3,7 @@
 from app import db
 from flask_login import UserMixin
 from datetime import datetime, timezone
+import json
 
 class Announcement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,3 +114,15 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.name}')"
+
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # Change 'user.id' if your user table is named differently!
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) 
+    
+    # We will store the entire JSON object as a text string
+    subscription_data = db.Column(db.Text, nullable=False)
+
+    def get_subscription_dict(self):
+        # Helper function to convert the text back to a dictionary when sending pushes
+        return json.loads(self.subscription_data)

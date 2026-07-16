@@ -20,6 +20,8 @@
     <div id="dashboard-container" data-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}">
 
         <div class="row mt-4">
+            <button class="btn btn-outline-secondary" onclick="subscribeToNotifications()">Enable Notifications</button>
+
             <!-- Left Column (Wider for main content) -->
             <div class="col-lg-8 pe-lg-5">
                 
@@ -143,7 +145,7 @@
                 <!-- Quick Links -->
                 <div class="md-section" id="quick-links">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="#" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('links') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Quick Links</div>
                             <i class="fa-solid fa-chevron-right text-muted"></i>
                         </a>

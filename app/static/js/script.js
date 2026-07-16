@@ -679,46 +679,48 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 2. Listen for any clicks inside this container
-    scheduleContainer.addEventListener('change', function(e) {
-        
-        // 3. Ensure they actually clicked a radio button
-        if (e.target && e.target.matches('input[name="schedule"]')) {
+    if (scheduleContainer) {
+        scheduleContainer.addEventListener('change', function(e) {
             
-            // 4. Find the label attached to this radio button and read its text
-            const labelText = document.querySelector(`label[for="${e.target.id}"]`).innerText;
-            
-            // Extract just the day part (e.g., splits "Monday | 07:00 AM" and grabs "Monday")
-            const selectedDayString = labelText.split('|')[0].trim(); 
-            
-            // 5. Map the text string to JavaScript's numbered days (0 = Sunday, 1 = Monday)
-            const daysOfWeek = {
-                'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 
-                'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6
-            };
-            
-            const targetDayNum = daysOfWeek[selectedDayString];
-            
-            if (targetDayNum !== undefined) {
-                const today = new Date();
-                const currentDayNum = today.getDay();
+            // 3. Ensure they actually clicked a radio button
+            if (e.target && e.target.matches('input[name="schedule"]')) {
                 
-                // 6. Calculate the math to find the most recent occurrence of that day
-                let daysToSubtract = currentDayNum - targetDayNum;
+                // 4. Find the label attached to this radio button and read its text
+                const labelText = document.querySelector(`label[for="${e.target.id}"]`).innerText;
                 
-                // If the target day is ahead of us in the week (e.g., today is Tuesday(2), target is Friday(5)),
-                // we need to wrap around to the previous week's Friday.
-                if (daysToSubtract < 0) {
-                    daysToSubtract += 7; 
+                // Extract just the day part (e.g., splits "Monday | 07:00 AM" and grabs "Monday")
+                const selectedDayString = labelText.split('|')[0].trim(); 
+                
+                // 5. Map the text string to JavaScript's numbered days (0 = Sunday, 1 = Monday)
+                const daysOfWeek = {
+                    'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 
+                    'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6
+                };
+                
+                const targetDayNum = daysOfWeek[selectedDayString];
+                
+                if (targetDayNum !== undefined) {
+                    const today = new Date();
+                    const currentDayNum = today.getDay();
+                    
+                    // 6. Calculate the math to find the most recent occurrence of that day
+                    let daysToSubtract = currentDayNum - targetDayNum;
+                    
+                    // If the target day is ahead of us in the week (e.g., today is Tuesday(2), target is Friday(5)),
+                    // we need to wrap around to the previous week's Friday.
+                    if (daysToSubtract < 0) {
+                        daysToSubtract += 7; 
+                    }
+                    
+                    // 7. Calculate the exact historical date
+                    const targetDate = new Date(today);
+                    targetDate.setDate(today.getDate() - daysToSubtract);
+                    
+                    // 8. Command Flatpickr to jump to this new date instantly!
+                    fpInstance.setDate(targetDate);
                 }
-                
-                // 7. Calculate the exact historical date
-                const targetDate = new Date(today);
-                targetDate.setDate(today.getDate() - daysToSubtract);
-                
-                // 8. Command Flatpickr to jump to this new date instantly!
-                fpInstance.setDate(targetDate);
             }
-        }
-    });
+        });
+    }
 
 });

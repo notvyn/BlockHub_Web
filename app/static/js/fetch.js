@@ -314,4 +314,67 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+
+    /* =========================================
+    WEB PUSH NOTIFICATION SETUP
+    ========================================= */
+
+    // You need to pass your PUBLIC key from your .env file into this variable later, 
+    // but for now, just paste the raw string here to test the connection.
+    const PUBLIC_KEY = "BNLX8AdbicZRzomXxCBRQjXd6VVoH90y6m0bxE_8FTFTJWCezMk1p2SONiCc3XPwu7Sk4jeBOHkCZM5zQGuhUR4"; 
+
+    // A mandatory helper function that converts your public key into the security format the browser demands
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    window.subscribeToNotifications = async function() {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            try {
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    console.log("Permission granted! Registering Service Worker...");
+                    
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    
+                    const subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(PUBLIC_KEY)
+                    });
+                    
+                    console.log("SUCCESS! Sending this to the server:", subscription);
+                    
+                    // NEW CODE: Send the subscription to your Flask backend
+                    const response = await fetch('/api/save-subscription', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(subscription)
+                    });
+                    
+                    const result = await response.json();
+                    console.log("Server response:", result);
+                    
+                } else {
+                    console.warn("User blocked notifications.");
+                }
+            } catch (error) {
+                console.error("Failed to subscribe:", error);
+            }
+        } else {
+            console.warn("Push notifications are not supported.");
+        }
+    };
+
+
 });

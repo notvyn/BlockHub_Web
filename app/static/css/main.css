@@ -331,13 +331,20 @@ main {
 }
 
 .search-result-item:hover {
-    background-color: var(--text-muted); /* Soft accent purple tint */
+    background-color: #ccbf97;
     cursor: pointer;
 }
 
 .search-result-item:focus {
-    background-color: rgb(15, 9, 37);
+    background-color: #ada280;
+}
 
+[date-theme='dark'] .search-result-item:hover {
+    background-color: var(--text-muted); /* Soft accent purple tint */
+}
+
+[data-theme='dark'] .search-result-item:focus {
+    background-color: rgb(15, 9, 37);
 }
 
 /* Hide the last bottom border so it looks clean */

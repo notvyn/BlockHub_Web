@@ -1,6 +1,6 @@
 """(Page Manager) - This is where the magic happens. It connects the URL (e.g., /dashboard) to the right HTML page."""
 
-from flask import render_template, redirect, url_for, request, jsonify
+from flask import render_template, redirect, url_for, request, jsonify, send_from_directory
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func, and_, or_
 from sqlalchemy.orm import joinedload
@@ -10,15 +10,52 @@ from app import app, login_manager, db
 
 import cloudinary
 import cloudinary.uploader
+import os
+import json
 
-from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link
+from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription
 from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm
 from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter
+from app.utility import send_web_push
 
 @login_manager.user_loader
 def load_user(user_id):
     # This looks up the user in your database by their ID
     return User.query.get(int(user_id))
+
+# Put this alongside your other routes!
+@app.route('/sw.js')
+def serve_sw():
+    # This tells Flask to serve the file from the static folder, 
+    # but the browser will think it's at the root (http://localhost:5000/sw.js)
+    return send_from_directory('static', 'js/sw.js', mimetype='application/javascript')
+
+@app.route('/api/save-subscription', methods=['POST'])
+@login_required # Ensures we know exactly who is saving this subscription
+def save_subscription():
+    sub_data = request.json
+    
+    if not sub_data:
+        return jsonify({'error': 'No subscription data provided'}), 400
+
+    # Convert the JSON dictionary back to a string so we can save it in the Text column
+    sub_string = json.dumps(sub_data)
+
+    # Check if this exact subscription already exists so we don't save duplicates
+    existing_sub = PushSubscription.query.filter_by(
+        user_id=current_user.id, 
+        subscription_data=sub_string
+    ).first()
+
+    if not existing_sub:
+        new_sub = PushSubscription(
+            user_id=current_user.id,
+            subscription_data=sub_string
+        )
+        db.session.add(new_sub)
+        db.session.commit()
+
+    return jsonify({'status': 'success', 'message': 'Subscription saved!'}), 200
 
 @app.context_processor
 def inject_global_forms():
@@ -348,6 +385,26 @@ def add_announcement():
         form.url.data = ''
 
         db.session.add(new_announcement)
+
+        # Grab all saved browser subscriptions from the database
+        all_subscriptions = PushSubscription.query.all()
+        
+        for sub in all_subscriptions:
+            # Use the helper method we made in models.py to turn the text back into a dictionary
+            sub_dict = sub.get_subscription_dict()
+            
+            # Fire the message!
+            status = send_web_push(
+                subscription_dict=sub_dict, 
+                notification_title="New Class Announcement!", 
+                notification_body=new_announcement.title,
+                target_url=f"/announcements#announcement-{new_announcement.id}"
+            )
+
+            # NEW: Automatically clean the database if the address is dead!
+            if status == "expired":
+                db.session.delete(sub)
+
         db.session.commit()
 
         return redirect(url_for('announcements'))
@@ -374,6 +431,27 @@ def add_course():
         form.units.data = ''
 
         db.session.add(new_course)
+        db.session.commit()
+
+        # Grab all saved browser subscriptions from the database
+        all_subscriptions = PushSubscription.query.all()
+
+        for sub in all_subscriptions:
+            # Use the helper method we made in models.py to turn the text back into a dictionary
+            sub_dict = sub.get_subscription_dict()
+            
+            # Fire the message!
+            status = send_web_push(
+                subscription_dict=sub_dict, 
+                notification_title="New Class Course!", 
+                notification_body=new_course.title,
+                target_url=f"/courses#course-{new_course.id}"
+            )
+
+            # NEW: Automatically clean the database if the address is dead!
+            if status == "expired":
+                db.session.delete(sub)
+
         db.session.commit()
 
         # flash("Course Added Successfully")
@@ -410,6 +488,26 @@ def add_deadline():
         form.note.data = ''
 
         db.session.add(new_deadline)
+
+        # Grab all saved browser subscriptions from the database
+        all_subscriptions = PushSubscription.query.all()
+        
+        for sub in all_subscriptions:
+            # Use the helper method we made in models.py to turn the text back into a dictionary
+            sub_dict = sub.get_subscription_dict()
+            
+            # Fire the message!
+            status = send_web_push(
+                subscription_dict=sub_dict, 
+                notification_title="New Class Deadline!", 
+                notification_body=new_deadline.description,
+                target_url=f"/deadlines#deadline-{new_deadline.id}"
+            )
+
+            # NEW: Automatically clean the database if the address is dead!
+            if status == "expired":
+                db.session.delete(sub)
+
         db.session.commit()
 
         # flash("Deadline Posted Successfully")
@@ -450,6 +548,26 @@ def add_link_api():
             # user_id=current_user.id  # If your links are tied to specific users
         )
         db.session.add(new_link)
+
+        # Grab all saved browser subscriptions from the database
+        all_subscriptions = PushSubscription.query.all()
+        
+        for sub in all_subscriptions:
+            # Use the helper method we made in models.py to turn the text back into a dictionary
+            sub_dict = sub.get_subscription_dict()
+            
+            # Fire the message!
+            status = send_web_push(
+                subscription_dict=sub_dict, 
+                notification_title="New Class Link!", 
+                notification_body=new_link.title,
+                target_url=f"/links#link-{new_link.id}"
+            )
+
+            # NEW: Automatically clean the database if the address is dead!
+            if status == "expired":
+                db.session.delete(sub)
+
         db.session.commit()
         
         # Send back a success message and the new data
@@ -1001,6 +1119,26 @@ def add_summary():
         form.note.data = ''
 
         db.session.add(new_summary)
+
+        # Grab all saved browser subscriptions from the database
+        all_subscriptions = PushSubscription.query.all()
+        
+        for sub in all_subscriptions:
+            # Use the helper method we made in models.py to turn the text back into a dictionary
+            sub_dict = sub.get_subscription_dict()
+            
+            # Fire the message!
+            status = send_web_push(
+                subscription_dict=sub_dict, 
+                notification_title="New Class Summary!", 
+                notification_body=new_summary.content,
+                target_url=f"/class-summaries#summary-{new_summary.id}"
+            )
+
+            # NEW: Automatically clean the database if the address is dead!
+            if status == "expired":
+                db.session.delete(sub)
+
         db.session.commit()
 
         return redirect(url_for('summaries'))
