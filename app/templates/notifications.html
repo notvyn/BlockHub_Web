@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Notifications{% endblock %}
+{% block page_title_txt %}See what was recently added! {% endblock %}
+
+{% block content %}
+    <div class="card-container">
+        {% for alert in notifications %}
+            <div class="card-wrapper">
+                <a href="{{ alert.url }}">
+                    <div class="d-flex align-items-center gap-2" style="color: var(--text-dark);">
+                        <i class="fa-solid {{ alert.icon }} mb-2"></i>
+                        <h5 class="fw-bold">{{ alert.title }}</h5>
+                    </div>
+                    <p class="fw-medium" style="color: var(--accent-purple);">{{ alert.preview }}</p>
+                    <small style="color: var(--text-muted);">{{ alert.sortable_date | timeago }}</small>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

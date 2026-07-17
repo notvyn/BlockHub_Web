@@ -78,6 +78,9 @@ A centralized class management system for CS 2103.
 - Enabled Search Feature for mobile and desktop
 - Created Service workers for site notification
 
+**July 17, 2026**
+- Created Notification page for viewing recently added 
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [ ] Add password security and form validation.

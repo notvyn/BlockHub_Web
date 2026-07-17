@@ -1,5 +1,6 @@
 from markupsafe import Markup
 from urllib.parse import urlparse # Import Python's built-in URL parser at the top!
+from datetime import datetime
 
 import bleach
 import markdown
@@ -93,3 +94,32 @@ def remove_images_filter(text):
         return ""
     # Replaces the markdown image string with an empty space, erasing it from the text
     return re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', '', text)
+
+@app.template_filter('timeago')
+def time_ago_filter(date_obj):
+    """
+    Takes a Python datetime object and returns a relative 'time ago' string.
+    """
+    # Safety check: if no date was provided, return nothing
+    if not date_obj:
+        return ""
+    
+    now = datetime.now()
+    diff = now - date_obj
+    seconds = diff.total_seconds()
+
+    # Translate the seconds into readable chunks
+    if seconds < 60:
+        return "Just now"
+    elif seconds < 3600:
+        minutes = int(seconds // 60)
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    elif seconds < 86400:
+        hours = int(seconds // 3600)
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    elif seconds < 604800: # 7 days
+        days = int(seconds // 86400)
+        return f"{days} day{'s' if days != 1 else ''} ago"
+    else:
+        # If it's older than a week, just show the actual date (e.g., "Jul 16, 2026")
+        return date_obj.strftime("%b %d, %Y")

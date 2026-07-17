@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, request, jsonify, send_fro
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func, and_, or_
 from sqlalchemy.orm import joinedload
-from datetime import date, timedelta, time
+from datetime import date, timedelta, time, datetime
 
 from app import app, login_manager, db
 
@@ -15,7 +15,7 @@ import json
 
 from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription
 from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm
-from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter
+from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter, time_ago_filter
 from app.utility import send_web_push
 
 @login_manager.user_loader
@@ -1226,6 +1226,87 @@ def delete_link(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/notifications')
+@login_required
+def notifications():
+    # 1. Create an empty master list
+    master_feed = []
+
+    # 2. Fetch the 20 newest Announcements
+    announcements = Announcement.query.order_by(Announcement.date_posted.desc()).limit(20).all()
+    for a in announcements:
+        master_feed.append({
+            'type': 'Announcement',
+            'title': a.title,
+            'preview': a.content[:80] + '...' if len(a.content) > 80 else a.content, # Snippet
+            'raw_date': a.date_posted,
+            'url': f"/announcements#announcement-{a.id}",
+            'icon': 'fa-bullhorn'
+        })
+
+    # 3. Fetch the 20 newest Deadlines
+    # Using date_given as the "posted" date
+    deadlines = Deadline.query.order_by(Deadline.date_given.desc()).limit(20).all()
+    for d in deadlines:
+        master_feed.append({
+            'type': 'Deadline',
+            'title': "New Deadline Posted",
+            'preview': f"{d.course.code}: {d.description} (Due: {d.due_date.strftime('%b %d')})",
+            'raw_date': d.date_given,
+            'url': f"/deadlines#deadline-{d.id}",
+            'icon': 'fa-clock'
+        })
+
+    # 4. Fetch the 20 newest Class Summaries
+    summaries = ClassSummary.query.order_by(ClassSummary.date_held.desc()).limit(20).all()
+    for s in summaries:
+        master_feed.append({
+            'type': 'Class Summary',
+            'title': f"Summary Added: {s.course.code}",
+            'preview': s.content[:80] + '...' if len(s.content) > 80 else s.content,
+            'raw_date': s.date_held,
+            'url': f"/class-summaries#summary-{s.id}",
+            'icon': 'fa-book-open'
+        })
+
+    # 5. Fetch the 20 newest Link
+    links = Link.query.order_by(Link.date_added.desc()).limit(20).all()
+    for l in links:
+        master_feed.append({
+            'type': 'Class Link',
+            'title': f"Link Added: {l.title}",
+            'preview': l.url[:80] + '...' if len(l.url) > 80 else l.url,
+            'raw_date': l.date_added,
+            'url': f"/links#link-{l.id}",
+            'icon': 'fa-link'
+        })
+
+    # 6. The Sorting Fix (Date vs. Datetime)
+    # Python crashes if you try to sort a mix of 'dates' and 'datetimes'. 
+    # This helper loop ensures everything is a comparable datetime object.
+    for item in master_feed:
+        if isinstance(item['raw_date'], datetime):
+            item['sortable_date'] = item['raw_date']
+        elif isinstance(item['raw_date'], date):
+            # Convert a plain date (like Deadline.date_given) into a datetime at midnight
+            item['sortable_date'] = datetime.combine(item['raw_date'], datetime.min.time())
+        else:
+            item['sortable_date'] = datetime.min # Fallback for missing dates
+
+    # 7. Sort the master list (Newest items at the very top)
+    master_feed.sort(key=lambda x: x['sortable_date'], reverse=True)
+
+    # 8. Pass the final, sorted feed to your HTML
+    return render_template(
+        'notifications.html', 
+        notifications=master_feed,
+        is_dedicated_page=True,
+        page_title="Notifications"
+    )
+
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
