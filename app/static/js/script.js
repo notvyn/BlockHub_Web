@@ -368,52 +368,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });  
     });
 
-    // Select ALL buttons with the theme-toggle-btn class
+    /* =========================================
+       UNIFIED DARK MODE CONTROLLER
+       ========================================= */
     const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn');
+    const settingsDarkModeToggle = document.getElementById('settingsDarkMode');
 
-    // 1. Helper function to sync ALL icons at the same time
-    function updateThemeIcons(isDark) {
+    // 1. The Master Function that changes everything at once
+    function applyTheme(isDark) {
+        // Change the actual CSS theme and save it
+        if (isDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('blockhub_theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('blockhub_theme', 'light');
+        }
+
+        // Sync the Header Icons (Sun/Moon)
         themeToggleBtns.forEach(btn => {
-            if (isDark) {
-                btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
-            } else {
-                btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
-            }
+            btn.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
         });
+
+        // Sync the Settings Toggle Switch (if they are on the profile page)
+        if (settingsDarkModeToggle) {
+            settingsDarkModeToggle.checked = isDark;
+        }
     }
 
-    // 2. Check if they already have a saved preference on page load
+    // 2. Initialize on Page Load (Read the saved memory)
     const savedTheme = localStorage.getItem('blockhub_theme');
+    const isCurrentlyDark = (savedTheme === 'dark');
+    applyTheme(isCurrentlyDark);
 
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        updateThemeIcons(true); // Set all to sun
-    } else {
-        updateThemeIcons(false); // Set all to moon
-    }
+    // 3. Click Event for the Header Button (Sun/Moon Icon)
+    themeToggleBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Check current state and send the OPPOSITE to the master function
+            const currentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            applyTheme(!currentlyDark); 
+        });
+    });
 
-    // 3. The Click Event
-    if (themeToggleBtns.length > 0) {
-        themeToggleBtns.forEach(btn => {
-            // Attach the event directly to the specific button (btn.)
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                // What is the current theme?
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-
-                if (currentTheme === 'dark') {
-                    // Switch to light
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('blockhub_theme', 'light');
-                    updateThemeIcons(false); // Changes BOTH icons to moon
-                } else {
-                    // Switch to dark
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('blockhub_theme', 'dark');
-                    updateThemeIcons(true); // Changes BOTH icons to sun
-                }
-            });
+    // 4. Click Event for the Settings Tab Switch
+    if (settingsDarkModeToggle) {
+        settingsDarkModeToggle.addEventListener('change', function() {
+            // Send the exact state of the switch (true/false) to the master function
+            applyTheme(this.checked); 
         });
     }
 

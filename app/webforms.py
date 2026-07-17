@@ -1,12 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField, TimeField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField, TimeField, FloatField, SelectMultipleField, widgets
 from wtforms.validators import DataRequired, Email, EqualTo, URL, Optional
 from wtforms.widgets import TextArea
+from flask_wtf.file import FileField, FileAllowed
 from datetime import date, timedelta, time
 
 class AnnouncementForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
-    content = StringField("Content", widget=TextArea())
+    content = StringField("Content", validators=[DataRequired()], widget=TextArea())
     url = StringField("URL", validators=[Optional()], widget=TextArea())
     submit = SubmitField()
 
@@ -66,3 +67,29 @@ class SignupForm(FlaskForm):
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired()])
     role = SelectField("Role", choices=[("", "Select your Role"), ("student", "Student"), ("officer", "Officer")], validators=[DataRequired()])
     submit = SubmitField()
+
+class FeedbackForm(FlaskForm):
+    title = StringField("Title", validators=[DataRequired()])
+    category = RadioField("Category", validators=[DataRequired()], choices=['Bug', 'Suggestion', 'Question', 'Other'])
+    message = StringField("Message", validators=[DataRequired()], widget=TextArea())
+    submit = SubmitField()
+
+class ProfileForm(FlaskForm):
+    # Standard text inputs
+    name = StringField('Display Name', validators=[DataRequired()])
+    # email = StringField('Email Address', validators=[DataRequired(), Email()])
+    bio = StringField('Profile Bio', widget=TextArea())
+    
+    # The image upload field with a security check to only allow images
+    profile_pic = FileField('Update Profile Picture', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only please!')
+    ])
+
+    tags = SelectMultipleField('Profile Tags', coerce=int, widget=widgets.ListWidget(prefix_label=False), option_widget=widgets.CheckboxInput())
+    
+    submit = SubmitField('Save Changes')
+
+class CreateTagForm(FlaskForm):
+    tag_name = StringField('Tag Name', validators=[DataRequired()])
+    tag_category = SelectField('Category', choices=[('Technical', 'Technical'), ('Interest', 'Interest'), ('Role', 'Role')])
+    submit = SubmitField('Create Tag')

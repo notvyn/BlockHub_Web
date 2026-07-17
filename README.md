@@ -79,11 +79,15 @@ A centralized class management system for CS 2103.
 - Created Service workers for site notification
 
 **July 17, 2026**
-- Created Notification page for viewing recently added 
+- Created Notification page for viewing recently added
+- Created Feedback page
+- Drafted Profile and Account Settings
+- Drafted Blockmates page
+- Added Email change validation and Password hashing
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
-- [ ] Add password security and form validation.
+- [ ] Add password security and form validation. (Password Done)
 - [/] Limit content for Announcement.
 - [/] Enable Dark Mode.
 - [/] Enable dropdown for adding entry.
@@ -104,3 +108,6 @@ A centralized class management system for CS 2103.
 - [ ] Fix total count badge of deadline on dashboard
 - [ ] Refine logic of Announcement query on dashboard
 - [ ] Refine styling of dashboard
+- [ ] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates
+- [ ] Create list of badges for profiles
+- [ ] Create new model for each user completion of Task

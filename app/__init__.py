@@ -4,6 +4,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_mail import Mail
 
 import cloudinary
 import os
@@ -34,6 +35,19 @@ cloudinary.config(
   api_key = os.getenv("CLOUDINARY_API_KEY"),
   api_secret = os.getenv("CLOUDINARY_API_SECRET")
 )
+
+# Your existing setup...
+app.config['SECRET_KEY'] = 'your-very-secret-key' # You should already have this!
+
+# Mail Configuration (Use Gmail SMTP for the MVP)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+# NEVER hardcode passwords! Use environment variables (.env)
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') 
+app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # This must be a Gmail "App Password", not your normal login!
+
+mail = Mail(app)
 
 # We import routes at the bottom to avoid circular dependencies
 from app import routes, models

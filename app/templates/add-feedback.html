@@ -3,13 +3,10 @@
 {% block head %}
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
-
-    <!-- <link href="{{ url_for('static', filename='css/dashboard.css')}}" rel="stylesheet"> -->
-    <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
 {% endblock %}
 
-{% block page_title %}New Announcement{% endblock %}
-{%block page_title_txt %}Tell the whole block about it !{% endblock %}
+{% block page_title %}New Feedback{% endblock %}
+{% block page_title_txt %}Tell the officers what to improve ;>{% endblock %}
 
 {% block content %}
     <div class="row mt-4">
@@ -17,23 +14,28 @@
             <form method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
-                <div class="mb-5">
-                    {{ form.title(class="form-control title-input border-0 shadow-none px-0", autocomplete="off", placeholder="Announcement Title...") }}
+                <div class="mb-4">
+                    {{ form.title(class="form-control title-input border-0 shadow-none px-0", autocomplete="off", placeholder="Feedback Title...") }}
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label md-code border-0 bg-transparent mb-1">CONTENT</label>
-                    {{ form.content(id="announcement-content", placeholder="e.g. Good day...") }}
+                    <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">CATEGORY</label>
+                    <div class="d-flex flex-wrap gap-2 pill-group">
+                        {% for subfield in form.category %}
+                            {{ subfield(class="btn-check") }}
+                            <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label md-code border-0 bg-transparent mb-1">ATTACHED URL (OPTIONAL)</label>
-                    {{ form.url(class="form-control", placeholder="[Title](https://...)") }}
+                    <label class="form-label md-code border-0 bg-transparent mb-1">MESSAGE</label>
+                    {{ form.message(id="feedback-message", class="form-control", placeholder="Found bug at... Block activity...") }}
                 </div>
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
                     <a href="javascript:history.back()" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
-                    {{ form.submit(value="Post Announcement", class="btn btn-modal-save") }}
+                    {{ form.submit(value="Submit Feedback", class="btn btn-modal-save") }}
                 </div>
             </form>
         </div>
@@ -43,10 +45,10 @@
 {% block script %}
     <script>
         const easyMDE = new EasyMDE({
-            element: document.getElementById('announcement-content'),
+            element: document.getElementById('feedback-message'),
             theme: "modern",
             minHeight: "100px", // <--- ADD THIS LINE (Adjust the pixel value to your liking)
-            maxHeight: "250px",
+            maxHeight: "200px",
             spellChecker: false,
             // Turn on the image upload feature
             uploadImage: true,

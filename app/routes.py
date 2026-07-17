@@ -1,10 +1,12 @@
 """(Page Manager) - This is where the magic happens. It connects the URL (e.g., /dashboard) to the right HTML page."""
 
-from flask import render_template, redirect, url_for, request, jsonify, send_from_directory
+from flask import render_template, redirect, url_for, request, jsonify, send_from_directory, flash
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func, and_, or_
 from sqlalchemy.orm import joinedload
 from datetime import date, timedelta, time, datetime
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import app, login_manager, db
 
@@ -13,10 +15,10 @@ import cloudinary.uploader
 import os
 import json
 
-from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription
-from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm
+from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag
+from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm, FeedbackForm, ProfileForm, CreateTagForm
 from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter, time_ago_filter
-from app.utility import send_web_push
+from app.utility import send_web_push, send_verification_email
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -134,6 +136,26 @@ def complete_deadline(id):
         'success': True, 
         'new_total': remaining_deadlines,
         'archive_total': archived_deadlines
+    })
+
+@app.route('/complete-feedback/<int:id>', methods=['POST'])
+def complete_feedback(id):
+    data = request.get_json()
+    is_completed = data.get('completed', False)
+    
+    feedback = Feedback.query.get_or_404(id)
+    
+    # Update the status based on the checkbox
+    if is_completed:
+        feedback.status = 'Resolved'
+    else:
+        feedback.status = 'Pending'
+        
+    db.session.commit()
+
+    # Send BOTH totals back to the JavaScript
+    return jsonify({    
+        'success': True
     })
 
 @app.route('/mark-announcement-read/<int:id>', methods=['POST'])
@@ -1305,24 +1327,256 @@ def notifications():
         page_title="Notifications"
     )
 
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedbacks():
+    feedback = Feedback.query.order_by(Feedback.date_added.desc()).all()
+
+    user_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id).count()
+
+    return render_template('feedbacks.html', feedback=feedback, user_feedback_count=user_feedback_count)
+    
+@app.route('/new-entry/feedback', methods=['GET', 'POST'])
+@login_required
+def add_feedback():
+    form = FeedbackForm()
+
+    if form.validate_on_submit():
+        new_feedback = Feedback(
+            user_id = current_user.id,
+            title = form.title.data,
+            category = form.category.data,
+            message = form.message.data
+        )
+
+        db.session.add(new_feedback)
+        db.session.commit()
+
+        return redirect(url_for('feedbacks'))
+    elif request.method == 'POST':
+        # If it's a POST request but validation failed, print the exact reason!
+        print("FEEDBACK FORM FAILED:", form.errors)
+
+    return render_template('add-feedback.html', form=form, has_back_btn=True) 
+
+@app.route('/update-entry/feedback/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update_feedback(id):
+    form = FeedbackForm()
+    feedback_to_update = Feedback.query.get_or_404(id)
+
+    if form.validate_on_submit():
+        feedback_to_update.user_id = current_user.id
+        feedback_to_update.title = form.title.data
+        feedback_to_update.category = form.category.data
+        feedback_to_update.message = form.message.data
+
+        db.session.commit()
+        return redirect(url_for('feedbacks'))
+
+    elif request.method == 'GET':
+        form.title.data = feedback_to_update.title
+        form.category.data = feedback_to_update.category 
+        form.message.data = feedback_to_update.message
+
+    else:
+        print("FORM VALIDATION FAILED:", form.errors)
+
+    return render_template('update-feedback.html', form=form, has_back_btn=True) 
+
+@app.route('/profile/update', methods=['GET', 'POST'])
+@login_required
+def update_profile():
+    form = ProfileForm()
+    tag_form = CreateTagForm()
+
+    # 1. DYNAMICALLY LOAD CHOICES
+    # This fetches all tags and formats them as (id, name) for WTForms
+    form.tags.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
+
+    if form.validate_on_submit():
+        # 1. Update the text fields
+        current_user.name = form.name.data
+        current_user.bio = form.bio.data
+
+        # 2. SAVE THE TAGS
+        # Clear their old tags first
+        current_user.tags = []
+
+        # Loop through the integer IDs they checked and add the actual Tag objects
+        for tag_id in form.tags.data:
+            selected_tag = Tag.query.get(tag_id)
+            if selected_tag:
+                current_user.tags.append(selected_tag)
+
+        # 2. Check if they uploaded a new image
+        if form.profile_pic.data:
+            image_file = form.profile_pic.data
+            
+            # Send it to Cloudinary directly!
+            upload_result = cloudinary.uploader.upload(image_file, resource_type='image')
+            
+            # Save the new URL to the database
+            current_user.profile_image = upload_result.get("secure_url")
+
+        # 3. Save everything
+        db.session.commit()
+        return redirect(url_for('profile'))
+
+    elif request.method == 'GET':
+        # PRE-FILL THE FORM when they first load the page
+        form.name.data = current_user.name
+        form.bio.data = current_user.bio
+
+        # 3. PRE-CHECK THE BOXES THEY ALREADY OWN
+        form.tags.data = [tag.id for tag in current_user.tags]
+    else:
+        print("FORM VALIDATION FAILED:", form.errors)
+
+    return render_template('update-profile.html', form=form, tag_form=tag_form, page_title="Profile", has_back_btn=True)
+
+@app.route('/api/settings/update-email', methods=['POST'])
+@login_required
+def api_update_email():
+    data = request.get_json()
+    new_email = data.get('email')
+
+    if not new_email:
+        return jsonify({'success': False, 'message': 'Email is required.'}), 400
+
+    # Check if someone else is already using this email
+    existing_user = User.query.filter_by(email=new_email).first()
+    if existing_user and existing_user.id != current_user.id:
+        return jsonify({'success': False, 'message': 'This email is already in use.'}), 400
+
+    # Send the verification email instead of saving to the database
+    try:
+        send_verification_email(current_user, new_email)
+        return jsonify({'success': True, 'message': 'Verification email sent! Please check your inbox.'})
+    except Exception as e:
+        print(f"Mail Error: {e}")
+        return jsonify({'success': False, 'message': 'Failed to send email. Please try again later.'}), 500
+
+@app.route('/api/settings/update-password', methods=['POST'])
+@login_required
+def api_update_password():
+    data = request.get_json()
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    # Use the helper method to verify the current password safely
+    if not current_user.check_password(current_password):
+        return jsonify({'success': False, 'message': 'Incorrect current password.'}), 403
+
+    # Use the helper method to hash the new password
+    current_user.set_password(new_password)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Password updated successfully!'})
+
+@app.route('/api/settings/delete-account', methods=['DELETE'])
+@login_required
+def api_delete_account():
+    user = User.query.get(current_user.id)
+    
+    # Optional: Log them out before deleting the record
+    logout_user()
+    
+    db.session.delete(user)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'redirect': url_for('login')})
 
 
+@app.route('/profile')
+@login_required
+def profile():
+    # Inside your profile route...
+    total_hearts = AnnouncementHeart.query.filter_by(user_id=current_user.id).count()
+    # total_summaries = ClassSummary.query.filter_by(user_id=current_user.id).count()
+    # (You would need to add a user_id to ClassSummary for this to work!)
+
+    # Create a dynamic list to pass to the HTML
+    earned_badges = []
+
+    if total_hearts >= 5:
+        earned_badges.append({'name': 'Active Supporter', 'icon': 'fa-heart', 'color': 'danger'})
+        
+    # if total_summaries >= 3:
+    #     earned_badges.append({'name': 'Top Contributor', 'icon': 'fa-book-open', 'color': 'success'})
+    
+    return render_template('profile.html', earned_badges=earned_badges)
+
+@app.route('/api/create-tag', methods=['POST'])
+@login_required
+def create_tag():
+    form = CreateTagForm()
+    
+    # WTForms will automatically find the CSRF token and data in the request
+    if form.validate_on_submit():
+        
+        # Check if the tag already exists (case-insensitive) to prevent duplicates
+        existing_tag = Tag.query.filter(func.lower(Tag.name) == func.lower(form.tag_name.data)).first()
+        
+        if existing_tag:
+            return jsonify({'success': False, 'error': 'This tag already exists!'}), 400
+
+        # Save the new tag
+        new_tag = Tag(
+            name=form.tag_name.data,
+            category=form.tag_category.data
+        )
+        db.session.add(new_tag)
+        db.session.commit()
+        
+        # Send the success response with the new tag's data
+        return jsonify({
+            'success': True,
+            'tag': {
+                'id': new_tag.id,
+                'name': new_tag.name,
+                'category': new_tag.category
+            }
+        })
+        
+    # If WTForms validation fails
+    return jsonify({'success': False, 'errors': form.errors}), 400
+
+@app.route('/blockmates')
+@login_required
+def blockmates():
+    # Fetch all users, maybe sort alphabetically by name
+    all_students = User.query.order_by(User.name).all()
+    return render_template('blockmates.html', students=all_students)
+
+@app.route('/blockmates/<int:id>', methods=['GET', 'POST'])
+@login_required
+def blockmate(id):
+    blockmate = User.query.get_or_404(id)
+
+    # Create a dynamic list to pass to the HTML
+    earned_badges = []
+    total_hearts = AnnouncementHeart.query.filter_by(user_id=blockmate.id).count()
+
+    if total_hearts >= 5:
+        earned_badges.append({'name': 'Active Supporter', 'icon': 'fa-heart', 'color': 'danger'})
+
+    return render_template('blockmate.html', blockmate=blockmate, earned_badges=earned_badges, has_back_btn=True)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
+        user = User.query.filter_by(email=form.email.data).first()
 
-        user = User.query.filter_by(email=email).first()
-
-        if user:
-            if password == user.password_hash:
-                login_user(user)
-                return redirect(url_for('dashboard'))
-    
+        # Check if the user exists AND the passwords match using Werkzeug
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        else:
+            # Optional: Add a flash message here for invalid credentials
+            pass
+            
     return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -1336,32 +1590,53 @@ def signup():
     form = SignupForm()
 
     if form.validate_on_submit():
-        name=form.name.data
-        email=form.email.data
-        password=form.password.data
-        role=form.role.data
-
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=form.email.data).first()
 
         if user is None:
             new_user = User(
-                name=name,
-                email=email,
-                password_hash=password,
-                role=role
+                name=form.name.data,
+                email=form.email.data,
+                role=form.role.data
             )
+            # Use the new helper method to hash the password securely
+            new_user.set_password(form.password.data)
 
             db.session.add(new_user)
             db.session.commit()
 
             login_user(new_user)
+            return redirect(url_for('dashboard'))
         
-        form.name.data = ''
-        form.email.data = ''
-        form.password.data = ''
-        form.confirm_password.data = ''
-        form.role.data = ''
-
-        return redirect(url_for('dashboard'))
-    
     return render_template('signup.html', form=form)
+    
+@app.route('/verify-email/<token>')
+@login_required
+def verify_email_update(token):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    
+    try:
+        # Decrypt the token. Max_age=1800 means it expires in 1800 seconds (30 mins).
+        data = serializer.loads(token, salt='email-update-salt', max_age=1800)
+        
+        user_id = data.get('user_id')
+        new_email = data.get('new_email')
+        
+        # Security check: Ensure the logged-in user matches the token
+        if current_user.id != user_id:
+            flash('Invalid or unauthorized token.', 'danger')
+            return redirect(url_for('settings'))
+
+        # SUCCESS! Update the database.
+        current_user.email = new_email
+        db.session.commit()
+        
+        flash('Your email has been successfully updated!', 'success')
+        return redirect(url_for('profile'))
+        
+    except SignatureExpired:
+        flash('The verification link has expired. Please request a new one.', 'danger')
+        return redirect(url_for('profile'))
+        
+    except BadSignature:
+        flash('Invalid verification link.', 'danger')
+        return redirect(url_for('profile'))

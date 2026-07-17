@@ -3,6 +3,7 @@
 from app import db
 from flask_login import UserMixin
 from datetime import datetime, timezone
+from werkzeug.security import generate_password_hash, check_password_hash
 import json
 
 class Announcement(db.Model):
@@ -101,16 +102,41 @@ class Link(db.Model):
     url = db.Column(db.Text, nullable=False)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 
+# Place this helper table right above your User model
+user_tags = db.Table('user_tags',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
+)
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    category = db.Column(db.String(50)) # e.g., "Technical", "Interest", "Role"
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(200), nullable=False, unique=True)
+    bio = db.Column(db.Text, nullable=True)
     date_added = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    role = db.Column(db.String(20), default="student", nullable=False)
+    role = db.Column(db.String(20), default="Student", nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    profile_image = db.Column(db.String(255), nullable=True, default='https://res.cloudinary.com/your-cloud-name/image/upload/v12345/default-avatar.png')
     
-    password_hash = db.Column(db.String(200), nullable=False)
+    # We still store it as a string, but it will hold the long scrambled hash
+    password_hash = db.Column(db.String(256), nullable=False)
 
     announcements = db.relationship('Announcement', backref='author', lazy=True, cascade="all, delete-orphan")
+    tags = db.relationship('Tag', secondary=user_tags, backref=db.backref('users', lazy='dynamic'))
+
+    # --- NEW HELPER METHODS ---
+    def set_password(self, password):
+        """Scrambles the plain text password and saves the hash."""
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        """Takes a plain text password, hashes it, and compares it to the database."""
+        return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
         return f"User('{self.name}')"
@@ -126,3 +152,12 @@ class PushSubscription(db.Model):
     def get_subscription_dict(self):
         # Helper function to convert the text back to a dictionary when sending pushes
         return json.loads(self.subscription_data)
+    
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(80), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(80), nullable=False, default='Pending')
+    date_added = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

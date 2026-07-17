@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block page_title %}Settings{% endblock %}
+{% block page_title_txt %}Personalize your Hub!{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-12 col-lg-8">
+        <div class="card-wrapper p-4 p-md-5">
+            
+            <!-- Notice the enctype! It is MANDATORY for file uploads -->
+            <form method="POST" enctype="multipart/form-data" novalidate>
+                {{ form.hidden_tag() }}
+
+                <div class="d-flex flex-column flex-md-row gap-4 align-items-center align-items-md-start mb-4">
+                    
+                    <!-- Left Side: Current Avatar -->
+                    <div class="text-center">
+                        <img src="{{ current_user.profile_image }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid var(--accent-purple);">
+                        
+                        <!-- The File Input is often ugly, you can style it using Bootstrap classes -->
+                        <div class="small">
+                            {{ form.profile_pic(class="form-control form-control-sm") }}
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Text Inputs -->
+                    <div class="flex-grow-1 w-100">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">DISPLAY NAME</label>
+                            {{ form.name(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">BIO</label>
+                            {{ form.bio(class="form-control") }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The Tags Section -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label fw-bold text-muted small mb-0" style="letter-spacing: 1px;">PROFILE TAGS</label>
+                        
+                        <!-- THE TRIGGER BUTTON -->
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createTagModal">
+                            <i class="fa-solid fa-plus"></i> New Tag
+                        </button>
+                    </div>
+                    
+                    <!-- The Pill Checkboxes -->
+                    <div class="d-flex flex-wrap gap-2 pill-group" id="tags-container">
+                        {% for subfield in form.tags %}
+                            <!-- This hidden input is the actual checkbox -->
+                            {{ subfield(class="btn-check") }}
+                            
+                            <!-- This label acts as the visual pill -->
+                            <!-- If you have custom CSS for 'btn-pill', you can use that instead of the btn-outline-primary classes! -->
+                            <label class="btn btn-outline-primary rounded-pill btn-sm px-3" for="{{ subfield.id }}">
+                                {{ subfield.label.text }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end border-top pt-4">
+                    {{ form.submit(class="btn btn-outline-secondary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     FORM 2: THE CREATE TAG MODAL (Outside the main form!)
+     ========================================== -->
+<div class="modal fade" id="createTagModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            
+            <!-- Make sure you pass your tag_form from the route! -->
+            <form id="createTagForm" method="POST">
+                {{ tag_form.hidden_tag() }}
+                
+                <div class="modal-header">
+                    <h5 class="modal-title">Create a New Tag</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="mb-3">
+                        {{ tag_form.tag_name.label(class="form-label") }}
+                        {{ tag_form.tag_name(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ tag_form.tag_category.label(class="form-label") }}
+                        {{ tag_form.tag_category(class="form-select") }}
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    {{ tag_form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

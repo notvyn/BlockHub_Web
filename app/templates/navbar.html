@@ -15,6 +15,12 @@
             </a>
         </li>
         <li class="sidebar-item">
+            <a href="{{ url_for('blockmates') }}" class="sidebar-link">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Blockmates</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
             <a href="{{ url_for('announcements') }}" class="sidebar-link">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Announcements</span>
@@ -48,6 +54,7 @@
         
     </ul>
     <div class="sidebar-footer">
+        {% if current_user.is_authenticated %}
         <li class="sidebar-item">
             <a href="{{ url_for('notifications') }}" class="sidebar-link">
                 <i class="fa-solid fa-bell"></i>
@@ -55,17 +62,20 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
+            <a href="{{ url_for('feedbacks')}}" class="sidebar-link">
                 <i class="fa-solid fa-square-poll-horizontal"></i>
                 <span>Feedback</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fa-solid fa-user-gear"></i>
-                <span>Setting</span>
+            <a href="{{ url_for('profile')}}" class="sidebar-link">
+                <!-- <i class="fa-solid fa-user-gear"></i>
+                <span>Setting</span> -->
+                <img src="{{ current_user.profile_image }}" class="sidebar-avatar rounded-circle" style="height: 20px; width: 20px;">
+                <span class="sidebar-name">{{ current_user.name }}</span>
             </a>
         </li>
+        {% endif %}
 
         <div class="sidebar-auth">
             {% if current_user.is_authenticated %}

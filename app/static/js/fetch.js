@@ -376,5 +376,196 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    const completeBtn = document.querySelectorAll('.complete-btn');
+
+    completeBtn.forEach(btn => {
+        // 1. Pass 'event' into the function so we can stop the default link behavior
+        btn.addEventListener('click', function(event) {
+            // Prevent the page from jumping to the top!
+            event.preventDefault(); 
+            
+            const feedbackId = this.getAttribute('data-id');
+            
+            const taskContainer = this.closest('.feedback-item');
+            const taskTitle = taskContainer.querySelector('.feedback-title');
+            const statusText = taskContainer.querySelector('.feedback-status');
+
+            taskContainer.style.transition = 'all 0.4s ease';
+
+            fetch(`/complete-feedback/${feedbackId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // You are explicitly passing true here
+                body: JSON.stringify({ completed: true }) 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Since we know it's a one-way "Mark Complete" button, 
+                    // we don't need the if/else check anymore. Just update the UI!
+                    
+                    if (taskTitle) taskTitle.style.textDecoration = 'line-through';
+                    if (statusText) statusText.textContent = 'Resolved';
+                    if (taskContainer) taskContainer.style.filter = 'grayscale(1)';
+                    
+                    // Optional UI Polish: Hide the button so they can't click it again
+                    this.style.display = 'none'; 
+                }
+            })
+            .catch(error => console.error('Error updating task:', error));
+        });
+    });
+
+    const tagForm = document.getElementById('createTagForm');
+    
+    if (tagForm) {
+        tagForm.addEventListener('submit', function(event) {
+            // Stop the browser from reloading the page
+            event.preventDefault();
+            
+            // Gather all the inputs from the form automatically
+            const formData = new FormData(tagForm);
+            
+            fetch('/api/create-tag', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 1. Hide the Bootstrap modal
+                    const modalElement = document.getElementById('createTagModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                    
+                    // 2. Clear the inputs so it's empty next time they open it
+                    tagForm.reset();
+                    
+                    /// 3. Find the container using the new ID we added above
+                    const checkboxesContainer = document.getElementById('tags-container');
+
+                    // 4. Create the HTML matching the exact Jinja pill structure!
+                    const newCheckboxHTML = `
+                        <input class="btn-check" id="tags-${data.tag.id}" name="tags" type="checkbox" value="${data.tag.id}" checked>
+                        <label class="btn btn-outline-primary rounded-pill btn-sm px-3" for="tags-${data.tag.id}">
+                            ${data.tag.name}
+                        </label>
+                    `;
+
+                    // 5. Inject the new checkbox into the page!
+                    checkboxesContainer.insertAdjacentHTML('beforeend', newCheckboxHTML);
+                    
+                } else {
+                    // Alert the user if the tag already exists or is invalid
+                    alert('Error: ' + (data.error || 'Please fill out all fields.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error generating tag:', error);
+            });
+        });
+    }
+
+    /* =========================================
+       ACCOUNT SETTINGS TAB LOGIC
+       ========================================= */
+
+    // Push Notification Toggle
+    const pushToggle = document.getElementById('settingsPushNotifications');
+
+    if (pushToggle) {
+        // 1. Check current status on load
+        if (Notification.permission === 'granted') {
+            pushToggle.checked = true;
+        } else {
+            pushToggle.checked = false;
+        }
+
+        // 2. Trigger on change
+        pushToggle.addEventListener('change', function(e) {
+            if (this.checked) {
+                // Attempt to subscribe
+                if (typeof window.subscribeToNotifications === 'function') {
+                    window.subscribeToNotifications().then(() => {
+                        // Re-check permission after the function runs
+                        if (Notification.permission !== 'granted') {
+                            this.checked = false; // Snap back if permission was denied/blocked
+                        }
+                    });
+                }
+            } else {
+                // Browsers don't allow programmatic revocation of push permissions
+                alert("To disable notifications, please click the lock icon next to your URL bar, select 'Site settings', and reset permissions.");
+                this.checked = true; // Snap back to true as we can't force-disable it via JS
+            }
+        });
+    }
+
+    // 3. Update Email via Fetch
+    const updateEmailForm = document.getElementById('updateEmailForm');
+    if (updateEmailForm) {
+        updateEmailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newEmail = document.getElementById('newEmailInput').value;
+            const msgBox = document.getElementById('emailMessage');
+
+            fetch('/api/settings/update-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: newEmail })
+            })
+            .then(res => res.json())
+            .then(data => {
+                msgBox.style.display = 'block';
+                msgBox.textContent = data.message;
+                msgBox.className = data.success ? 'small mt-2 text-success fw-bold' : 'small mt-2 text-danger fw-bold';
+                setTimeout(() => msgBox.style.display = 'none', 3000);
+            });
+        });
+    }
+
+    // 4. Update Password via Fetch
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const currentPw = document.getElementById('currentPassword').value;
+            const newPw = document.getElementById('newPassword').value;
+            const msgBox = document.getElementById('passwordMessage');
+
+            fetch('/api/settings/update-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ current_password: currentPw, new_password: newPw })
+            })
+            .then(res => res.json())
+            .then(data => {
+                msgBox.style.display = 'inline';
+                msgBox.textContent = data.message;
+                msgBox.className = data.success ? 'small me-3 text-success fw-bold' : 'small me-3 text-danger fw-bold';
+                
+                if (data.success) changePasswordForm.reset(); // Clear passwords on success
+                setTimeout(() => msgBox.style.display = 'none', 4000);
+            });
+        });
+    }
+
+    // 5. Delete Account Logic
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', function() {
+            if (confirm("Are you absolutely sure you want to delete your account? All data will be lost.")) {
+                fetch('/api/settings/delete-account', {
+                    method: 'DELETE'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect; // Send them to login page
+                    }
+                });
+            }
+        });
+    }
 
 });
