@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/deadline.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Deadlines{% endblock %}
+{% block page_title_txt %}Being productive right now! ;>{% endblock %}
+
+{% block extra_header %}
+<div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3">
+    <div style="color: var(--text-muted);">
+        Total Blockmates: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ students|length }}</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+    <div class="card-container">
+        {% for student in students %}
+            <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
+            <div class="card-wrapper">
+                <div class="d-flex gap-2">
+                    <div class="d-flex align-items-center me-2">{{ loop.index }}</div>
+                    <img src="{{ student.profile_image }}" class="rounded-circle" style="width: 60px; height: 60px;">
+                    <div>
+                        <a href="{{ url_for('blockmate', id=student.id) }}" class="fw-bold" style="color: var(--text-dark); font-size: 1.2rem;">{{student.name}}</a>
+                        <div class="mb-2">{{student.email}}</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tag in student.tags %}
+
+                                <!-- Set a default color -->
+                                {% set badge_color = 'bg-secondary' %}
+                                
+                                <!-- Change the color based on the tag's category -->
+                                {% if tag.category == 'Technical' %}
+                                    {% set badge_color = 'bg-primary' %}
+                                {% elif tag.category == 'Role' %}
+                                    {% set badge_color = 'bg-danger' %}
+                                {% elif tag.category == 'Interest' %}
+                                    {% set badge_color = 'bg-info text-dark' %}
+                                {% endif %}
+
+                                <span class="badge rounded-pill {{ badge_color }}">{{ tag.name }}</span>
+                                
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

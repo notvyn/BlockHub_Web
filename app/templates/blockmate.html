@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/deadline.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Deadlines{% endblock %}
+{% block page_title_txt %}Being productive right now! ;>{% endblock %}
+
+{% block content %}
+    <div class="card-container">
+        <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
+        <div class="card-wrapper">
+            <div class="d-flex gap-3">
+                <img src="{{ blockmate.profile_image }}" class="rounded-circle" style="width: 60px; height: 60px;">
+                <div>
+                    <div class="fw-bold m-0" style="color: var(--text-dark); font-size: 1.2rem;">{{blockmate.name}}</div>
+                    <div class="small mb-2">{{blockmate.email}}</div>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for tag in blockmate.tags %}
+
+                            <!-- Set a default color -->
+                            {% set badge_color = 'bg-secondary' %}
+                            
+                            <!-- Change the color based on the tag's category -->
+                            {% if tag.category == 'Technical' %}
+                                {% set badge_color = 'bg-primary' %}
+                            {% elif tag.category == 'Role' %}
+                                {% set badge_color = 'bg-danger' %}
+                            {% elif tag.category == 'Interest' %}
+                                {% set badge_color = 'bg-info text-dark' %}
+                            {% endif %}
+
+                            <span class="badge rounded-pill {{ badge_color }}">{{ tag.name }}</span>
+                            
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-muted mb-2">ABOUT ME</h6>
+                        <p class="text-dark">{{ current_user.bio }}</p>
+                    </div>
+
+                    <div class="">
+                        <h6 class="fw-bold text-muted mb-3">ACHIEVEMENTS</h6>
+                        
+                        {% if earned_badges %}
+                            <div class="d-flex flex-wrap gap-3">
+                                {% for badge in earned_badges %}
+                                    <!-- Render each dynamically generated badge -->
+                                    <div class="text-center p-3 rounded" style="background-color: rgba(0,0,0,0.03); width: 100px;">
+                                        <i class="fa-solid {{ badge.icon }} fa-2x mb-2 text-{{ badge.color }}"></i>
+                                        <div class="small fw-bold" style="font-size: 0.75rem;">{{ badge.name }}</div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <!-- Fallback if they haven't unlocked anything yet -->
+                            <div class="text-muted small rounded">
+                                <i class="fa-solid fa-lock mb-2"></i><br>
+                                Still Explorin ;>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
