@@ -1,9 +1,11 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, IntegerField, URLField, RadioField, TimeField, FloatField, SelectMultipleField, widgets
-from wtforms.validators import DataRequired, Email, EqualTo, URL, Optional
+from wtforms.validators import DataRequired, Email, EqualTo, URL, Optional, Length
 from wtforms.widgets import TextArea
 from flask_wtf.file import FileField, FileAllowed
 from datetime import date, timedelta, time
+
+from app.utility import validate_school_email, validate_password_strength
 
 class AnnouncementForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
@@ -61,12 +63,12 @@ class LoginForm(FlaskForm):
     submit = SubmitField()
 
 class SignupForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired(), EqualTo('confirm_password', message='Password must Match!')])
-    confirm_password = PasswordField("Confirm Password", validators=[DataRequired()])
-    role = SelectField("Role", choices=[("", "Select your Role"), ("student", "Student"), ("officer", "Officer")], validators=[DataRequired()])
-    submit = SubmitField()
+    name = StringField("Name", validators=[DataRequired(), Length(min=8, max=120, message="Name must be between 8 and 120 characters.")])
+    email = StringField("Email", validators=[DataRequired(), validate_school_email])
+    password = PasswordField("Password", validators=[DataRequired(), validate_password_strength])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
+    role = RadioField("Role", choices=[("Student", "Student"), ("Officer", "Officer")], default="Student", validators=[DataRequired()])
+    submit = SubmitField('Create Account')
 
 class FeedbackForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])

@@ -4,7 +4,7 @@ from app import db
 from flask_login import UserMixin
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
-import json
+import json, os
 
 class Announcement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -14,6 +14,9 @@ class Announcement(db.Model):
     date_posted = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    reads = db.relationship('AnnouncementRead', backref='announcement', lazy=True, cascade="all, delete-orphan")
+    hearts = db.relationship('AnnouncementHeart', backref='announcement', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Announcement('{self.title}', '{self.date_posted}')"
@@ -89,12 +92,21 @@ class Deadline(db.Model):
     due_date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(50), nullable=False, default='Upcoming')
     note = db.Column(db.Text, nullable=True)
-
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
-    is_archived = db.Column(db.Boolean, default=False)
+
+    completions = db.relationship('DeadlineCompletion', backref='deadline', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Deadline {self.description}>'
+
+class DeadlineCompletion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    deadline_id = db.Column(db.Integer, db.ForeignKey('deadline.id'), nullable=False)
+    date_completed = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    # Ensures a user can't complete the exact same deadline twice
+    __table_args__ = (db.UniqueConstraint('user_id', 'deadline_id', name='unique_user_deadline'),)
 
 class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,6 +125,8 @@ class Tag(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     category = db.Column(db.String(50)) # e.g., "Technical", "Interest", "Role"
 
+cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
@@ -121,13 +135,19 @@ class User(db.Model, UserMixin):
     date_added = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     role = db.Column(db.String(20), default="Student", nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    profile_image = db.Column(db.String(255), nullable=True, default='https://res.cloudinary.com/your-cloud-name/image/upload/v12345/default-avatar.png')
+    profile_image = db.Column(db.String(255), nullable=True)
     
     # We still store it as a string, but it will hold the long scrambled hash
     password_hash = db.Column(db.String(256), nullable=False)
 
     announcements = db.relationship('Announcement', backref='author', lazy=True, cascade="all, delete-orphan")
     tags = db.relationship('Tag', secondary=user_tags, backref=db.backref('users', lazy='dynamic'))
+
+    feedbacks = db.relationship('Feedback', backref='user', lazy=True, cascade="all, delete-orphan")
+    announcement_reads = db.relationship('AnnouncementRead', backref='user', lazy=True, cascade="all, delete-orphan")
+    announcement_hearts = db.relationship('AnnouncementHeart', backref='user', lazy=True, cascade="all, delete-orphan")
+    deadline_completions = db.relationship('DeadlineCompletion', backref='user', lazy=True, cascade="all, delete-orphan")
+    push_subscriptions = db.relationship('PushSubscription', backref='user', lazy=True, cascade="all, delete-orphan")
 
     # --- NEW HELPER METHODS ---
     def set_password(self, password):
@@ -137,6 +157,18 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         """Takes a plain text password, hashes it, and compares it to the database."""
         return check_password_hash(self.password_hash, password)
+
+    def __init__(self, **kwargs):
+        # 1. Run the standard SQLAlchemy initialization
+        super(User, self).__init__(**kwargs)
+        
+        # 2. If no profile image was provided, generate one!
+        if not self.profile_image and self.name:
+            # Format the name for a URL (e.g., "Juan Dela Cruz" -> "Juan+Dela+Cruz")
+            formatted_name = self.name.replace(' ', '+')
+            
+            # Use UI Avatars to generate a random colored badge with their initials
+            self.profile_image = f"https://ui-avatars.com/api/?name={formatted_name}&background=random&color=fff&bold=true"
 
     def __repr__(self):
         return f"User('{self.name}')"
@@ -155,9 +187,10 @@ class PushSubscription(db.Model):
     
 class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     title = db.Column(db.String(200), nullable=False)
     category = db.Column(db.String(80), nullable=False)
     message = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(80), nullable=False, default='Pending')
+    admin_reply = db.Column(db.Text, nullable=True)
     date_added = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

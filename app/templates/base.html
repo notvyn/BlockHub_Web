@@ -92,7 +92,9 @@
             <!-- Dashboard Content Injected Here -->
             <main>
                 <div class="top-bar d-flex justify-content-between align-items-center">
+                    
                     <div class="tb-txt d-flex align-items-center gap-3">
+                    {% if not is_auth %}
                         
                         {% if has_back_btn == true %}
                         <a href="javascript:history.back()" class="back-btn">
@@ -104,10 +106,12 @@
                             <h2 class="page-title"># {% block page_title %}{% endblock %}</h2>
                             <p class="page-title-txt">> {%block page_title_txt %}{% endblock %}</p> 
                         </div>
-                        
+                    {% endif %}
                     </div>
+                    
                     <div class="tb-btn d-none d-md-flex align-items-center justify-content-evenly">
                         <!-- ADDED: position-relative -->
+                        {% if not is_auth %}
                         <div class="search-box position-relative">
                             <i class="bi bi-search"></i>
                             
@@ -117,9 +121,11 @@
                             <!-- ADDED: The Desktop Results Dropdown -->
                             <div id="desktop-search-results" class="search-dropdown shadow-lg rounded" style="display: none;"></div>
                         </div>
+                        {% endif %}
                         
                         <button class="theme-toggle-btn" id="theme-toggle-desktop"><i class="fa-solid fa-moon"></i></button>
 
+                        {% if not is_auth %}
                         {% if is_entry != true %}
                         <div class="dropdown">
                             <button class="entry-toggle" type="button" id="desktopAddEntryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -136,8 +142,10 @@
                             </ul>
                         </div>
                         {% endif %}
+                        {% endif %}
                     </div>
                 </div>
+                
                 
                 <!-- Can be remove -->
                 {% block extra_header %}{% endblock %}

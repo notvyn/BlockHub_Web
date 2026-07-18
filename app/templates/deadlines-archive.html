@@ -21,11 +21,11 @@
     <div class="card-container">
         {% for d in deadlines %}
             <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
-            <div id="deadline{{ d.id }}" class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid var(--accent-purple); filter: grayscale(0.5);">
+            <div id="deadline{{ d.id }}" class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid var(--accent-purple); opacity: {% if d.id in completed_ids %}0.75{% else %}1{% endif %}; transition: opacity 0.3s ease;">
 
                 <!-- 1. MOBILE CHECKBOX (Top Right, Hidden on Desktop) -->
                 <div class="d-md-none position-absolute" style="top: 1rem; right: 1rem; z-index: 5;">
-                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-mob-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.status == 'Done' %}checked{% endif %}>
+                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-mob-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.id in completed_ids %}checked{% endif %}>
                     <label class="dl-checkbox m-0" for="btn-check-mob-{{ d.id }}">
                         <i class="fa-solid fa-check"></i>
                     </label>
@@ -36,7 +36,7 @@
                     
                     <!-- DESKTOP CHECKBOX (Hidden on Mobile) -->
                     <div class="d-none d-md-block mt-1">
-                        <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.status == 'Done' %}checked{% endif %}>
+                        <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.id in completed_ids %}checked{% endif %}>
                         <label class="dl-checkbox m-0" for="btn-check-{{ d.id }}">
                             <i class="fa-solid fa-check"></i>
                         </label>
@@ -44,7 +44,7 @@
                     
                     <div class="dl-core flex-grow-1 pe-5 pe-md-0 me-2">
                         <div class="md-code mb-1 border-0 bg-transparent p-0">{{ d.course.code }} | {{ d.category }}</div>
-                        <div class="dl-title md-task-title fs-5 fw-bold mb-1" {% if d.status == 'Done' %}style="text-decoration: line-through;"{% endif %}>{{ d.description }}</div>
+                        <div class="dl-title md-task-title fs-5 fw-bold mb-1" {% if d.id in completed_ids %}style="text-decoration: line-through;"{% endif %}>{{ d.description }}</div>
                         <div class="dl-due" style="font-size: 0.85rem;">
                             Submission: {{ d.due_date.strftime("%A - %B %d, %Y") }}
                         </div>
@@ -75,8 +75,13 @@
                         {% endif %}
                         
                         <div class="dl-status text-end" style="font-size: 0.8rem;">
-                            <!-- Added 'status-text' class here so JS can easily grab and update it -->
-                            Status: <span class="fw-bold status-text">{{ d.status }}</span>
+                            Status: 
+                            {% if d.id in completed_ids %}
+                                <span class="fw-bold status-text text-success">Done</span>
+                            {% else %}
+                                <!-- If it's here but not completed, the clock ran out on them -->
+                                <span class="fw-bold status-text text-danger">Missed</span>
+                            {% endif %}
                         </div>
                     </div>
 

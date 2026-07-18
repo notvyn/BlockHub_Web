@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, request, jsonify, send_fro
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func, and_, or_
 from sqlalchemy.orm import joinedload
-from datetime import date, timedelta, time, datetime
+from datetime import date, timedelta, datetime, timezone, time
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -15,7 +15,7 @@ import cloudinary.uploader
 import os
 import json
 
-from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag
+from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion
 from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm, FeedbackForm, ProfileForm, CreateTagForm
 from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter, time_ago_filter
 from app.utility import send_web_push, send_verification_email
@@ -109,33 +109,40 @@ def global_search():
     return jsonify({'results': results})
 
 @app.route('/complete-deadline/<int:id>', methods=['POST'])
+@login_required
 def complete_deadline(id):
     data = request.get_json()
     is_completed = data.get('completed', False)
-    
-    deadline = Deadline.query.get_or_404(id)
-    
-    # Update the status based on the checkbox
-    if is_completed:
-        deadline.status = 'Done'
-    else:
-        deadline.status = 'Pending'
+
+    # 1. Check if a completion record already exists for THIS user and THIS deadline
+    completion = DeadlineCompletion.query.filter_by(user_id=current_user.id, deadline_id=id).first()
+
+    # 2. Add or Remove the record based on the checkbox state
+    if is_completed and not completion:
+        # Checkbox was checked (true), and no record exists -> CREATE IT
+        new_completion = DeadlineCompletion(user_id=current_user.id, deadline_id=id)
+        db.session.add(new_completion)
         
-    db.session.commit()
+    elif not is_completed and completion:
+        # Checkbox was unchecked (false), and a record exists -> DELETE IT
+        db.session.delete(completion)
     
-    # Count the remaining active deadlines
-    remaining_deadlines = Deadline.query.filter(
-        Deadline.status.in_(['Upcoming', 'Pending'])
-    ).count()
+    # Save the changes to the database
+    db.session.commit()
 
-    # Count the totally completed deadlines
-    archived_deadlines = Deadline.query.filter_by(status='Done').count()
+    # 3. Calculate the new badge totals dynamically for the JS to update the UI
+    # Total deadlines completed by this specific user
+    archive_total = DeadlineCompletion.query.filter_by(user_id=current_user.id).count()
+    
+    # Total active deadlines (Total global deadlines MINUS what the user has completed)
+    total_global_deadlines = Deadline.query.count()
+    new_total = total_global_deadlines - archive_total
 
-    # Send BOTH totals back to the JavaScript
-    return jsonify({    
-        'success': True, 
-        'new_total': remaining_deadlines,
-        'archive_total': archived_deadlines
+    # Send the success response back to the Javascript fetch call
+    return jsonify({
+        'success': True,
+        'new_total': new_total,
+        'archive_total': archive_total
     })
 
 @app.route('/complete-feedback/<int:id>', methods=['POST'])
@@ -258,9 +265,9 @@ def dashboard():
     # ---------------------------------------------------------
     total_announcements = Announcement.query.count()
     
-    total_deadlines = Deadline.query.filter(
-        Deadline.status.in_(['Upcoming', 'Pending'])
-    ).count()
+    # total_deadlines = Deadline.query.filter(
+    #     Deadline.status.in_(['Upcoming', 'Pending'])
+    # ).count()
 
     # ---------------------------------------------------------
     # 2. THE HYBRID ANNOUNCEMENT LOGIC
@@ -319,19 +326,50 @@ def dashboard():
     # ---------------------------------------------------------
     # 3. DEADLINES & OTHER DATA
     # ---------------------------------------------------------
-    deadlines = Deadline.query.filter(
-        Deadline.status.in_(['Upcoming', 'Pending'])
-    ).order_by(Deadline.due_date).limit(3).all()
-    
-    links = Link.query.order_by(Link.date_added).all()
 
-    today = date.today()
+    # 1. Grab the exact UTC time, remove timezone info, and add 8 hours for PHT
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    ph_time = now_utc + timedelta(hours=8)
+    
+    # 2. Calculate the 24-hour grace period based on Philippine Time
+    cutoff_time = ph_time - timedelta(days=1)
+
+    completed_ids = []
+
+    if current_user.is_authenticated:
+    # 1. What has the user already checked off?
+        completed_ids = [c.deadline_id for c in DeadlineCompletion.query.filter_by(user_id=current_user.id).all()]
+
+    # 2. Start the query: Only get tasks where the deadline is STILL IN THE FUTURE (or grace period)
+    active_query = Deadline.query.filter(Deadline.due_date >= cutoff_time)
+    
+    # 3. Filter out the ones they already clicked "Done" on
+    if completed_ids:
+        active_query = active_query.filter(Deadline.id.notin_(completed_ids))
+        
+    active_deadlines = active_query.order_by(Deadline.due_date.asc()).all()
+
+    # --- NEW: Give the date a clock (11:59 PM) so Jinja can do exact hour math ---
+    for d in active_deadlines:
+        if type(d.due_date) is date:
+            d.due_datetime = datetime.combine(d.due_date, time(23, 59, 59))
+        else:
+            d.due_datetime = d.due_date
+
+    links = Link.query.order_by(Link.date_added).limit(3).all()
+
+    # 1. Grab the exact UTC time, remove timezone info, and add 8 hours for PHT
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    ph_time = now_utc + timedelta(hours=8)
+    
+    # 2. Calculate the 24-hour grace period based on Philippine Time
+    cutoff_time = ph_time - timedelta(days=1)
 
     # 1. Math: Sunday is 6. If today is Wed (2), 6 - 2 = 4 days until Sunday.
-    days_until_sunday = 6 - today.weekday()
+    days_until_sunday = 6 - ph_time.weekday()
     
     # 2. Add those days to today's date to find the exact date of this Sunday
-    end_of_week = today + timedelta(days=days_until_sunday)
+    end_of_week = ph_time + timedelta(days=days_until_sunday)
 
     # 1. Grab the absolute newest record, regardless of time.
     target_record = ClassSummary.query.order_by(ClassSummary.date_held.desc()).first()
@@ -346,7 +384,7 @@ def dashboard():
             record_date = record_date.date()
             
         # 3. Calculate how many days old it is
-        days_old = (date.today() - record_date).days
+        days_old = (ph_time - record_date).days
         
         # 4. If it is 3 days old or less, fetch all summaries for that calendar day
         if days_old <= 3:
@@ -379,14 +417,14 @@ def dashboard():
         deadline_form=deadline_form,
         announcements=final_announcements,
         read_ids=read_announcement_ids,
-        deadlines=deadlines,
-        total_deadlines=total_deadlines,
+        deadlines=active_deadlines,
         target_record=target_record,
         daily_summaries=daily_summaries,
         links=links,
         user=user,
-        today=today,
-        end_of_week=end_of_week
+        today=ph_time,
+        end_of_week=end_of_week,
+        completed_ids=completed_ids
     )
 
 @app.route('/add-entry/announcement', methods=['GET', 'POST'])
@@ -605,6 +643,7 @@ def add_link_api():
     }), 400
 
 @app.route('/api/update-link/<int:id>', methods=['POST'])
+@login_required
 def update_link(id):
     form = LinkForm() # Or whatever your form is named
     
@@ -624,6 +663,7 @@ def update_link(id):
     return jsonify({'success': False, 'errors': form.errors})
 
 @app.route('/announcements/<int:id>')
+@login_required
 def announcement(id):
     announcement = Announcement.query.get_or_404(id)
     
@@ -682,6 +722,7 @@ def announcement(id):
                            page_title="Announcement")
 
 @app.route('/announcements')
+@login_required
 def announcements():
     # 1. Fetch all announcements, newest first
     announcements = Announcement.query.order_by(Announcement.date_posted.desc()).all()
@@ -743,6 +784,7 @@ def announcements():
                            page_title="Announcement")
 
 @app.route('/update-entry/announcement/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update_announcement(id):
     announcement_to_update = Announcement.query.get_or_404(id)
     form = AnnouncementForm()
@@ -794,27 +836,78 @@ def delete_announcement(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/deadlines')
+@login_required
 def deadlines():
-    deadlines = Deadline.query.filter(
-        Deadline.status.in_(['Upcoming', 'Pending'])).order_by(Deadline.due_date).all()
-    today = date.today()
-    return render_template('deadlines.html', deadlines=deadlines, today=today, is_dedicated_page=True, page_title="Deadline")
+    # 1. Grab the exact UTC time, remove timezone info, and add 8 hours for PHT
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    ph_time = now_utc + timedelta(hours=8)
+    
+    # 2. Calculate the 24-hour grace period based on Philippine Time
+    cutoff_time = ph_time - timedelta(days=1)
+    
+    # 1. What has the user already checked off?
+    completed_ids = [c.deadline_id for c in DeadlineCompletion.query.filter_by(user_id=current_user.id).all()]
+    
+    # 2. Start the query: Only get tasks where the deadline is STILL IN THE FUTURE (or grace period)
+    active_query = Deadline.query.filter(Deadline.due_date >= cutoff_time)
+    
+    # 3. Filter out the ones they already clicked "Done" on
+    if completed_ids:
+        active_query = active_query.filter(Deadline.id.notin_(completed_ids))
+        
+    active_deadlines = active_query.order_by(Deadline.due_date.asc()).all()
+
+    # --- NEW: Give the date a clock (11:59 PM) so Jinja can do exact hour math ---
+    for d in active_deadlines:
+        if type(d.due_date) is date:
+            d.due_datetime = datetime.combine(d.due_date, time(23, 59, 59))
+        else:
+            d.due_datetime = d.due_date
+
+    # today = date.today()
+    return render_template('deadlines.html', deadlines=active_deadlines, completed_ids=completed_ids, today=ph_time, is_dedicated_page=True, page_title="Deadline")
 
 @app.route('/deadlines/archive')
 def deadlines_archive():
-    deadlines = Deadline.query.filter(
-        Deadline.status.in_(['Done', 'Dropped'])).order_by(Deadline.due_date).all()
-    today = date.today()
-    return render_template('deadlines-archive.html', deadlines=deadlines, today=today, is_dedicated_page=True, page_title="Deadline")
+    # 1. Grab the exact UTC time, remove timezone info, and add 8 hours for PHT
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    ph_time = now_utc + timedelta(hours=8)
+    
+    # 2. Calculate the 24-hour grace period based on Philippine Time
+    cutoff_time = ph_time - timedelta(days=1)
+    
+    completed_ids = [c.deadline_id for c in DeadlineCompletion.query.filter_by(user_id=current_user.id).all()]
+    
+    # The Archive Logic: Show it if the deadline HAS PASSED **OR** if the user ALREADY FINISHED IT
+    if completed_ids:
+        archive_deadlines = Deadline.query.filter(
+            or_(Deadline.due_date < cutoff_time, Deadline.id.in_(completed_ids))
+        ).order_by(Deadline.due_date.desc()).all()
+    else:
+        archive_deadlines = Deadline.query.filter(Deadline.due_date < cutoff_time).order_by(Deadline.due_date.desc()).all()
+
+    for d in archive_deadlines:
+        if type(d.due_date) is date:
+            d.due_datetime = datetime.combine(d.due_date, time(23, 59, 59))
+        else:
+            d.due_datetime = d.due_date
+
+    # today = date.today()
+    return render_template('deadlines-archive.html', deadlines=archive_deadlines, completed_ids=completed_ids, today=ph_time, is_dedicated_page=True, page_title="Deadline")
 
 @app.route('/update-entry/deadline/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update_deadline(id):
     deadline_to_update = Deadline.query.get_or_404(id)
     form = DeadlineForm()
 
+    course = Course.query.all()
+
+    form.course.choices = [(c.id, f"{c.code} | {c.title}") for c in course]
+
     if form.validate_on_submit():
         # POST REQUEST: The form is valid, save the new data
-        deadline_to_update.course = form.course.data
+        deadline_to_update.course_id = form.course.data
         deadline_to_update.description = form.description.data
         deadline_to_update.category = form.category.data
         deadline_to_update.date_given = form.date_given.data
@@ -827,7 +920,7 @@ def update_deadline(id):
         
     elif request.method == 'GET':
         # GET REQUEST: Pre-fill the form fields with the existing database data
-        form.course.data = deadline_to_update.course
+        form.course.data = deadline_to_update.course_id
         form.description.data = deadline_to_update.description
         form.category.data = deadline_to_update.category
         deadline_to_update.date_given = form.date_given.data
@@ -861,6 +954,7 @@ def delete_deadline(id):
 
 
 @app.route('/courses')
+@login_required
 def courses():
     courses_list = Course.query.order_by(Course.date_added).all()
     
@@ -911,6 +1005,7 @@ def courses():
     )
 
 @app.route('/courses/<int:id>/add-schedule', methods=['GET', 'POST'])
+@login_required
 def add_course_schedule(id):
     course = Course.query.get_or_404(id)
     form = CourseScheduleForm()
@@ -937,6 +1032,7 @@ def add_course_schedule(id):
     return render_template('add-course-schedule.html', course=course, form=form, has_back_btn=True, is_entry=True)
 
 @app.route('/update-entry/course/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update_course(id):
     course_to_update = Course.query.get_or_404(id)
     form = CourseForm()
@@ -986,6 +1082,7 @@ def delete_course(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/courses/<int:id>/update-schedule', methods=['GET', 'POST'])
+@login_required
 def update_course_schedule(id):
     form = CourseScheduleForm()
     schedule_to_update = CourseSchedule.query.get_or_404(id)
@@ -1014,6 +1111,7 @@ def update_course_schedule(id):
     return render_template('update-course-schedule.html', schedule_to_update=schedule_to_update, form=form, course=course, has_back_btn=True, is_entry=True)
 
 @app.route('/delete-entry/course-schedule/<int:id>', methods=['POST', 'DELETE'])
+@login_required
 def delete_course_schedule(id):
     # Only allow the author (or an admin) to delete it
     schedule_to_delete = CourseSchedule.query.get_or_404(id)
@@ -1033,6 +1131,7 @@ def delete_course_schedule(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/class-summaries/<int:id>', methods=['GET', 'POST'])
+@login_required
 def summary(id):
     # 1. Fetch ALL summaries, ordering by newest date first
     summary = ClassSummary.query.options(joinedload(ClassSummary.course))\
@@ -1041,6 +1140,7 @@ def summary(id):
     return render_template('summary.html', summary=summary, is_dedicated_page=True, page_title="Class Summary", has_back_btn=True)
 
 @app.route('/delete-entry/class-summary/<int:id>', methods=['POST', 'DELETE'])
+@login_required
 def delete_summary(id):
     # Only allow the author (or an admin) to delete it
     summary_to_delete = ClassSummary.query.get_or_404(id)
@@ -1060,11 +1160,15 @@ def delete_summary(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/class-summaries')
+@login_required
 def summaries():
     # 1. Get the requested year and week from the URL. 
     # If they aren't provided (like when you first click the sidebar), default to the current week.
-    today = date.today()
-    current_year, current_week, _ = today.isocalendar()
+    # 1. Grab the exact UTC time, remove timezone info, and add 8 hours for PHT
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    ph_time = now_utc + timedelta(hours=8)
+    
+    current_year, current_week, _ = ph_time.isocalendar()
 
     req_year = request.args.get('year', default=current_year, type=int)
     req_week = request.args.get('week', default=current_week, type=int)
@@ -1113,6 +1217,7 @@ def summaries():
                            page_title="Class Summary")
 
 @app.route('/add-entry/class-summary', methods=['GET', 'POST'])
+@login_required
 def add_summary():
     form = ClassSummaryForm()
 
@@ -1170,6 +1275,7 @@ def add_summary():
     return render_template('add-summary.html', form=form, has_back_btn=True, is_entry=True)
 
 @app.route('/update-entry/class-summary/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update_summary(id):
     form = ClassSummaryForm()
     summary_to_update = ClassSummary.query.get_or_404(id)
@@ -1210,6 +1316,7 @@ def update_summary(id):
 # --- NEW API ROUTE ---
 # JavaScript will fetch data from here when a course is clicked
 @app.route('/api/get-schedules/<int:course_id>')
+@login_required
 def get_schedules(course_id):
     schedules = CourseSchedule.query.filter_by(course_id=course_id).all()
     
@@ -1225,12 +1332,14 @@ def get_schedules(course_id):
 
 
 @app.route('/links')
+@login_required
 def links():
     links = Link.query.all()
 
     return render_template('links.html', links=links, is_dedicated_page=True)
 
 @app.route('/delete-entry/link/<int:id>', methods=['POST', 'DELETE'])
+@login_required
 def delete_link(id):
     # Only allow the author (or an admin) to delete it
     link_to_delete = Link.query.get_or_404(id)
@@ -1250,7 +1359,6 @@ def delete_link(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/notifications')
-@login_required
 def notifications():
     # 1. Create an empty master list
     master_feed = []
@@ -1328,6 +1436,7 @@ def notifications():
     )
 
 @app.route('/feedback', methods=['GET', 'POST'])
+@login_required
 def feedbacks():
     feedback = Feedback.query.order_by(Feedback.date_added.desc()).all()
 
@@ -1336,13 +1445,14 @@ def feedbacks():
     return render_template('feedbacks.html', feedback=feedback, user_feedback_count=user_feedback_count)
     
 @app.route('/new-entry/feedback', methods=['GET', 'POST'])
-@login_required
 def add_feedback():
     form = FeedbackForm()
 
+    user_id = current_user.id if current_user.is_authenticated else None
+
     if form.validate_on_submit():
         new_feedback = Feedback(
-            user_id = current_user.id,
+            user_id = user_id,
             title = form.title.data,
             category = form.category.data,
             message = form.message.data
@@ -1382,6 +1492,22 @@ def update_feedback(id):
         print("FORM VALIDATION FAILED:", form.errors)
 
     return render_template('update-feedback.html', form=form, has_back_btn=True) 
+
+@app.route('/api/reply-feedback/<int:id>', methods=['POST'])
+@login_required
+def reply_feedback(id):
+    data = request.get_json()
+    reply_text = data.get('reply_text', '').strip()
+    
+    feedback = Feedback.query.get_or_404(id)
+    
+    # Save the reply and update the status
+    feedback.admin_reply = reply_text
+    feedback.status = 'Resolved'
+    
+    db.session.commit()
+
+    return jsonify({'success': True})
 
 @app.route('/profile/update', methods=['GET', 'POST'])
 @login_required
@@ -1577,7 +1703,7 @@ def login():
             # Optional: Add a flash message here for invalid credentials
             pass
             
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, is_auth=True)
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -1607,7 +1733,7 @@ def signup():
             login_user(new_user)
             return redirect(url_for('dashboard'))
         
-    return render_template('signup.html', form=form)
+    return render_template('signup.html', form=form, is_auth=True)
     
 @app.route('/verify-email/<token>')
 @login_required

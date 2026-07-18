@@ -31,8 +31,9 @@
 
 {% block content %}
     <div class="card-container">
+        {% if deadlines %}
         {% for d in deadlines %}
-            {% set days_left = (d.due_date - today).days %}
+            {% set days_left = (d.due_datetime - today).days %}
 
             {% if days_left <= 2 %}
                 {% set urgency_color = 'var(--accent-red, var(--bs-danger))' %} 
@@ -47,7 +48,7 @@
 
                 <!-- 1. MOBILE CHECKBOX (Top Right, Hidden on Desktop) -->
                 <div class="d-md-none position-absolute" style="top: 1rem; right: 1rem; z-index: 5;">
-                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-mob-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.status == 'Done' %}checked{% endif %}>
+                    <input type="checkbox" class="btn-check task-checkbox" id="btn-check-mob-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.id in completed_ids %}checked{% endif %}>
                     <label class="dl-checkbox m-0" for="btn-check-mob-{{ d.id }}">
                         <i class="fa-solid fa-check"></i>
                     </label>
@@ -58,7 +59,7 @@
                     
                     <!-- DESKTOP CHECKBOX (Hidden on Mobile) -->
                     <div class="d-none d-md-block mt-1">
-                        <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.status == 'Done' %}checked{% endif %}>
+                        <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.id in completed_ids %}checked{% endif %}>
                         <label class="dl-checkbox m-0" for="btn-check-{{ d.id }}">
                             <i class="fa-solid fa-check"></i>
                         </label>
@@ -66,7 +67,7 @@
                     
                     <div class="dl-core flex-grow-1 pe-5 pe-md-0 me-2">
                         <div class="md-code mb-1 border-0 bg-transparent p-0">{{ d.course.code }} | {{ d.category }}</div>
-                        <div class="dl-title md-task-title fs-5 fw-bold mb-1" {% if d.status == 'Done' %}style="text-decoration: line-through;"{% endif %}>{{ d.description }}</div>
+                        <div class="dl-title md-task-title fs-5 fw-bold mb-1" {% if d.id in completed_ids == 'Done' %}style="text-decoration: line-through;"{% endif %}>{{ d.description }}</div>
                         <div class="dl-due" style="font-size: 0.85rem;">
                             Submission: {{ d.due_date.strftime("%A - %B %d, %Y") }}
                         </div>
@@ -97,9 +98,23 @@
                         {% endif %}
                         
                         <div class="dl-status text-end" style="font-size: 0.8rem;">
-                            <!-- Added 'status-text' class here so JS can easily grab and update it -->
                             Status: <span class="fw-bold status-text">{{ d.status }}</span><br>
-                            Days Left: <span class="fw-bold status-text">{{ days_left }}</span>
+                            
+                            {% set time_diff = d.due_datetime - today %}
+                            
+                            {% if time_diff.days > 0 %}
+                                <!-- Still more than a day away -->
+                                Days Left: <span class="fw-bold status-text">{{ time_diff.days }}</span>
+                                
+                            {% elif time_diff.days == 0 %}
+                                <!-- Less than 24 hours away! Calculate the hours -->
+                                {% set hours_left = time_diff.seconds // 3600 %}
+                                Hours Left: <span class="fw-bold status-text text-danger">{{ hours_left }}</span>
+                                
+                            {% else %}
+                                <!-- Caught in the 24-hour grace period -->
+                                Time Left: <span class="fw-bold status-text text-danger">Overdue</span>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -107,6 +122,14 @@
 
             </div>
         {% endfor %}
+        {% else %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-solid fa-face-grin-stars mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No upcoming deadlines right now</h5>
+                <p style="font-size: 0.9rem;">Enjoy the free time!</p>
+            </div>
+        {% endif %}
+
     </div>
 
     <!-- TOAST CONTAINER FOR STACKING -->
