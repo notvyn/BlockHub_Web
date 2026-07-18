@@ -85,9 +85,18 @@ A centralized class management system for CS 2103.
 - Drafted Blockmates page
 - Added Email change validation and Password hashing
 
+**July 18, 2026**
+- Styled Login and Signup Page
+- Added validation form (i.e. Password and Email Matching)
+- Refined query logic for Deadlines 
+- Fixed Cascading attribute of relational models
+- Changed logout sidebar icon
+- Added password toggle on authentication pages
+- Refine resolve feature on Feedback page
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
-- [ ] Add password security and form validation. (Password Done)
+- [/] Add password security and form validation. (Password Done, Partial Form Validation, continue for entries)
 - [/] Limit content for Announcement.
 - [/] Enable Dark Mode.
 - [/] Enable dropdown for adding entry.
@@ -103,11 +112,12 @@ A centralized class management system for CS 2103.
 - [/] Have a live update on the total content count for each action on a page
 - [ ] Fix mobile sidebar screen UI issue 
 - [/] Fix Total Units live update count
-- [ ] Have conditional text for no entry pages
+- [ ] Have conditional text for no entry pages (Summaries and Deadlines already done)
 - [/] Add Room to the Master Schedule and Model
-- [ ] Fix total count badge of deadline on dashboard
+- [/] Fix total count badge of deadline on dashboard
 - [ ] Refine logic of Announcement query on dashboard
 - [ ] Refine styling of dashboard
-- [ ] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates
+- [ ] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates (Login and Signup done)
 - [ ] Create list of badges for profiles
-- [ ] Create new model for each user completion of Task
+- [/] Create new model for each user completion of Task
+- [ ] Add is_pinned on Announcements and Links

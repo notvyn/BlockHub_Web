@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+     // 2. The Regex Patterns
+    window.globalConfig = {
+        emailRegex: /^\d{2}-\d{5}@g\.batstate-u\.edu\.ph$/,
+        passRegex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+    }
+
     // Grab the sidebar
     const sidebar = document.querySelector("#sidebar");
 
@@ -11,6 +18,41 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebar.classList.toggle("expand");
         });
     });
+
+    const eyeToggle = document.querySelectorAll('.eye-toggle');
+
+    eyeToggle.forEach(eye => {
+        eye.addEventListener('click', function() {
+            const parent = this.closest('.input-group');
+            const passwordInput = parent.querySelector('.form-control');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.innerHTML = '<i class="fa-solid fa-eye"></i>';
+            }
+            else {
+                passwordInput.type = 'password';
+                this.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+            }
+        });
+    });
+
+    // 3. Helper Function to instantly update the UI and Error Text
+    window.setValidation = function (inputElement, isValid, errorMessage) {
+        // Find the exact error div matching this input's ID
+        const errorDiv = document.getElementById('error-' + inputElement.id);
+        
+        if (isValid) {
+            inputElement.classList.remove('is-invalid');
+            inputElement.classList.add('is-valid');
+            if (errorDiv) errorDiv.textContent = ''; 
+        } else {
+            inputElement.classList.remove('is-valid');
+            inputElement.classList.add('is-invalid');
+            // Inject the specific error text
+            if (errorDiv) errorDiv.textContent = errorMessage;
+        }
+    }
 
     // Handle Mobile Search Expansion
     const mSearchTrigger = document.getElementById('m-search-trigger');
@@ -30,12 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const checkboxes = document.querySelectorAll('.task-checkbox');
     const badge = document.getElementById('deadline-badge');
-    const deadlinePageTotal = document.getElementById('deadline-page-total-count');
-    const toastContainer = document.getElementById('toast-container');
-    const deadlineArchivePageTotal = document.getElementById('deadline-archive-page-total-count');
 
-    // NEW: Determine which page the user is currently on by checking which total count exists
-    const isArchivePage = !!deadlineArchivePageTotal;
+    // Check if we are on the Archive page
+    const isArchivePage = !!document.getElementById('deadline-archive-page-total-count');
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
@@ -46,16 +85,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const taskTitle = taskContainer.querySelector('.md-task-title');
             const statusText = taskContainer.querySelector('.status-text');
             
+            // Match mobile and desktop checkboxes
             const allCheckboxesForTask = taskContainer.querySelectorAll('.task-checkbox');
             allCheckboxesForTask.forEach(cb => cb.checked = isCompleted);
 
-            taskContainer.style.transition = 'all 0.4s ease';
-            taskContainer.style.overflow = 'hidden';
-
-            // NEW LOGIC: Should this card disappear?
-            // If on Archive Page: hide when UNCHECKED (false). If on Main Page: hide when CHECKED (true).
-            const shouldHide = isArchivePage ? !isCompleted : isCompleted;
-
+            // Send the update to Python
             fetch(`/complete-deadline/${deadlineId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -65,109 +99,37 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if(data.success) {
                     
-                    // 1. Immediately update the physical text to match the new status
-                    if (isCompleted) {
-                        if (taskTitle) taskTitle.style.textDecoration = 'line-through';
-                        if (statusText) statusText.textContent = 'Done';
-                    } else {
-                        if (taskTitle) taskTitle.style.textDecoration = 'none';
-                        if (statusText) statusText.textContent = 'Upcoming';
-                    }
-
-                    // 2. Do we hide the card and show the toast?
-                    if (shouldHide) {
-                        
-                        // Crush the card smoothly
-                        // taskContainer.classList.remove('p-3', 'p-md-3', 'mb-2');
-                        // taskContainer.style.maxHeight = taskContainer.scrollHeight + 'px';
-                        // void taskContainer.offsetWidth; 
-                        
-                        // taskContainer.style.maxHeight = '0px';
-                        // taskContainer.style.padding = '0px';
-                        // taskContainer.style.margin = '0px';
-                        // taskContainer.style.borderWidth = '0px';
+                    // MAIN DASHBOARD LOGIC: Fade it out and remove it
+                    if (!isArchivePage && isCompleted) {
+                        taskContainer.style.transition = 'opacity 0.4s ease';
                         taskContainer.style.opacity = '0';
-                        
                         setTimeout(() => {
                             taskContainer.classList.remove('d-flex');
                             taskContainer.classList.add('d-none');
                         }, 400);
-
-                        // BUILD THE DYNAMIC STACKING TOAST
-                        const titleText = taskTitle ? taskTitle.textContent.trim() : 'Task';
+                    } 
+                    // ARCHIVE PAGE LOGIC: Update text and toggle opacity
+                    else if (isArchivePage) {
+                        if (taskTitle) taskTitle.style.textDecoration = isCompleted ? 'line-through' : 'none';
+                        if (statusText) {
+                            statusText.textContent = isCompleted ? 'Done' : 'Missed';
+                            statusText.className = isCompleted ? 'fw-bold status-text text-success' : 'fw-bold status-text text-danger';
+                        }
                         
-                        // Dynamic Toast Text based on the page
-                        const actionText = isArchivePage ? 'moved to Upcoming' : 'marked done';
-                        
-                        const toast = document.createElement('div');
-                        toast.className = 'bg-dark text-white rounded shadow-lg overflow-hidden';
-                        toast.style.minWidth = '300px';
-                        toast.style.transform = 'translateY(100%)';
-                        toast.style.opacity = '0';
-                        toast.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-
-                        toast.innerHTML = `
-                            <div class="p-3 d-flex justify-content-between align-items-center">
-                                <div class="pe-3">
-                                    <i class="fa-solid fa-circle-check text-success me-2"></i>
-                                    <span style="font-size: 0.9rem;"><strong>${titleText}</strong> ${actionText}.</span>
-                                </div>
-                                <button class="btn btn-sm btn-outline-light undo-btn" style="font-weight: 600;">UNDO</button>
-                            </div>
-                            <div style="height: 4px; background: rgba(255,255,255,0.2);">
-                                <div class="undo-progress" style="height: 100%; width: 100%; background: var(--accent-purple, #8e44ad);"></div>
-                            </div>
-                        `;
-
-                        toastContainer.appendChild(toast);
-                        
-                        void toast.offsetWidth;
-                        toast.style.transform = 'translateY(0)';
-                        toast.style.opacity = '1';
-
-                        const progress = toast.querySelector('.undo-progress');
-                        setTimeout(() => {
-                            progress.style.transition = 'width 5s linear';
-                            progress.style.width = '0%';
-                        }, 50);
-
-                        // 4. The 5-Second Deletion Timer
-                        const undoTimer = setTimeout(() => {
-                            toast.style.opacity = '0';
-                            toast.style.transform = 'translateY(20px)';
-                            setTimeout(() => toast.remove(), 300);
-                        }, 5000);
-
-                        // 5. The UNDO Button Logic
-                        toast.querySelector('.undo-btn').addEventListener('click', function() {
-                            clearTimeout(undoTimer); 
-                            
-                            toast.style.opacity = '0';
-                            setTimeout(() => toast.remove(), 300);
-
-                            // We send the OPPOSITE of what it currently is to undo the action
-                            const undoState = !isCompleted;
-
-                            fetch(`/complete-deadline/${deadlineId}`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ completed: undoState })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if(data.success) {
-                                    allCheckboxesForTask.forEach(cb => cb.checked = undoState);
-                                    restoreCard(taskContainer, taskTitle, statusText, undoState);
-                                    updateBadges(data.new_total, data.archive_total);
-                                }
-                            });
-                        });
-
-                    } else {
-                        // User manually un-did their action before the toast timer ended without using the button
-                        restoreCard(taskContainer, taskTitle, statusText, isCompleted);
+                        // NEW: Dim the card if it's done, bring it to full brightness if missed
+                        taskContainer.style.opacity = isCompleted ? '0.75' : '1';
                     }
-                    
+
+                    // Update the red notification badge on the active page
+                    if (badge && data.new_total !== undefined) {
+                        if (data.new_total > 0) {
+                            badge.textContent = data.new_total;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none'; 
+                        }
+                    }
+
                     updateBadges(data.new_total, data.archive_total);
                 }
             })
@@ -175,24 +137,155 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Helper function to restore a crushed card perfectly
-    // Added 'isCompleted' parameter so it knows whether to restore a crossed-out title or a normal one
-    function restoreCard(container, title, status, isCompleted) {
-        if (title) title.style.textDecoration = isCompleted ? 'line-through' : 'none';
-        if (status) status.textContent = isCompleted ? 'Done' : 'Upcoming';
+    // const checkboxes = document.querySelectorAll('.task-checkbox');
+    // const badge = document.getElementById('deadline-badge');
+    const deadlinePageTotal = document.getElementById('deadline-page-total-count');
+    // const toastContainer = document.getElementById('toast-container');
+    const deadlineArchivePageTotal = document.getElementById('deadline-archive-page-total-count');
+
+    // // NEW: Determine which page the user is currently on by checking which total count exists
+    // const isArchivePage = !!deadlineArchivePageTotal;
+
+    // checkboxes.forEach(checkbox => {
+    //     checkbox.addEventListener('change', function() {
+    //         const deadlineId = this.getAttribute('data-id');
+    //         const isCompleted = this.checked;
+            
+    //         const taskContainer = this.closest('.deadline-item');
+    //         const taskTitle = taskContainer.querySelector('.md-task-title');
+    //         const statusText = taskContainer.querySelector('.status-text');
+            
+    //         const allCheckboxesForTask = taskContainer.querySelectorAll('.task-checkbox');
+    //         allCheckboxesForTask.forEach(cb => cb.checked = isCompleted);
+
+    //         taskContainer.style.transition = 'all 0.4s ease';
+    //         taskContainer.style.overflow = 'hidden';
+
+    //         // NEW LOGIC: Should this card disappear?
+    //         // If on Archive Page: hide when UNCHECKED (false). If on Main Page: hide when CHECKED (true).
+    //         const shouldHide = isArchivePage ? !isCompleted : isCompleted;
+
+    //         fetch(`/complete-deadline/${deadlineId}`, {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ completed: isCompleted })
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if(data.success) {
+                    
+    //                 // 1. Immediately update the physical text to match the new status
+    //                 if (isCompleted) {
+    //                     if (taskTitle) taskTitle.style.textDecoration = 'line-through';
+    //                     if (statusText) statusText.textContent = 'Done';
+    //                 } else {
+    //                     if (taskTitle) taskTitle.style.textDecoration = 'none';
+    //                     if (statusText) statusText.textContent = 'Upcoming';
+    //                 }
+
+    //                 // 2. Do we hide the card and show the toast?
+    //                 if (shouldHide) {
+                        
+    //                     taskContainer.style.opacity = '0';
+                        
+    //                     setTimeout(() => {
+    //                         taskContainer.classList.remove('d-flex');
+    //                         taskContainer.classList.add('d-none');
+    //                     }, 400);
+
+    //                     // BUILD THE DYNAMIC STACKING TOAST
+    //                     const titleText = taskTitle ? taskTitle.textContent.trim() : 'Task';
+                        
+    //                     // Dynamic Toast Text based on the page
+    //                     const actionText = isArchivePage ? 'moved to Upcoming' : 'marked done';
+                        
+    //                     const toast = document.createElement('div');
+    //                     toast.className = 'bg-dark text-white rounded shadow-lg overflow-hidden';
+    //                     toast.style.minWidth = '300px';
+    //                     toast.style.transform = 'translateY(100%)';
+    //                     toast.style.opacity = '0';
+    //                     toast.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+
+    //                     toast.innerHTML = `
+    //                         <div class="p-3 d-flex justify-content-between align-items-center">
+    //                             <div class="pe-3">
+    //                                 <i class="fa-solid fa-circle-check text-success me-2"></i>
+    //                                 <span style="font-size: 0.9rem;"><strong>${titleText}</strong> ${actionText}.</span>
+    //                             </div>
+    //                             <button class="btn btn-sm btn-outline-light undo-btn" style="font-weight: 600;">UNDO</button>
+    //                         </div>
+    //                         <div style="height: 4px; background: rgba(255,255,255,0.2);">
+    //                             <div class="undo-progress" style="height: 100%; width: 100%; background: var(--accent-purple, #8e44ad);"></div>
+    //                         </div>
+    //                     `;
+
+    //                     toastContainer.appendChild(toast);
+                        
+    //                     void toast.offsetWidth;
+    //                     toast.style.transform = 'translateY(0)';
+    //                     toast.style.opacity = '1';
+
+    //                     const progress = toast.querySelector('.undo-progress');
+    //                     setTimeout(() => {
+    //                         progress.style.transition = 'width 5s linear';
+    //                         progress.style.width = '0%';
+    //                     }, 50);
+
+    //                     // 4. The 5-Second Deletion Timer
+    //                     const undoTimer = setTimeout(() => {
+    //                         toast.style.opacity = '0';
+    //                         toast.style.transform = 'translateY(20px)';
+    //                         setTimeout(() => toast.remove(), 300);
+    //                     }, 5000);
+
+    //                     // 5. The UNDO Button Logic
+    //                     toast.querySelector('.undo-btn').addEventListener('click', function() {
+    //                         clearTimeout(undoTimer); 
+                            
+    //                         toast.style.opacity = '0';
+    //                         setTimeout(() => toast.remove(), 300);
+
+    //                         // We send the OPPOSITE of what it currently is to undo the action
+    //                         const undoState = !isCompleted;
+
+    //                         fetch(`/complete-deadline/${deadlineId}`, {
+    //                             method: 'POST',
+    //                             headers: { 'Content-Type': 'application/json' },
+    //                             body: JSON.stringify({ completed: undoState })
+    //                         })
+    //                         .then(response => response.json())
+    //                         .then(data => {
+    //                             if(data.success) {
+    //                                 allCheckboxesForTask.forEach(cb => cb.checked = undoState);
+    //                                 restoreCard(taskContainer, taskTitle, statusText, undoState);
+    //                                 updateBadges(data.new_total, data.archive_total);
+    //                             }
+    //                         });
+    //                     });
+
+    //                 } else {
+    //                     // User manually un-did their action before the toast timer ended without using the button
+    //                     restoreCard(taskContainer, taskTitle, statusText, isCompleted);
+    //                 }
+                    
+    //                 updateBadges(data.new_total, data.archive_total);
+    //             }
+    //         })
+    //         .catch(error => console.error('Error updating task:', error));
+    //     });
+    // });
+
+    // // Helper function to restore a crushed card perfectly
+    // // Added 'isCompleted' parameter so it knows whether to restore a crossed-out title or a normal one
+    // function restoreCard(container, title, status, isCompleted) {
+    //     if (title) title.style.textDecoration = isCompleted ? 'line-through' : 'none';
+    //     if (status) status.textContent = isCompleted ? 'Done' : 'Upcoming';
         
-        container.classList.remove('d-none');
-        container.classList.add('d-flex');
+    //     container.classList.remove('d-none');
+    //     container.classList.add('d-flex');
         
-        // void container.offsetWidth;
-        
-        // container.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        // container.style.maxHeight = '1000px'; 
-        // container.style.padding = ''; 
-        // container.style.margin = '';
-        // container.style.borderWidth = '';
-        container.style.opacity = '1';
-    }
+    //     container.style.opacity = '1';
+    // }
 
     // Helper function to update the red numbers smoothly
     // Added 'archiveTotal' to smoothly update the number on the Archive page
@@ -722,6 +815,52 @@ document.addEventListener('DOMContentLoaded', function() {
                     fpInstance.setDate(targetDate);
                 }
             }
+        });
+    }
+
+    // 1. Grab the inputs
+    const nameInput = document.getElementById('name')
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+
+    // --- NAME VALIDATION ---
+    if (nameInput) {
+        nameInput.addEventListener('input', function() {
+            const isValid = this.value !== '';
+            window.setValidation(this, isValid, 'Please enter a valid name');
+        });
+    }
+
+    // --- EMAIL VALIDATION ---
+    if (emailInput) {
+        emailInput.addEventListener('input', function() {
+            const isValid = window.globalConfig.emailRegex.test(this.value);
+            window.setValidation(this, isValid, 'Format: 25-00000@g.batstate-u.edu.ph');
+        });
+    }
+
+    // --- PASSWORD VALIDATION ---
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const isValid = window.globalConfig.passRegex.test(this.value);
+            window.setValidation(this, isValid, 'Min 8 chars, 1 uppercase, 1 lowercase, 1 number.');
+            
+            // If they fix the main password, force the confirm box to re-check itself
+            if (confirmInput.value) {
+                confirmInput.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+
+    // --- CONFIRM PASSWORD VALIDATION ---
+    if (confirmInput) {
+        confirmInput.addEventListener('input', function() {
+            // Fix: It must match exactly AND the main password must actually be strong!
+            const isMatch = this.value === passwordInput.value && this.value !== '';
+            const isMainValid = window.globalConfig.passRegex.test(passwordInput.value);
+            
+            window.setValidation(this, (isMatch && isMainValid), 'Passwords do not match or main password is weak.');
         });
     }
 

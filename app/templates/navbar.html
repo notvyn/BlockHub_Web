@@ -54,13 +54,13 @@
         
     </ul>
     <div class="sidebar-footer">
-        {% if current_user.is_authenticated %}
         <li class="sidebar-item">
             <a href="{{ url_for('notifications') }}" class="sidebar-link">
                 <i class="fa-solid fa-bell"></i>
                 <span>Notification</span>
             </a>
         </li>
+        {% if current_user.is_authenticated %}
         <li class="sidebar-item">
             <a href="{{ url_for('feedbacks')}}" class="sidebar-link">
                 <i class="fa-solid fa-square-poll-horizontal"></i>
@@ -80,15 +80,17 @@
         <div class="sidebar-auth">
             {% if current_user.is_authenticated %}
                 <li class="sidebar-item">
-                    <a href="{{ url_for('logout') }}" class="sidebar-link">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>                   
+                    <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                        <!-- Swapped to a standard power/exit icon -->
+                        <i class="fa-solid fa-power-off"></i>                   
                         <span>Logout</span>
                     </a>
                 </li>
             {% else %}
                 <li class="sidebar-item">
                     <a href="{{ url_for('login') }}" class="sidebar-link">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>                   
+                        <!-- Swapped to an 'entering the door' icon -->
+                        <i class="fa-solid fa-right-to-bracket"></i>                   
                         <span>Login</span>
                     </a>
                 </li>
