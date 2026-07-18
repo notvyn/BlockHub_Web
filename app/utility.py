@@ -2,10 +2,12 @@ from pywebpush import webpush, WebPushException
 from flask import url_for
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
+from wtforms.validators import ValidationError
 from app import app, mail
 
 import json
 import os
+import re
 
 # Grab your keys from your environment variables
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY') 
@@ -68,3 +70,21 @@ This link will expire in 30 minutes.
 '''
     # 5. Send it!
     mail.send(msg)
+
+def validate_school_email(form, field):
+    """Ensures the user is signing up with a valid BatStateU email format."""
+    # ^\d{2}   = Starts with exactly 2 digits
+    # -        = A literal hyphen
+    # \d{5}    = Exactly 5 digits
+    pattern = r'^\d{2}-\d{5}@g\.batstate-u\.edu\.ph$'
+    
+    if not re.match(pattern, field.data):
+        raise ValidationError('Must use a valid university format (e.g., 25-00000@g.batstate-u.edu.ph).')
+    
+def validate_password_strength(form, field):
+    """Ensures the password meets strict security requirements."""
+    # Pattern: Min 8 chars, 1 uppercase, 1 lowercase, 1 number
+    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$'
+    
+    if not re.match(pattern, field.data):
+        raise ValidationError('Password must be at least 8 characters and include a lowercase letter, an uppercase letter, and a number.')

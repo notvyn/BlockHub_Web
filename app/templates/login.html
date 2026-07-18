@@ -1,18 +1,52 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% from "_formhelpers.html" import render_field %}
+
 {% block content %}
-    <h1>Login</h1>
-
-    <form method="POST">
-        {{ form.hidden_tag() }}
-
-        {{ form.email.label() }}
-        {{ form.email(placeholder="Enter Email") }}
+<div class="row justify-content-center mt-5">
+    <div class="col-12 col-md-8 col-lg-5">
         
-        {{ form.password.label() }}
-        {{ form.password(placeholder="Enter Password") }}
+        <div class="card-wrapper p-4 p-md-5 shadow-sm">
+            <!-- Main Title -->
+            <h3 class="fw-bold text-center" style="font-family: var(--ADLamDisplayFont);">Login to BlockHub</h3>
+            <!-- Flavor Text Subtitle -->
+            <p class="text-center small mb-4" style="font-family: monospace; color: var(--text-muted);">> Welcome back to class!</p>
+            
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
-        {{ form.submit(value="Submit") }}
-    </form>
+                <div class="mb-3">
+                    {{ render_field(form.email, placeholder="Enter your email", icon='fa-envelope')}}
+                </div>
+                
+                <div class="mb-4">
+                    {{ render_field(form.password, placeholder="Enter your password", icon='fa-lock', eye=true)}}
+                </div>
 
+                <div class="d-grid mt-2">
+                    {{ form.submit(class="btn btn-submit fw-bold py-2", value="Login") }}
+                </div>
+            </form>
+
+            <div class="text-center mt-4 pt-3 small">
+                <span style="color: var(--text-muted);">Don't have an account?</span> 
+                <a href="{{ url_for('signup') }}" class="fw-bold text-decoration-none" style="color: var(--text-dark);">Sign up here</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+    });
+</script>
 {% endblock %}

@@ -1,3 +1,23 @@
+/* Target the browser's autofill state */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* 1. Cover the blue background with a massive inner shadow */
+    -webkit-box-shadow: 0 0 0 1000px var(--card-bg) inset !important;
+    
+    /* 2. Force the text color to match your theme */
+    -webkit-text-fill-color: var(--text-dark) !important;
+
+    -webkit-font-family: var(--ActorFont);
+    
+    /* 3. Retain your existing borders */
+    border: 1px solid var(--text-muted); /* Adjust to your border variable */
+    
+    /* 4. Optional: Delay any background color changes */
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 /* --- Standard Form Inputs --- */
 .add-entry-form .form-control {
     background-color: transparent;
@@ -21,13 +41,19 @@
     font-weight: 600;
 }
 
-.form-control::placeholder, .form-label{
+.form-label {
     color: var(--text-muted);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.5;
 }
 
 .form-control, .form-control:focus-within {
     background-color: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.1)
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--text-dark);
 }
 
 [data-theme="dark"] .form-control, [data-theme="dark"] .form-control:focus-within {
@@ -82,6 +108,23 @@
     box-shadow: none !important; /* Kills the blue bootstrap glow */
 }
 
+.input-group-text {
+    background: transparent !important;
+    border: 1px solid rgba(0, 0, 0, 0.1);   
+}
+
+.eye-toggle {
+    color: var(--text-muted);
+}
+
+.auth-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .auth-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* --- 2. Single-Click Pills (Bulletproof Radio Hack) --- */
 .btn-pill {
     background-color: transparent;
@@ -102,6 +145,12 @@
     background-color: rgba(0, 0, 0, 0.05);
 }
 
+[data-theme='dark'] .btn-pill:hover {
+    color: var(--text-dark);
+    border-color: var(--text-dark);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
 /* Safely hide the native radio circle without disabling it */
 .btn-check {
     position: absolute !important;
@@ -111,14 +160,18 @@
 
 /* The Checked State */
 .btn-check:checked + .btn-pill {
-    background-color: var(--accent-purple) !important;
-    color: #ffffff !important;
-    border-color: var(--accent-purple) !important;
+    background-color: var(--text-muted) !important;
+    color: var(--main-bg) !important;
+    border-color: var(--text-muted) !important;
 }
 
-/* Dark Mode Hover */
-[data-theme="dark"] .btn-pill:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+.btn-submit {
+    background-color: var(--accent-purple);
+    color: var(--main-bg);
+}
+
+.btn-submit:hover {
+    border: 1px solid var(--accent-purple) !important;
 }
 
 /* --- 3. Date Grid & Custom Inputs --- */
@@ -145,6 +198,58 @@
 [data-theme="dark"] input[type="time"],
 [data-theme="dark"] input[type="date"] {
     color-scheme: dark;
+}
+
+/* 1. Reset Bootstrap's default 'is-invalid' input styling */
+.form-control.is-invalid {
+    border-color: #dee2e6 !important; /* Default border color */
+    box-shadow: none !important;
+}
+
+.form-control.is-valid {
+    border-color: #dee2e6 !important; /* Default border color */
+    box-shadow: none !important;
+}
+
+/* 2. When the input is invalid, apply the custom red glow to the whole input group */
+.input-group:has(.form-control.is-invalid) {
+    border: 1px solid #dc3545;
+    border-radius: 0.375rem;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.input-group:has(.form-control.is-valid) {
+    border: 1px solid #0c9a43;
+    border-radius: 0.375rem;
+    box-shadow: 0 0 0 0.25rem rgba(54, 170, 26, 0.25);
+}
+
+.input-group:focus-within {
+    border: 1px solid var(--text-dark);
+    border-radius: 0.375rem;
+    box-shadow: 0 0 5px 0.25rem var(--accent-purple);
+}
+
+/* Remove the default Bootstrap blue glow from the input */
+.input-group .form-control:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* 3. Ensure the icon and toggle button match the container's appearance */
+.input-group:has(.form-control.is-invalid) .input-group-text {
+    border-color: transparent !important;
+    background-color: transparent !important;
+}
+
+.input-group:has(.form-control.is-valid) .input-group-text {
+    border-color: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Force the error message to display when the input group right above it has an invalid input */
+.input-group:has(.is-invalid) + .invalid-feedback {
+    display: block;
 }
 
 /* Mobile responsive fallback for the dates */

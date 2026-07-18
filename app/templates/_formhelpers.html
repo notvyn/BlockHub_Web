@@ -1,0 +1,28 @@
+{% macro render_field(field, icon=none, eye=false) %}
+    <div class="mb-3">
+        {{ field.label(class="form-label small fw-bold", style="letter-spacing: 1px;") }}
+        
+        <div class="input-group">
+            {% if icon %}
+                <label for="{{ field.id }}" class="input-group-text border-end-0">
+                    <i class="fa-solid {{ icon }}"></i>
+                </label>
+            {% endif %}
+            
+            <!-- Adds ps-2 only if there's an icon, otherwise standard padding -->
+            {{ field(class="form-control " + ("ps-2 " if icon else "") + ("is-invalid" if field.errors else ""), **kwargs) }}
+
+            {% if eye %}
+                <button type="button" class="input-group-text eye-toggle">
+                    <i class="fa-solid fa-eye-slash"></i>
+                </button>
+            {% endif %}
+        </div> 
+        <!-- The input-group always closes here -->
+        
+        <!-- The error text is always outside, waiting for our CSS to reveal it -->
+        <div class="invalid-feedback fw-bold" id="error-{{ field.id }}">
+            {% if field.errors %}{{ field.errors[0] }}{% endif %}
+        </div>
+    </div>
+{% endmacro %}
