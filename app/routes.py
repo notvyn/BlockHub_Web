@@ -2,11 +2,12 @@
 
 from flask import render_template, redirect, url_for, request, jsonify, send_from_directory, flash
 from flask_login import current_user, login_user, login_required, logout_user
-from sqlalchemy import func, and_, or_
+from sqlalchemy import func, and_, or_, text
 from sqlalchemy.orm import joinedload
 from datetime import date, timedelta, datetime, timezone, time
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from werkzeug.security import generate_password_hash, check_password_hash
+from collections import defaultdict
 
 from app import app, login_manager, db
 
@@ -1687,6 +1688,42 @@ def blockmate(id):
         earned_badges.append({'name': 'Active Supporter', 'icon': 'fa-heart', 'color': 'danger'})
 
     return render_template('blockmate.html', blockmate=blockmate, earned_badges=earned_badges, has_back_btn=True)
+
+@app.route('/tools/wallpaper')
+@login_required
+def wallpaper_generator():
+    # 1. Fetch all schedules and join them with Course
+    all_schedules = CourseSchedule.query.join(Course).all()
+    
+    # 2. Prepare a standard dictionary
+    grouped_schedule = {}
+    
+    for sched in all_schedules:
+        # THE FIX: Strip hidden spaces and force capitalization (e.g., ' monday ' -> 'Monday')
+        day = sched.day.strip().capitalize()
+        
+        # If we haven't seen this day yet, create a list for it
+        if day not in grouped_schedule:
+            grouped_schedule[day] = []
+            
+        grouped_schedule[day].append({
+            'time': f"{sched.start_time.strftime('%I:%M %p')} - {sched.end_time.strftime('%I:%M %p')}",
+            'course': sched.course.code,
+            'room': sched.room,
+            'raw_time': sched.start_time # We keep this hidden value to sort chronologically 
+        })
+        
+    # 3. Sort the days in order
+    day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    sorted_schedule = {}
+    
+    for target_day in day_order:
+        if target_day in grouped_schedule:
+            # Sort the classes inside that day from morning to evening using the hidden raw_time
+            sorted_classes = sorted(grouped_schedule[target_day], key=lambda x: x['raw_time'])
+            sorted_schedule[target_day] = sorted_classes
+
+    return render_template('wallpaper.html', schedule_data=sorted_schedule)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

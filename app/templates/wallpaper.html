@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Added Alex Brush for the cursive title, DM Serif for the days -->
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=DM+Serif+Display&family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wallpaper.css')}}">
+{% endblock %}
+
+{% block page_title %}Tools{% endblock %}
+{% block page_title_txt %}Customize your own! ;>{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        
+        <!-- LEFT COLUMN: The Controls -->
+        <div class="col-md-5 pe-md-5">
+            <h2 class="fw-bold mb-1" style="color: var(--accent-purple);">Wallpaper Generator</h2>
+            <p class="text-muted mb-4">Customize your class schedule into an aesthetic lock screen.</p>
+
+            <!-- Class Block Input -->
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">1. Enter Block</label>
+                <input type="text" id="block-input" class="form-control" placeholder="e.g. CS 2103">
+            </div>
+
+            <!-- Template Selection -->
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">1. Choose Template</label>
+                <div class="d-flex gap-2">
+                    <button id="btn-template-dark" class="btn btn-dark flex-grow-1 theme-btn" onclick="changeTemplate('template-dark')">Dark Glass</button>
+                    <button id="btn-template-light" class="btn btn-outline-dark flex-grow-1 theme-btn" onclick="changeTemplate('template-light')">Light Glass</button>
+                </div>
+            </div>
+
+            <!-- Custom Background -->
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">2. Custom Background</label>
+                <input class="form-control" type="file" id="bg-upload" accept="image/png, image/jpeg, image/jpg">
+                <div class="form-text">Recommended size: 1080x1920 (9:16 aspect ratio)</div>
+            </div>
+
+            <!-- Download Button -->
+            <button id="download-btn" class="btn w-100 py-3 fw-bold text-white mt-3" style="background-color: var(--accent-purple);" onclick="downloadWallpaper()">
+                <i class="fa-solid fa-download me-2"></i> Download Wallpaper
+            </button>
+        </div>
+
+        <!-- RIGHT COLUMN: The Live Preview -->
+        <div class="col-md-7 d-flex justify-content-center align-items-center mt-5 mt-md-0">
+            
+            <!-- Safe Scaling Wrapper -->
+            <div class="preview-wrapper border border-4 border-white">
+                
+                <!-- THE ACTUAL WALLPAPER EXPORT DIV (1080x1920) -->
+                <div id="wallpaper-export" class="template-dark">
+
+                    <div class="schedule-glass-card">
+
+                        <!-- Aesthetic Titles -->
+                        <div class="wallpaper-header">
+                            <div class="wallpaper-title-1">Class Schedule</div>
+                            <div class="wallpaper-title-2">Block/Section</div>
+                        </div>
+                        
+                        <!-- Map full days to short days for the exact aesthetic -->
+                        {% set day_map = {'Monday': 'mon', 'Tuesday': 'tues', 'Wednesday': 'wed', 'Thursday': 'thurs', 'Friday': 'fri', 'Saturday': 'sat', 'Sunday': 'sun'} %}
+                        
+                        <!-- THE JINJA LOOP -->
+                        {% for day, classes in schedule_data.items() %}
+                            <div class="schedule-row">
+                                
+                                <!-- LEFT COLUMN: Day & Time -->
+                                <div class="left-panel">
+                                    <div class="day-text">{{ day_map[day] }}</div>
+                                    <div class="time-text">
+                                        {% for class in classes %}
+                                            <p>{{ class.time }}</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <!-- RIGHT COLUMN: Classes -->
+                                <div class="right-panel">
+                                    {% for class in classes %}
+                                        <p>{{ class.course }} | {{ class.room }}</p>
+                                    {% endfor %}
+                                </div>
+                                
+                            </div>
+                        {% endfor %}
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        const wallpaper = document.getElementById('wallpaper-export');
+
+        const blockInput = document.getElementById('block-input');
+        // Use querySelector with a dot (.) for classes
+        const wallpaperTitle = document.querySelector('.wallpaper-title-2'); 
+
+        if (wallpaperTitle) {
+            blockInput.addEventListener('input', function() {
+                // If the user clears the input, fall back to 'CS 2103'
+                if (blockInput.value.trim() !== "") {
+                    wallpaperTitle.textContent = blockInput.value;
+                } else {
+                    wallpaperTitle.textContent = 'CS 2103';
+                }
+            });
+        }
+
+        // --- 1. THEME SWITCHING ---
+        function changeTemplate(templateName) {
+            // Remove existing themes
+            wallpaper.classList.remove('template-dark', 'template-light');
+            // Add new theme
+            wallpaper.classList.add(templateName);
+
+            // Update UI buttons styling
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('btn-dark');
+                btn.classList.add('btn-outline-dark');
+            });
+            
+            const activeBtn = document.getElementById('btn-' + templateName);
+            activeBtn.classList.remove('btn-outline-dark');
+            activeBtn.classList.add('btn-dark');
+        }
+
+        // --- 2. CUSTOM BACKGROUND UPLOAD ---
+        document.getElementById('bg-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const imageUrl = URL.createObjectURL(file);
+                wallpaper.style.backgroundImage = `url('${imageUrl}')`;
+            }
+        });
+
+        // --- 3. DOWNLOAD WALLPAPER ---
+        async function downloadWallpaper() {
+            const downloadBtn = document.getElementById('download-btn');
+            const originalText = downloadBtn.innerHTML;
+            
+            // Show loading state
+            downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating HD...';
+            downloadBtn.disabled = true;
+
+            // Wait a tiny bit for the UI to update the button text
+            await new Promise(r => setTimeout(r, 100));
+
+            // Wait for custom fonts to be fully loaded before capturing
+            await document.fonts.ready;
+
+            html2canvas(wallpaper, {
+                scale: 2, // Capture at 2x scale (2160x3840) for incredibly crisp text!
+                useCORS: true, 
+                allowTaint: true,
+                backgroundColor: null,
+                
+                // The Magic Clone Trick!
+                // This lets us strip away the "transform: scale(0.35)" on the hidden clone
+                // before html2canvas takes the picture, resulting in a perfect 1080x1920 layout.
+                onclone: function (clonedDocument) {
+                    const clonedWallpaper = clonedDocument.getElementById('wallpaper-export');
+                    clonedWallpaper.style.transform = 'none';
+                    clonedWallpaper.style.position = 'relative'; 
+                }
+
+            }).then(canvas => {
+                // Convert canvas to a JPG image
+                const image = canvas.toDataURL("image/jpeg", 0.95);
+                
+                // Create a temporary link to trigger the download
+                const link = document.createElement('a');
+                link.download = 'BlockHub_Schedule.jpg';
+                link.href = image;
+                link.click();
+
+                // Reset button
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            }).catch(err => {
+                console.error("Error generating wallpaper:", err);
+                alert("There was an issue generating your wallpaper. Please try again.");
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            });
+        }
+    </script>
+{% endblock %}

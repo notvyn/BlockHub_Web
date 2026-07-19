@@ -94,6 +94,11 @@ A centralized class management system for CS 2103.
 - Added password toggle on authentication pages
 - Refine resolve feature on Feedback page
 
+**July 19, 2026**
+- Drafted Wallpaper Generator page
+- Added tools for sidebar (needs refinement)
+
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Password Done, Partial Form Validation, continue for entries)
@@ -121,3 +126,4 @@ A centralized class management system for CS 2103.
 - [ ] Create list of badges for profiles
 - [/] Create new model for each user completion of Task
 - [ ] Add is_pinned on Announcements and Links
+- [ ] Fix styling of Wallpaper Generator

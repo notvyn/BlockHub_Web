@@ -1,0 +1,180 @@
+/* --- HEADER STYLING --- */
+.wallpaper-header {
+    text-align: center;
+    margin-bottom: 50px; /* Adds space before the schedule rows */
+    width: 100%;
+}
+
+.wallpaper-title-1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 65px;
+    font-weight: 800;
+    letter-spacing: -2px;
+}
+
+.wallpaper-title-2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 35px;
+    font-weight: 500;
+}
+
+/* --- THEME COLORS FOR HEADER --- */
+.template-dark .wallpaper-title-1,
+.template-dark .wallpaper-title-2 {
+    color: #ffffff;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}
+
+.template-light .wallpaper-title-1,
+.template-light .wallpaper-title-2 {
+    color: #1e293b;
+}
+
+/* Shared styling for time and course details */
+.time-text p, .right-panel p {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 26px; 
+    font-weight: 600; 
+    letter-spacing: 0.5px;
+    height: 30px; 
+    display: flex;
+    align-items: center;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.4);
+    white-space: nowrap; /* PREVENTS 'AM/PM' FROM WRAPPING */
+}
+
+/* The container that holds the scaled-down preview safely */
+        .preview-wrapper {
+            width: 378px;  
+            height: 672px; 
+            overflow: hidden;
+            position: relative;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            background-color: #000;
+        }
+
+        /* THE ACTUAL HD WALLPAPER (1080x1920) */
+        #wallpaper-export {
+            width: 1080px;
+            height: 1920px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: scale(0.35);
+            transform-origin: top left;
+            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1080&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- THE NEW GLASS CARD LAYOUT --- */
+        .schedule-glass-card {
+            width: 90%;
+            max-width: 950px;
+            padding: 40px 60px;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-row {
+            width: 100%;
+            /* Flexbox ensures left and right panels are exactly the same height */
+            display: flex;
+            align-items: stretch; 
+        }
+
+        /* LEFT SIDE: Day & Time (Holds the borders) */
+        .left-panel {
+            width: 50%;
+            padding: 40px 40px 40px 0; /* Padding for breathing room */
+            display: flex;
+            align-items: flex-start; /* Aligns the day text to the top */
+            border-right: 4px solid #ffffff; /* The thick continuous vertical line */
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3); /* The horizontal line */
+        }
+
+        /* Remove the horizontal line from the very last day */
+        .schedule-row:last-child .left-panel {
+            border-bottom: none;
+        }
+
+        /* RIGHT SIDE: Course & Room (No borders) */
+        .right-panel {
+            width: 50%;
+            padding: 40px 0 40px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 30px; /* Space between multiple classes */
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .day-text {
+            width: 35%;
+            font-family: 'DM Serif Display', serif;
+            font-size: 75px; /* Massive HD text */
+            line-height: 0.8; /* Pulls it up to perfectly align with the time */
+            text-transform: lowercase;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .time-text {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Space between multiple classes */
+        }
+
+        /* Shared styling for time and course details */
+        .time-text p, .right-panel p {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 26px; 
+            font-weight: 600; 
+            letter-spacing: 0.5px;
+            height: 30px; /* Fixed height forces absolute alignment between left and right columns */
+            display: flex;
+            align-items: center;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.4);
+        }
+
+        .time-text p {
+            justify-content: flex-end; /* Push times against the vertical line */
+        }
+
+        .right-panel p {
+            justify-content: flex-start; /* Push courses against the vertical line */
+        }
+
+        /* --- THEMES --- */
+        .template-dark .schedule-glass-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(0, 0, 0, 0.6));
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .template-dark .left-panel {
+            border-right-color: #ffffff;
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+        }
+        .template-dark .day-text, .template-dark p {
+            color: #ffffff;
+        }
+
+        .template-light .schedule-glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 245, 0.8));
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+        .template-light .left-panel {
+            border-right-color: #1e293b;
+            border-bottom-color: rgba(30, 41, 59, 0.2);
+        }
+        .template-light .day-text, .template-light p {
+            color: #1e293b;
+            text-shadow: none;
+        }
