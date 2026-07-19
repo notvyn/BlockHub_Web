@@ -1,0 +1,35 @@
+.nav-pills .nav-link.active {
+    background-color: var(--accent-purple) !important;
+    color: var(--main-bg);
+}
+
+.nav-pills .nav-link {
+    color: var(--text-dark);
+}
+
+.user-name {
+    color: var(--text-dark);
+} 
+
+.user-email, .about-user, .user-badge {
+    color: var(--text-muted);
+}
+
+.pf-badge {
+    background-color: rgba(0, 0, 0, 0.03);
+    width: 150px;
+}
+
+[data-theme='dark'] .pf-badge {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--accent-purple);
+    border-color: var(--main-bg);
+}
+
+.form-switch .form-check-input:focus {
+    box-shadow: 0 0 0 0 var(--accent-purple);
+    border-color: var(--text-dark);
+}

@@ -1617,6 +1617,7 @@ def api_delete_account():
 @app.route('/profile')
 @login_required
 def profile():
+    form = LoginForm()
     # Inside your profile route...
     total_hearts = AnnouncementHeart.query.filter_by(user_id=current_user.id).count()
     # total_summaries = ClassSummary.query.filter_by(user_id=current_user.id).count()
@@ -1626,12 +1627,12 @@ def profile():
     earned_badges = []
 
     if total_hearts >= 5:
-        earned_badges.append({'name': 'Active Supporter', 'icon': 'fa-heart', 'color': 'danger'})
+        earned_badges.append({'name': 'Active Supporter', 'description': 'React on 5 Posted Announcements' , 'icon': 'fa-heart', 'color': 'danger'})
         
     # if total_summaries >= 3:
     #     earned_badges.append({'name': 'Top Contributor', 'icon': 'fa-book-open', 'color': 'success'})
     
-    return render_template('profile.html', earned_badges=earned_badges)
+    return render_template('profile.html', earned_badges=earned_badges, form=form)
 
 @app.route('/api/create-tag', methods=['POST'])
 @login_required

@@ -97,6 +97,8 @@ A centralized class management system for CS 2103.
 **July 19, 2026**
 - Drafted Wallpaper Generator page
 - Added tools for sidebar (needs refinement)
+- Added description key for Earned badges
+- Refined styling of profile page
 
 
 ## TO-DO LIST
@@ -127,3 +129,4 @@ A centralized class management system for CS 2103.
 - [/] Create new model for each user completion of Task
 - [ ] Add is_pinned on Announcements and Links
 - [ ] Fix styling of Wallpaper Generator
+- [ ] Refine formhelper render_form function for form validation and width span

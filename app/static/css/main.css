@@ -23,6 +23,7 @@
     --accent-red: #ef4444;
     --accent-yellow: #ca7d01;
     --accent-blue: #0ea5e9;
+    --hue-shade: rgba(0, 0, 0, 0.1);
     --ADLamDisplayFont: "ADLaM Display";
     --ABeeZeeFont: "ABeeZee";
     --ActorFont: "Actor";
@@ -44,6 +45,8 @@
     --text-dark: #E7DFC6;       /* (Note: Even though it's called 'dark', it acts as your main light text now) */
     --text-muted: #9a91b5;      /* A soft, readable lavender-gray instead of harsh gray */
     
+    --hue-shade: rgba(255, 255, 255, 0.1);
+
     /* Accents: Brightened up by about 10-15% so they pop against the dark backgrounds */
     --accent-purple: #8b5cf6;   
     --accent-red: #f87171;      
@@ -127,6 +130,14 @@ main {
     width: 100%;
     display: flex;
     /* flex-grow: 1; */
+}
+
+.text-dark {
+    color: var(--text-dark) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
 }
 
 /* --- Top Bar --- */

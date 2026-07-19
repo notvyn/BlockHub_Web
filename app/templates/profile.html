@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/card.css')}}">
+{% endblock %}
+
+{% from "_formhelpers.html" import render_field %}
+
 {% block page_title %}Profile{% endblock %}
 {% block page_title_txt %}Wow, you are so cool! ;){% endblock %}
 
@@ -47,8 +54,8 @@
                         </div>
                         <div class="col">
                             <!-- Name and Multiple Roles -->
-                            <h3 class="fw-bold text-dark mb-1">{{ current_user.name }}</h3>
-                            <p class="text-muted small">{{ current_user.email }}</p>
+                            <h3 class="fw-bold mb-1 user-name">{{ current_user.name }}</h3>
+                            <p class="small user-email">{{ current_user.email }}</p>
                             <div class="d-flex flex-wrap gap-2">
                                 {% for tag in current_user.tags %}
         
@@ -75,22 +82,27 @@
                     </div>
 
                     <!-- Bio Section -->
-                    <div class="mb-5">
-                        <h6 class="fw-bold text-muted mb-2">ABOUT ME</h6>
-                        <p class="text-dark">{{ current_user.bio }}</p>
+                    <div class="about-user mb-5">
+                        <h6 class="fw-bold mb-2">ABOUT ME</h6>
+                        {% if current_user.bio %}
+                            <p class="">{{ current_user.bio }}</p>
+                        {% else %}
+                            <p class="">No bio yet. Tell some thing about yourself :></p>
+                        {% endif %}
                     </div>
 
                     <!-- Achievements Section -->
                     <div>
-                        <h6 class="fw-bold text-muted mb-3">ACHIEVEMENTS</h6>
+                        <h6 class="fw-bold user-badge mb-3">ACHIEVEMENTS</h6>
                         
                         {% if earned_badges %}
                             <div class="d-flex flex-wrap gap-3">
                                 {% for badge in earned_badges %}
                                     <!-- Render each dynamically generated badge -->
-                                    <div class="text-center p-3 rounded" style="background-color: rgba(0,0,0,0.03); width: 100px;">
+                                    <div class="pf-badge text-center p-3 rounded">
                                         <i class="fa-solid {{ badge.icon }} fa-2x mb-2 text-{{ badge.color }}"></i>
-                                        <div class="small fw-bold" style="font-size: 0.75rem;">{{ badge.name }}</div>
+                                        <div class="small fw-bold mb-1" style="font-size: 0.85rem;">{{ badge.name }}</div>
+                                        <div class="small" style="font-size: 0.7rem; color: var(--text-muted);">{{ badge.description }}</div>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -112,7 +124,7 @@
                 
                 <!-- Preferences & Notifications -->
                 <div class="card-wrapper p-4 mb-4">
-                    <h5 class="fw-bold mb-4"><i class="fa-solid fa-sliders text-muted me-2"></i> Preferences</h5>
+                    <h5 class="fw-bold mb-4"><i class="fa-solid fa-sliders me-2"></i> Preferences</h5>
                     
                     <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded">
                         <div>
@@ -169,7 +181,7 @@
                         </div>
                         <div class="text-end">
                             <span id="passwordMessage" class="small me-3" style="display: none;"></span>
-                            <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-key me-2"></i>Save Password</button>
+                            <button type="submit" class="btn btn-submit px-4"><i class="fa-solid fa-key me-2"></i>Save Password</button>
                         </div>
                     </form>
                 </div>
