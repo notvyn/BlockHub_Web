@@ -21,15 +21,15 @@
 
                     <div class="mb-4">
                         <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DAY</label>
-                        <div class="d-flex flex-wrap gap-2 pill-group {% if form.status.errors %}border border-danger p-2 rounded{% endif %}" id="scheduleContainer">
+                        <div class="d-flex flex-wrap gap-2 pill-group {% if form.day.errors %}border border-danger p-2 rounded{% endif %}" id="scheduleContainer">
                             {% for subfield in form.day %}
                                 {{ subfield(class="btn-check") }}
                                 <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                             {% endfor %}
                         </div>
                         <div class="invalid-feedback fw-bold mt-1" id="error-day" style="{% if form.day.errors %}display: block;{% endif %}">
-                        {% if form.day.errors %}{{ form.day.errors[0] }}{% endif %}
-                    </div>
+                            {% if form.day.errors %}{{ form.day.errors[0] }}{% endif %}
+                        </div>
                     </div>
                     
                     <div class="date-grid mb-4">

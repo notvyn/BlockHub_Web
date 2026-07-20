@@ -101,6 +101,12 @@ input:-webkit-autofill:active {
     border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
 }
 
+/* Restrict Bootstrap from ruining the title-input design */
+.title-input.form-control.is-valid,
+.title-input.form-control.is-invalid {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
+}
+
 .title-input, 
 [data-theme="dark"] .add-entry-form .title-input {
     background-color: transparent !important;
@@ -200,14 +206,8 @@ input:-webkit-autofill:active {
     color-scheme: dark;
 }
 
-/* 1. Reset Bootstrap's default 'is-invalid' input styling */
-.form-control.is-invalid {
-    border-color: #dee2e6 !important; /* Default border color */
-    box-shadow: none !important;
-}
-
-.form-control.is-valid {
-    border-color: #dee2e6 !important; /* Default border color */
+.form-control.is-valid, .form-control.is-invalid {
+    border-color: var(--hue-shade) !important; /* Default border color */
     box-shadow: none !important;
 }
 

@@ -21,31 +21,40 @@
 {% block content %}
     <div class="row mt-4">
         <div class="col-12">
-            <form method="POST" class="add-entry-form" novalidate>
+            <form id="summarySchedule" method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
                 <div class="form-container">
                     
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">1. SELECT COURSE</label>
-                        <div class="d-flex flex-wrap gap-2 pill-group">
+                        <div class="d-flex flex-wrap gap-2 pill-group {% if form.course.errors %}border border-danger p-2 rounded{% endif %}" id="courseContainer">
                             {% for subfield in form.course %}
                                 {{ subfield(class="btn-check course-radio") }}
                                 <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                             {% endfor %}
                         </div>
+                        <div class="invalid-feedback fw-bold mt-1" id="error-course" style="{% if form.course.errors %}display: block;{% endif %}">
+                        {% if form.course.errors %}{{ form.course.errors[0] }}{% endif %}
+                    </div>
                     </div>
                     
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">2. SELECT SCHEDULE</label>
-                        <div id="dynamic-date-container" class="d-flex flex-wrap gap-2 pill-group" data-saved-schedule="{{ form.schedule.data }}">
+                        <div id="dynamic-date-container" class="d-flex flex-wrap gap-2 pill-group {% if form.schedule.errors %}border border-danger p-2 rounded{% endif %}" data-saved-schedule="{{ form.schedule.data }}">
                             <span class="" style="font-size: 0.85rem; font-style: italic; color: var(--text-muted);">Select a course above to view available dates...</span>
+                        </div>
+                        <div class="invalid-feedback fw-bold mt-1" id="error-schedule" style="{% if form.schedule.errors %}display: block;{% endif %}">
+                            {% if form.schedule.errors %}{{ form.schedule.errors[0] }}{% endif %}
                         </div>
                     </div>
 
                     <div>
                         <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">3. DATE HELD</label>
-                            {{ form.date_held(class="form-control custom-date-input") }}
+                            {{ form.date_held(class="form-control custom-date-input" + ("is-invalid" if form.date_held.errors else "")) }}
+                        </div>
+                        <div class="invalid-feedback fw-bold" id="error-date_held" style="{% if form.date_held.errors %}display: block;{% endif %}">
+                            {% if form.date_held.errors %}{{ form.date_held.errors[0] }}{% endif %}
                         </div>
                     </div>
                 </div>
@@ -53,6 +62,9 @@
                 <div class="mb-4">
                     <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">TAKEAWAY (MAIN CONTENT)</label>
                     {{ form.content(class="form-control", id="summary-content", placeholder="e.g. Discussion of...") }}
+                    <div class="invalid-feedback fw-bold mt-2" id="error-content" style="{% if form.content.errors %}display: block;{% endif %}">
+                        {% if form.content.errors %}{{ form.content.errors[0] }}{% endif %}
+                    </div>
                 </div>
                 
                 <div class="mb-4">
@@ -62,7 +74,7 @@
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
                     <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
-                    {{ form.submit(value="Save", class="btn btn-modal-save px-4") }}
+                    {{ form.submit(value="Post Summary", class="btn btn-modal-save px-4") }}
                 </div>
             </form>
         </div>
@@ -94,5 +106,17 @@
             dateFormat: "Y-m-d",     // This keeps the backend data clean
             allowInput: true
         });
+
+        {% if form.content.errors %}
+            if (easyMDE.element.nextSibling) {
+                easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
+            }
+        {% endif %}
+
+        window.initEntryValidation('summarySchedule', [
+            { type: 'radio', name: 'course', containerId: 'courseContainer', errorId: 'error-course', message: 'Please select a course.'},
+            { type: 'radio', name: 'schedule', errorId: 'error-schedule', message: 'Please select a schedule.'},
+            { type: 'easymde', instance: easyMDE, errorId: 'error-content', message: 'Class Summary content cannot be empty.'}
+        ]);
     </script>
 {% endblock %}
