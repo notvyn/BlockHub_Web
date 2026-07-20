@@ -10,7 +10,7 @@
 {% block content %}
     <div class="row mt-4">
         <div class="col-12">
-            <form method="POST" class="add-entry-form">
+            <form id="courseScheduleForm" method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
                 <div class="mb-5">
@@ -21,28 +21,40 @@
 
                     <div class="mb-4">
                         <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DAY</label>
-                        <div class="d-flex flex-wrap gap-2 pill-group">
+                        <div class="d-flex flex-wrap gap-2 pill-group {% if form.status.errors %}border border-danger p-2 rounded{% endif %}" id="scheduleContainer">
                             {% for subfield in form.day %}
                                 {{ subfield(class="btn-check") }}
                                 <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                             {% endfor %}
                         </div>
+                        <div class="invalid-feedback fw-bold mt-1" id="error-day" style="{% if form.day.errors %}display: block;{% endif %}">
+                        {% if form.day.errors %}{{ form.day.errors[0] }}{% endif %}
+                    </div>
                     </div>
                     
                     <div class="date-grid mb-4">
                         <div>
                             <label for="start-time" class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">START TIME</label>
-                            {{ form.start_time(class="form-control", id="start-time", autocomplete="off", onclick="this.showPicker()", style="cursor: pointer;") }}
+                            {{ form.start_time(class="form-control" + ("is-invalid" if form.start_time.errors else ""), id="start-time", autocomplete="off", onclick="this.showPicker()", style="cursor: pointer;") }}
+                            <div class="invalid-feedback fw-bold" id="error-start_time" style="{% if form.start_time.errors %}display: block;{% endif %}">
+                                {% if form.start_time.errors %}{{ form.start_time.errors[0] }}{% endif %}
+                            </div>
                         </div>
                         <div>
                             <label for="end-time" class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">END TIME</label>
-                            {{ form.end_time(class="form-control", id="end-time", autocomplete="off", onclick="this.showPicker()", style="cursor: pointer;") }}
+                            {{ form.end_time(class="form-control" + ("is-invalid" if form.end_time.errors else ""), id="end-time", autocomplete="off", onclick="this.showPicker()", style="cursor: pointer;") }}
+                            <div class="invalid-feedback fw-bold" id="error-end_time" style="{% if form.end_time.errors %}display: block;{% endif %}">
+                                {% if form.end_time.errors %}{{ form.end_time.errors[0] }}{% endif %}
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         <label for="room" class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">ROOM</label>
-                        {{ form.room(class="form-control", id="room", autocomplete="off", placeholder="e.g. LAB 3") }}
+                        {{ form.room(class="form-control" + ("is-invalid" if form.room.errors else ""), id="room", autocomplete="off", placeholder="e.g. LAB 3") }}
+                        <div class="invalid-feedback fw-bold" id="error-room">
+                            {% if form.room.errors %}{{ form.room.errors[0] }}{% endif %}
+                        </div>
                     </div>
 
                 </div>
@@ -54,4 +66,15 @@
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        window.initEntryValidation('courseScheduleForm', [
+            { type: 'radio', name: 'schedule', containerId: 'scheduleContainer', errorId: 'error-day', message: 'Please select a day.'},
+            { type: 'date', id: 'start_time', errorId: 'error-start_time', message: 'Please select a start time.'},
+            { type: 'date', id: 'end_time', errorId: 'error-end_time', message: 'Please select an end time.'},
+            { type: 'text', id: 'room', errorId: 'error-room', message: 'Please enter a room.'}
+        ]);
+    </script>
 {% endblock %}

@@ -10,11 +10,14 @@
 {% block content %}
     <div class="row mt-4">
         <div class="col-12">
-            <form method="POST" class="add-entry-form">
+            <form id="courseForm" method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
                 <div class="mb-5">
-                    {{ form.title(class="form-control title-input border-0 shadow-none px-0", autocomplete="off", placeholder="Course Title...") }}
+                    {{ form.title(class="form-control title-input border-0 shadow-none px-0" + ("is-invalid" if form.title.errors else ""), autocomplete="off", placeholder="Course Title...") }}
+                    <div class="invalid-feedback fw-bold" id="error-title">
+                        {% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
                 <div class="form-container">
@@ -22,22 +25,34 @@
                     <div class="date-grid mb-4">
                         <div>
                             <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE CODE</label>
-                            {{ form.code(class="form-control", autocomplete="off", placeholder="e.g. CC 102") }}
+                            {{ form.code(class="form-control" + ("is-invalid" if form.code.errors else ""), autocomplete="off", placeholder="e.g. CC 102") }}
+                            <div class="invalid-feedback fw-bold" id="error-code" style="{% if form.code.errors %}display: block;{% endif %}">
+                                {% if form.code.errors %}{{ form.code.errors[0] }}{% endif %}
+                            </div>
                         </div>
                         <div>
                             <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">CREDIT UNITS</label>
-                            {{ form.units(class="form-control", autocomplete="off", placeholder="e.g. 3") }}
+                            {{ form.units(class="form-control" + ("is-invalid" if form.units.errors else ""), type="number", min="0", step="any", autocomplete="off", placeholder="e.g. 3") }}
+                            <div class="invalid-feedback fw-bold" id="error-units" style="{% if form.units.errors %}display: block;{% endif %}">
+                            {% if form.units.errors %}{{ form.units.errors[0] }}{% endif %}
+                        </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE INSTRUCTOR</label>
-                        {{ form.instructor(class="form-control custom-date-input", autocomplete="off", placeholder="e.g. Dr. Ada Lovelace") }}
+                        {{ form.instructor(class="form-control custom-date-input" + ("is-invalid" if form.instructor.errors else ""), autocomplete="off", placeholder="e.g. Dr. Ada Lovelace") }}
+                        <div class="invalid-feedback fw-bold" id="error-instructor" style="{% if form.instructor.errors %}display: block;{% endif %}">
+                            {% if form.instructor.errors %}{{ form.instructor.errors[0] }}{% endif %}
+                        </div>
                     </div>
 
                     <div>
                         <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">INSTRUCTOR EMAIL</label>
-                        {{ form.instructor_email(class="form-control custom-date-input", autocomplete="off", placeholder="e.g. ada.lovelave@g.batstate-u.edu.ph") }}
+                        {{ form.instructor_email(class="form-control" + ("is-invalid" if form.instructor_email.errors else ""), autocomplete="off", placeholder="e.g. ada.lovelace@g.batstate-u.edu.ph") }}
+                        <div class="invalid-feedback fw-bold" id="error-instructor_email" style="{% if form.instructor_email.errors %}display: block;{% endif %}">
+                            {% if form.instructor_email.errors %}{{ form.instructor_email.errors[0] }}{% endif %}
+                        </div>
                     </div>
 
                 </div>
@@ -49,4 +64,16 @@
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        window.initEntryValidation('courseForm', [
+            { type: 'text', id: 'title', errorId: 'error-title', message: 'Course title is required.'},
+            { type: 'text', id: 'code', errorId: 'error-code', message: 'Course code is required.'},
+            { type: 'float', id: 'units', errorId: 'error-units', message: 'Please enter a valid course units.'},
+            { type: 'text', id: 'instructor', errorId: 'error-instructor', message: 'Course instructor is required.'},
+            { type: 'url', id: 'instructor_email', optional: true, errorId: 'error-instructor_email', messageFormat: 'URL must start with http:// or https://' }
+        ]);
+    </script>
 {% endblock %}

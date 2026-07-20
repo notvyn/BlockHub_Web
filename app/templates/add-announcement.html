@@ -3,8 +3,6 @@
 {% block head %}
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
-
-    <!-- <link href="{{ url_for('static', filename='css/dashboard.css')}}" rel="stylesheet"> -->
     <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
 {% endblock %}
 
@@ -14,21 +12,34 @@
 {% block content %}
     <div class="row mt-4">
         <div class="col-12">
-            <form method="POST" class="add-entry-form" novalidate>
+            <form id="announcementForm" method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
+                <!-- 1. Title -->
                 <div class="mb-5">
-                    {{ form.title(class="form-control title-input border-0 shadow-none px-0", autocomplete="off", placeholder="Announcement Title...") }}
+                    {{ form.title(class="form-control title-input border-0 shadow-none px-0 " + ("is-invalid" if form.title.errors else ""), autocomplete="off", placeholder="Announcement Title...") }}
+                    <div class="invalid-feedback fw-bold" id="error-title">
+                        {% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
+                <!-- 2. EasyMDE Content -->
                 <div class="mb-4">
                     <label class="form-label md-code border-0 bg-transparent mb-1">CONTENT</label>
                     {{ form.content(id="announcement-content", placeholder="e.g. Good day...") }}
+                    
+                    <!-- We force this error to show if WTForms rejects it -->
+                    <div class="invalid-feedback fw-bold mt-2" id="error-content" style="{% if form.content.errors %}display: block;{% endif %}">
+                        {% if form.content.errors %}{{ form.content.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label md-code border-0 bg-transparent mb-1">ATTACHED URL (OPTIONAL)</label>
-                    {{ form.url(class="form-control", placeholder="[Title](https://...)") }}
+                    {{ form.url(class="form-control " + ("is-invalid" if form.url.errors else ""), placeholder="[Title](https://...)") }}
+                    <div class="invalid-feedback fw-bold" id="error-url">
+                        {% if form.url.errors %}{{ form.url.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
@@ -45,10 +56,9 @@
         const easyMDE = new EasyMDE({
             element: document.getElementById('announcement-content'),
             theme: "modern",
-            minHeight: "100px", // <--- ADD THIS LINE (Adjust the pixel value to your liking)
+            minHeight: "100px", 
             maxHeight: "250px",
             spellChecker: false,
-            // Turn on the image upload feature
             uploadImage: true,
             toolbar: [
                 "bold", "italic", "strikethrough", "|", 
@@ -59,7 +69,6 @@
                 "preview", "side-by-side", "fullscreen", "|", 
                 "guide"
             ],
-            // Define the custom upload function
             imageUploadFunction: function(file, onSuccess, onError) {
                 const formData = new FormData();
                 formData.append('image', file);
@@ -71,7 +80,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.data && data.data.filePath) {
-                        // If successful, tell EasyMDE the URL to insert!
                         onSuccess(data.data.filePath);
                     } else {
                         onError("Upload failed");
@@ -82,5 +90,21 @@
                 });
             }
         });
+
+        // 3. Highlight the EasyMDE wrapper dynamically on page load if WTForms flagged it
+        {% if form.content.errors %}
+            if (easyMDE.element.nextSibling) {
+                easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
+            }
+        {% endif %}
+
+        // 4. Initialize Live Validation
+        window.initEntryValidation('announcementForm', [
+            { type: 'text', id: 'title', errorId: 'error-title', message: 'A title is required.' },
+            { type: 'easymde', instance: easyMDE, errorId: 'error-content', message: 'Announcement content cannot be empty.' },
+
+            // The Optional URL Validation
+            { type: 'url', id: 'url', optional: true, errorId: 'error-url', messageFormat: 'URL must start with http:// or https://' }
+        ]);
     </script>
 {% endblock %}

@@ -2,7 +2,6 @@
 
 {% block head %}
     <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
 {% endblock %}
@@ -13,51 +12,76 @@
 {% block content %}
     <div class="row mt-4">
         <div class="col-12">
-            <form method="POST" class="add-entry-form">
+            <form id="deadlineForm" method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
+                <!-- 1. Title / Description -->
                 <div class="mb-5">
-                    {{ form.description(class="form-control title-input border-0 shadow-none px-0", autocomplete="off", placeholder="Deadline Title...") }}
+                    {{ form.description(class="form-control title-input border-0 shadow-none px-0 " + ("is-invalid" if form.description.errors else ""), autocomplete="off", placeholder="Deadline Title...") }}
+                    <div class="invalid-feedback fw-bold" id="error-description">
+                        {% if form.description.errors %}{{ form.description.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
+                <!-- 2. Course Radio Group -->
                 <div class="mb-4">
                     <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE</label>
-                    <div class="d-flex flex-wrap gap-2 pill-group">
+                    <!-- Apply red border if WTForms catches an error -->
+                    <div class="d-flex flex-wrap gap-2 pill-group {% if form.course.errors %}border border-danger p-2 rounded{% endif %}" id="courseContainer">
                         {% for subfield in form.course %}
-                            {{ subfield(class="btn-check") }}
+                            {{ subfield(class="btn-check course-radio") }}
                             <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                         {% endfor %}
+                    </div>
+                    <!-- Force display block if there's a backend error -->
+                    <div class="invalid-feedback fw-bold mt-1" id="error-course" style="{% if form.course.errors %}display: block;{% endif %}">
+                        {% if form.course.errors %}{{ form.course.errors[0] }}{% endif %}
                     </div>
                 </div>
                 
-                <div class="mb-4">
+                <!-- 3. Category Radio Group -->
+                <div class="mb-4" id="group-category">
                     <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">CATEGORY</label>
-                    <div class="d-flex flex-wrap gap-2 pill-group">
+                    <div class="d-flex flex-wrap gap-2 pill-group {% if form.category.errors %}border border-danger p-2 rounded{% endif %}" id="categoryContainer">
                         {% for subfield in form.category %}
-                            {{ subfield(class="btn-check") }}
+                            {{ subfield(class="btn-check category-radio") }}
                             <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                         {% endfor %}
                     </div>
+                    <div class="invalid-feedback fw-bold mt-1" id="error-category" style="{% if form.category.errors %}display: block;{% endif %}">
+                        {% if form.category.errors %}{{ form.category.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
-                <div class="mb-4">
+                <!-- 4. Status Radio Group -->
+                <div class="mb-4" id="group-status">
                     <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">STATUS</label>
-                    <div class="d-flex flex-wrap gap-2 pill-group">
+                    <div class="d-flex flex-wrap gap-2 pill-group {% if form.status.errors %}border border-danger p-2 rounded{% endif %}" id="statusContainer">
                         {% for subfield in form.status %}
-                            {{ subfield(class="btn-check") }}
+                            {{ subfield(class="btn-check status-radio") }}
                             <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                         {% endfor %}
                     </div>
+                    <div class="invalid-feedback fw-bold mt-1" id="error-status" style="{% if form.status.errors %}display: block;{% endif %}">
+                        {% if form.status.errors %}{{ form.status.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
+                <!-- 5. Dates -->
                 <div class="date-grid mb-4">
                     <div>
                         <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DATE GIVEN</label>
-                        {{ form.date_given(class="form-control custom-date-input") }}
+                        {{ form.date_given(class="form-control custom-date-input " + ("is-invalid" if form.date_given.errors else "")) }}
+                        <div class="invalid-feedback fw-bold" id="error-date_given" style="{% if form.date_given.errors %}display: block;{% endif %}">
+                            {% if form.date_given.errors %}{{ form.date_given.errors[0] }}{% endif %}
+                        </div>
                     </div>
                     <div>
                         <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DUE DATE</label>
-                        {{ form.due_date(class="form-control custom-date-input") }}
+                        {{ form.due_date(class="form-control custom-date-input " + ("is-invalid" if form.due_date.errors else "")) }}
+                        <div class="invalid-feedback fw-bold" id="error-due_date" style="{% if form.due_date.errors %}display: block;{% endif %}">
+                            {% if form.due_date.errors %}{{ form.due_date.errors[0] }}{% endif %}
+                        </div>
                     </div>
                 </div>
                 
@@ -78,11 +102,28 @@
 {% block script %}
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        flatpickr(".custom-date-input", {
+        const fpDateGiven = flatpickr("#date_given", {
             altInput: true,
-            altFormat: "D - M d, Y", // This outputs: Mon - Jul 07, 2026
-            dateFormat: "Y-m-d",     // This keeps the backend data clean
+            altFormat: "D - M d, Y", 
+            dateFormat: "Y-m-d",     
             allowInput: true
         });
+
+        const fpDueDate = flatpickr("#due_date", {
+            altInput: true,
+            altFormat: "D - M d, Y", 
+            dateFormat: "Y-m-d",     
+            allowInput: true
+        });
+
+        // THE MISSING COMMA IS FIXED!
+        window.initEntryValidation('deadlineForm', [
+            { type: 'text', id: 'description', errorId: 'error-description', message: 'A title is required.' },
+            { type: 'radio', name: 'course', containerId: 'courseContainer', errorId: 'error-course', message: 'Please select a course.' },
+            { type: 'radio', name: 'category', containerId: 'categoryContainer', errorId: 'error-category', message: 'Please select a category.' },
+            { type: 'radio', name: 'status', containerId: 'statusContainer', errorId: 'error-status', message: 'Please select a status.' },
+            { type: 'flatpickr', instance: fpDateGiven, errorId: 'error-date_given', message: 'Please select a start date.' },
+            { type: 'flatpickr', instance: fpDueDate, errorId: 'error-due_date', message: 'Please select a due date.' }
+        ]);
     </script>
 {% endblock %}

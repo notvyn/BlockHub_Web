@@ -11,26 +11,35 @@
 {% block content %}
     <div class="row mt-4">
         <div class="col-12">
-            <form method="POST" class="add-entry-form" novalidate>
+            <form id="feedbackForm" method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
                 <div class="mb-4">
-                    {{ form.title(class="form-control title-input border-0 shadow-none px-0", autocomplete="off", placeholder="Feedback Title...") }}
+                    {{ form.title(class="form-control title-input border-0 shadow-none px-0" + ("is-invalid" if form.title.errors else ""), autocomplete="off", placeholder="Feedback Title...") }}
+                    <div class="invalid-feedback fw-bold" id="error-title">
+                        {% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">CATEGORY</label>
-                    <div class="d-flex flex-wrap gap-2 pill-group">
+                    <div class="d-flex flex-wrap gap-2 pill-group {% if form.category.errors %}border border-danger p-2 rounded{% endif %}" id="categoryContainer">
                         {% for subfield in form.category %}
                             {{ subfield(class="btn-check") }}
                             <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                         {% endfor %}
                     </div>
+                    <div class="invalid-feedback fw-bold mt-1" id="error-category" style="{% if form.category.errors %}display: block;{% endif %}">
+                        {% if form.category.errors %}{{ form.category.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label md-code border-0 bg-transparent mb-1">MESSAGE</label>
-                    {{ form.message(id="feedback-message", class="form-control", placeholder="Found bug at... Block activity...") }}
+                    {{ form.message(id="feedback-message", class="form-control" + ("is-invalid" if form.message.errors else ""), placeholder="Found bug at... Block activity...") }}
+                    <div class="invalid-feedback fw-bold" id="error-message">
+                        {% if form.message.errors %}{{ form.message.errors[0] }}{% endif %}
+                    </div>
                 </div>
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
@@ -84,5 +93,17 @@
                 });
             }
         });
+
+        {% if form.message.errors %}
+            if (easyMDE.element.nextSibling) {
+                easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
+            }
+        {% endif %}
+
+        window.initEntryValidation('feedbackForm', [
+            { type: 'text', id: 'title', errorId: 'error-title', message: 'Feedback Title is required.' },
+            { type: 'radio', name: 'category', containerId: 'categoryContainer', errorId: 'error-category', message: 'Please select a category.' },
+            { type: 'easymde', instance: easyMDE, errorId: 'error-message', message: 'Feedback content cannot be empty' }
+        ]);
     </script>
 {% endblock %}
