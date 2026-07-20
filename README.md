@@ -108,6 +108,7 @@ A centralized class management system for CS 2103.
 - Created feedbacks archive template for resolved items
 - Created error page handlers
 - Fixed light blinking dark mode 
+- Fixed Wallpaper Page and Template 1, added card and background opacity bar
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

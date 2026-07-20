@@ -29,16 +29,28 @@
 
             <!-- Template Selection -->
             <div class="mb-4">
-                <label class="form-label fw-bold small text-uppercase">1. Choose Template</label>
+                <label class="form-label fw-bold small text-uppercase">2. Choose Theme</label>
                 <div class="d-flex gap-2">
                     <button id="btn-template-dark" class="btn btn-dark flex-grow-1 theme-btn" onclick="changeTemplate('template-dark')">Dark Glass</button>
                     <button id="btn-template-light" class="btn btn-outline-dark flex-grow-1 theme-btn" onclick="changeTemplate('template-light')">Light Glass</button>
                 </div>
             </div>
 
+            <!-- Glass Opacity Control -->
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">3. Card Opacity</label>
+                <input type="range" id="opacity-slider" class="form-range" min="0" max="1" step="0.05" value="0">
+            </div>
+
+            <!-- Background Opacity Control -->
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">4. Background Opacity</label>
+                <input type="range" id="bg-opacity-slider" class="form-range" min="0" max="1" step="0.05" value="1">
+            </div>
+
             <!-- Custom Background -->
             <div class="mb-4">
-                <label class="form-label fw-bold small text-uppercase">2. Custom Background</label>
+                <label class="form-label fw-bold small text-uppercase">5. Custom Background</label>
                 <input class="form-control" type="file" id="bg-upload" accept="image/png, image/jpeg, image/jpg">
                 <div class="form-text">Recommended size: 1080x1920 (9:16 aspect ratio)</div>
             </div>
@@ -58,13 +70,15 @@
                 <!-- THE ACTUAL WALLPAPER EXPORT DIV (1080x1920) -->
                 <div id="wallpaper-export" class="template-dark">
 
-                    <div class="schedule-glass-card">
+                    <div id="wallpaper-bg-layer"></div>
 
-                        <!-- Aesthetic Titles -->
-                        <div class="wallpaper-header">
-                            <div class="wallpaper-title-1">Class Schedule</div>
-                            <div class="wallpaper-title-2">Block/Section</div>
-                        </div>
+                    <!-- Aesthetic Titles -->
+                    <div class="wallpaper-header">
+                        <div class="wallpaper-title-1">Class Schedule</div>
+                        <div class="wallpaper-title-2">Block/Section</div>
+                    </div>
+
+                    <div class="schedule-glass-card">
                         
                         <!-- Map full days to short days for the exact aesthetic -->
                         {% set day_map = {'Monday': 'mon', 'Tuesday': 'tues', 'Wednesday': 'wed', 'Thursday': 'thurs', 'Friday': 'fri', 'Saturday': 'sat', 'Sunday': 'sun'} %}
@@ -105,14 +119,17 @@
 {% block script %}
     <script>
         const wallpaper = document.getElementById('wallpaper-export');
-
+        const bgLayer = document.getElementById('wallpaper-bg-layer');
         const blockInput = document.getElementById('block-input');
-        // Use querySelector with a dot (.) for classes
         const wallpaperTitle = document.querySelector('.wallpaper-title-2'); 
+        
+        // Sliders
+        const opacitySlider = document.getElementById('opacity-slider');         // Card opacity
+        const bgOpacitySlider = document.getElementById('bg-opacity-slider');   // Background opacity
+        const glassCard = wallpaper.querySelector('.schedule-glass-card');
 
         if (wallpaperTitle) {
             blockInput.addEventListener('input', function() {
-                // If the user clears the input, fall back to 'CS 2103'
                 if (blockInput.value.trim() !== "") {
                     wallpaperTitle.textContent = blockInput.value;
                 } else {
@@ -123,12 +140,18 @@
 
         // --- 1. THEME SWITCHING ---
         function changeTemplate(templateName) {
-            // Remove existing themes
             wallpaper.classList.remove('template-dark', 'template-light');
-            // Add new theme
             wallpaper.classList.add(templateName);
 
-            // Update UI buttons styling
+            const alpha = opacitySlider ? opacitySlider.value : 0.85;
+            if (glassCard) {
+                if (templateName === 'template-light') {
+                    glassCard.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
+                } else {
+                    glassCard.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+                }
+            }
+
             document.querySelectorAll('.theme-btn').forEach(btn => {
                 btn.classList.remove('btn-dark');
                 btn.classList.add('btn-outline-dark');
@@ -139,56 +162,62 @@
             activeBtn.classList.add('btn-dark');
         }
 
-        // --- 2. CUSTOM BACKGROUND UPLOAD ---
+        // --- 2. LIVE CARD OPACITY ADJUSTMENT ---
+        if (opacitySlider && glassCard) {
+            opacitySlider.addEventListener('input', function() {
+                const alpha = this.value;
+                if (wallpaper.classList.contains('template-light')) {
+                    glassCard.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
+                } else {
+                    glassCard.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+                }
+            });
+        }
+
+        // --- 3. LIVE BACKGROUND OPACITY ADJUSTMENT ---
+        if (bgOpacitySlider && bgLayer) {
+            bgOpacitySlider.addEventListener('input', function() {
+                bgLayer.style.opacity = this.value;
+            });
+        }
+
+        // --- 4. CUSTOM BACKGROUND UPLOAD ---
         document.getElementById('bg-upload').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
                 const imageUrl = URL.createObjectURL(file);
-                wallpaper.style.backgroundImage = `url('${imageUrl}')`;
+                bgLayer.style.backgroundImage = `url('${imageUrl}')`;
             }
         });
 
-        // --- 3. DOWNLOAD WALLPAPER ---
+        // --- 5. DOWNLOAD WALLPAPER ---
         async function downloadWallpaper() {
             const downloadBtn = document.getElementById('download-btn');
             const originalText = downloadBtn.innerHTML;
             
-            // Show loading state
             downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating HD...';
             downloadBtn.disabled = true;
 
-            // Wait a tiny bit for the UI to update the button text
             await new Promise(r => setTimeout(r, 100));
-
-            // Wait for custom fonts to be fully loaded before capturing
             await document.fonts.ready;
 
             html2canvas(wallpaper, {
-                scale: 2, // Capture at 2x scale (2160x3840) for incredibly crisp text!
+                scale: 2, 
                 useCORS: true, 
                 allowTaint: true,
                 backgroundColor: null,
-                
-                // The Magic Clone Trick!
-                // This lets us strip away the "transform: scale(0.35)" on the hidden clone
-                // before html2canvas takes the picture, resulting in a perfect 1080x1920 layout.
                 onclone: function (clonedDocument) {
                     const clonedWallpaper = clonedDocument.getElementById('wallpaper-export');
                     clonedWallpaper.style.transform = 'none';
                     clonedWallpaper.style.position = 'relative'; 
                 }
-
             }).then(canvas => {
-                // Convert canvas to a JPG image
                 const image = canvas.toDataURL("image/jpeg", 0.95);
-                
-                // Create a temporary link to trigger the download
                 const link = document.createElement('a');
                 link.download = 'BlockHub_Schedule.jpg';
                 link.href = image;
                 link.click();
 
-                // Reset button
                 downloadBtn.innerHTML = originalText;
                 downloadBtn.disabled = false;
             }).catch(err => {
