@@ -25,7 +25,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
-    
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('blockhub_theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
     
     {% block head %}{% endblock %}
 </head>
