@@ -103,6 +103,7 @@ A centralized class management system for CS 2103.
 **July 20, 2026**
 - Added Form validation for Profile Security Forms
 - Added Form validation to Add Entry pages and Update Entry pages (i.e. Announcement, Summary, Course, Feedback, Schedule)
+- Added role badge and admin badge to profile, blockmates, and blockmate page 
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

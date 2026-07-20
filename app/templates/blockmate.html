@@ -18,6 +18,10 @@
                     <div class="fw-bold m-0" style="color: var(--text-dark); font-size: 1.2rem;">{{blockmate.name}}</div>
                     <div class="small mb-2">{{blockmate.email}}</div>
                     <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% if blockmate.is_admin %}
+                            <div class="badge rounded-pill bg-danger">Admin</div>
+                        {% endif %}
+                        <span class="badge rounded-pill" style="background-color: var(--accent-purple);">{{ blockmate.role }}</span>
                         {% for tag in blockmate.tags %}
 
                             <!-- Set a default color -->

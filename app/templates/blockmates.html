@@ -11,7 +11,7 @@
 {% block extra_header %}
 <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3">
     <div style="color: var(--text-muted);">
-        Total Blockmates: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ students|length }}</span>
+        <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ students|length }}</span> blockmates
     </div>
 </div>
 {% endblock %}
@@ -31,6 +31,7 @@
                             {% if student.is_admin %}
                                 <div class="badge rounded-pill bg-danger">Admin</div>
                             {% endif %}
+                            <span class="badge rounded-pill" style="background-color: var(--accent-purple);">{{ student.role }}</span>
                             {% for tag in student.tags %}
 
                                 <!-- Set a default color -->
