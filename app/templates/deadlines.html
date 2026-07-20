@@ -31,7 +31,15 @@
 
 {% block content %}
     <div class="card-container">
-        {% if deadlines %}
+        <!-- EMPTY STATE (If there's zero deadline) -->
+        {% if not deadlines %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-solid fa-face-grin-stars mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No upcoming deadlines right now.</h5>
+                <p style="font-size: 0.9rem;">Enjoy the free time!</p>
+            </div>
+        {% endif %}
+        
         {% for d in deadlines %}
             {% set days_left = (d.due_datetime - today).days %}
 
@@ -122,13 +130,6 @@
 
             </div>
         {% endfor %}
-        {% else %}
-            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
-                <i class="fa-solid fa-face-grin-stars mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
-                <h5>No upcoming deadlines right now</h5>
-                <p style="font-size: 0.9rem;">Enjoy the free time!</p>
-            </div>
-        {% endif %}
 
     </div>
 

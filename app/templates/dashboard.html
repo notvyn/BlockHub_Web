@@ -83,7 +83,7 @@
                             </div>
                         {% endfor %}
                     {% else %}
-                            <div>No deadlines found. Rest Well !</div>
+                        <div class="md-code border-0 bg-transparent">No deadlines found. Rest Well !</div>
                     {% endif %}
                 </div> 
 
@@ -97,6 +97,7 @@
                         </a>
                     </div>
 
+                    {% if announcements %}
                     {% for a in announcements %}
                     <div class="md-quote">
                         <div class="md-quote-title">
@@ -136,6 +137,9 @@
                         <div class="md-code md-date p-0">Posted by: {{ a.author.name }} @ {{ a.date_posted.strftime("%b %d, %Y") }}</div>
                     </div>
                     {% endfor %}
+                    {% else %}
+                        <div class="md-code border-0 bg-transparent">No announcements posted yet.</div>
+                    {% endif %}
                 </div> 
 
             </div>
@@ -151,6 +155,7 @@
                             <i class="fa-solid fa-chevron-right text-muted"></i>
                         </a>
                     </div>
+                    {% if links %}
                     <ul class="md-list">
                         {% for l in links %}
                             <li>
@@ -158,6 +163,9 @@
                             </li>
                         {% endfor %}
                     </ul>
+                    {% else %}
+                     <div class="md-code border-0 bg-transparent">No links posted yet.</div>
+                    {% endif %}
                 </div>
 
                 <!-- Class Summary -->

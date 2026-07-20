@@ -43,13 +43,17 @@
                     
                     <div class="mb-4">
                         <h6 class="fw-bold text-muted mb-2">ABOUT ME</h6>
-                        <p class="text-dark">{{ current_user.bio }}</p>
+                        {% if current_user.bio %}
+                            <p class="text-muted">{{ current_user.bio }}</p>
+                        {% else %}
+                            <p class="text-muted">User has no bio.</p>
+                        {% endif %}
                     </div>
 
+                    {% if earned_badges %}
                     <div class="">
                         <h6 class="fw-bold text-muted mb-3">ACHIEVEMENTS</h6>
                         
-                        {% if earned_badges %}
                             <div class="d-flex flex-wrap gap-3">
                                 {% for badge in earned_badges %}
                                     <!-- Render each dynamically generated badge -->
@@ -59,14 +63,8 @@
                                     </div>
                                 {% endfor %}
                             </div>
-                        {% else %}
-                            <!-- Fallback if they haven't unlocked anything yet -->
-                            <div class="text-muted small rounded">
-                                <i class="fa-solid fa-lock mb-2"></i><br>
-                                Still Explorin ;>
-                            </div>
-                        {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

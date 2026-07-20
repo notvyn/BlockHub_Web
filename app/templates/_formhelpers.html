@@ -1,4 +1,4 @@
-{% macro render_field(field, icon=none, eye=false, update_button=false) %}
+{% macro render_field(field, icon=none, eye=false) %}
     <div class="mb-3">
         {{ field.label(class="form-label small fw-bold", style="letter-spacing: 1px;") }}
         
@@ -16,10 +16,6 @@
                 <button type="button" class="input-group-text eye-toggle">
                     <i class="fa-solid fa-eye-slash"></i>
                 </button>
-            {% endif %}
-
-            {% if update_button %}
-                <button type="submit" class="btn btn-outline-secondary px-4">Update</button>
             {% endif %}
         </div> 
         <!-- The input-group always closes here -->

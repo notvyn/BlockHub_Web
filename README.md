@@ -104,10 +104,14 @@ A centralized class management system for CS 2103.
 - Added Form validation for Profile Security Forms
 - Added Form validation to Add Entry pages and Update Entry pages (i.e. Announcement, Summary, Course, Feedback, Schedule)
 - Added role badge and admin badge to profile, blockmates, and blockmate page 
+- Added conditional display of having no content for pages
+- Created feedbacks archive template for resolved items
+- Created error page handlers
+- Fixed light blinking dark mode 
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
-- [/] Add password security and form validation. (Password Done, Partial Form Validation, continue for entries)
+- [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
 - [/] Limit content for Announcement.
 - [/] Enable Dark Mode.
 - [/] Enable dropdown for adding entry.
@@ -115,15 +119,15 @@ A centralized class management system for CS 2103.
 - [/] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
 - [/] Fix total deadline visual number
-- [ ] Fix style and structure dedicated pages for each content (i.e. Announcement ✔️, Courses, Deadlines, Summaries)
-- [ ] Create new model for Courses' schedule
+- [/] Fix style and structure dedicated pages for each content (i.e. Announcement ✔️, Courses, Deadlines, Summaries)
+- [/] Create new model for Courses' schedule
 - [/] Include total number of content and other labels on each dedicated pages
 - [ ] Add small red dot on sidebar for pages with new content
 - [ ] Fix Recent Announcements Total Count and refine Query (Dashboard) 
 - [/] Have a live update on the total content count for each action on a page
 - [ ] Fix mobile sidebar screen UI issue 
 - [/] Fix Total Units live update count
-- [ ] Have conditional text for no entry pages (Summaries and Deadlines already done)
+- [ ] Have conditional text for no entry pages (Summaries and Deadlines already done, added archives, links, announcements, courses)
 - [/] Add Room to the Master Schedule and Model
 - [/] Fix total count badge of deadline on dashboard
 - [ ] Refine logic of Announcement query on dashboard
@@ -133,4 +137,3 @@ A centralized class management system for CS 2103.
 - [/] Create new model for each user completion of Task
 - [ ] Add is_pinned on Announcements and Links
 - [ ] Fix styling of Wallpaper Generator
-- [ ] Refine formhelper render_form function for form validation and width span

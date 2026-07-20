@@ -149,7 +149,7 @@ class User(db.Model, UserMixin):
     deadline_completions = db.relationship('DeadlineCompletion', backref='user', lazy=True, cascade="all, delete-orphan")
     push_subscriptions = db.relationship('PushSubscription', backref='user', lazy=True, cascade="all, delete-orphan")
 
-    # --- NEW HELPER METHODS ---
+    # --- NEW HELPER METHODS --- 
     def set_password(self, password):
         """Scrambles the plain text password and saves the hash."""
         self.password_hash = generate_password_hash(password)

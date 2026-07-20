@@ -9,6 +9,13 @@
 
 {% block content %}
     <div class="card-container">
+        {% if not notifications %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-regular fa-bell mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No entries found yet.</h5>
+                <p style="font-size: 0.9rem;">Enjoy the free time!</p>
+            </div>
+        {% endif %}
         {% for alert in notifications %}
             <div class="card-wrapper">
                 <a href="{{ alert.url }}">

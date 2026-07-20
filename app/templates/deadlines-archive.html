@@ -19,6 +19,15 @@
 
 {% block content %}
     <div class="card-container">
+        <!-- EMPTY STATE (If there's zero deadlines in archives) -->
+        {% if not deadlines %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-solid fa-monument mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No archives recorded yet.</h5>
+                <p style="font-size: 0.9rem;">Enjoy the free time!</p>
+            </div>
+        {% endif %}
+
         {% for d in deadlines %}
             <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
             <div id="deadline{{ d.id }}" class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid var(--accent-purple); opacity: {% if d.id in completed_ids %}0.75{% else %}1{% endif %}; transition: opacity 0.3s ease;">

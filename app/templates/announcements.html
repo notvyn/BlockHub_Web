@@ -16,6 +16,15 @@
 
 {% block content %}
     <div class="card-container announcement-container">
+
+        <!-- EMPTY STATE (If there's no announcement) -->
+        {% if not announcements %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-solid fa-scroll mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No announcements posted yet</h5>
+                <p style="font-size: 0.9rem;">Enjoy the free time!</p>
+            </div>
+        {% endif %}
     
         {% for a in announcements %}
         <div id="announcement-{{ a.id }}" class="card-wrapper announcement-card d-flex flex-column">

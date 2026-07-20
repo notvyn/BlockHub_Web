@@ -16,6 +16,15 @@
 
 {% block content %}
     <div class="row">
+        <!-- EMPTY STATE (If there's zero deadline) -->
+        {% if not links %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-solid fa-anchor mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No links found.</h5>
+                <p style="font-size: 0.9rem;">Try adding one!</p>
+            </div>
+        {% endif %}
+
         {% for link in links %}
             <div class="col-12 col-lg-6 col-xl-4 d-flex">
                 

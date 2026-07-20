@@ -11,13 +11,21 @@
 {% block extra_header %}
 <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3">
     <div style="color: var(--text-muted);">
-        <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ students|length }}</span> blockmates
+        Total Students: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ students|length }}</span> 
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
     <div class="card-container">
+        {% if not students %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-solid fa-people-group mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No other students found.</h5>
+                <p style="font-size: 0.9rem;">Invite some!</p>
+            </div>
+        {% endif %}
+
         {% for student in students %}
             <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
             <div class="card-wrapper">

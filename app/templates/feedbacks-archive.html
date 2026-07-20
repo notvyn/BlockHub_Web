@@ -4,13 +4,13 @@
     <link href="{{ url_for('static' , filename='css/card.css')}}" rel="stylesheet">
 {% endblock %}
 
-{% block page_title %}Feedbacks{% endblock %}
+{% block page_title %}Feedbacks Archive{% endblock %}
 {% block page_title_txt %}Have something on mind? :>{% endblock %}
 
 {% block extra_header %}
     <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3 ">
         <a href="{{ url_for('add_feedback') }}" class="btn btn-outline-secondary">New Feedback</a>
-        <a href="{{ url_for('feedbacks_archive') }}" class="btn btn-outline-secondary">View Resolved</a>
+        <a href="{{ url_for('feedbacks') }}" class="btn btn-outline-secondary">View Pending</a>
         <div style="color: var(--text-muted);">
         Total Feedbacks: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">
             {%if current_user.role == 'Officer'%}
@@ -61,19 +61,6 @@
         <!-- RIGHT SIDE: Actions (Edit, Delete, Complete) -->
         <!-- Used flex-md-column to stack buttons neatly on the right -->
         <div class="feedback-actions d-flex flex-row flex-md-column justify-content-between align-items-md-end pt-3 pt-md-0 ps-md-4 mt-2 mt-md-0" style="min-width: 140px;">
-            {% if current_user.id == f.user_id and f.status != 'Resolved' %}                        
-            <div class="d-flex gap-2 mb-4">
-                <!-- Make sure to add the correct update_feedback URL here -->
-                <a href="{{ url_for('update_feedback', id=f.id)}}" class="btn btn-icon-action" title="Edit">
-                    <i class="fa-solid fa-pencil"></i>
-                </a>
-                <!-- FIXED: Changed data-type from 'deadline' to 'feedback' -->
-                <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ f.id }}" data-type="feedback" title="Delete">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-            {% endif %}
-            
             {% if current_user.role == 'Officer' %}
                 {% if f.status == 'Pending' %}
                     <button type="button" class="btn btn-sm btn-outline-success fw-bold reply-trigger-btn" 

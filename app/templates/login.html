@@ -24,7 +24,19 @@
                 </div>
                 
                 <div class="mb-4">
-                    {{ render_field(form.password, placeholder="Enter your password", icon='fa-lock', eye=true)}}
+                    <label class="form-label small fw-bold" style="letter-spacing: 1px;">Password</label>
+                    
+                    <div class="input-group">
+                        <label for="{{ form.password.id }}" class="input-group-text border-end-0">
+                            <i class="fa-solid fa-lock"></i>
+                        </label>
+                        
+                        {{ form.password(class="form-control", placeholder="Enter your email") }}
+
+                        <button type="button" class="input-group-text eye-toggle">
+                            <i class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div> 
                 </div>
 
                 <div class="d-grid mt-2">

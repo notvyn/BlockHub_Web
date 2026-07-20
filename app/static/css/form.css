@@ -116,7 +116,8 @@ input:-webkit-autofill:active {
 
 .input-group-text {
     background: transparent !important;
-    border: 1px solid rgba(0, 0, 0, 0.1);   
+    border: 1px solid var(--hue-shade);
+    color: var(--text-muted);   
 }
 
 .eye-toggle {

@@ -17,6 +17,7 @@
 
 {% block content %}
     <!-- MASTER SCHEDULE ACCORDION -->
+    {% if courses %}
     <div class="accordion my-3 shadow-sm" id="scheduleAccordion">
         <div class="accordion-item" style="background-color: var(--main-bg);">
             <h2 class="accordion-header border-0" id="headingOne">
@@ -85,8 +86,17 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <div class="card-container courses-list">
+        {% if not courses %}
+            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+                <i class="fa-solid fa-book mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                <h5>No courses found yet.</h5>
+                <p style="font-size: 0.9rem;">Enjoy the free time!</p>
+            </div>
+        {% endif %}
+
         {% for c in courses %}
             <div id="course-{{ c.id }}" class="card-wrapper course-card d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
                 
