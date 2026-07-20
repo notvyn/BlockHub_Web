@@ -1439,11 +1439,20 @@ def notifications():
 @app.route('/feedback', methods=['GET', 'POST'])
 @login_required
 def feedbacks():
-    feedback = Feedback.query.order_by(Feedback.date_added.desc()).all()
+    feedback = Feedback.query.filter(Feedback.status == 'Pending').order_by(Feedback.date_added.desc()).all()
 
-    user_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id).count()
+    user_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id, Feedback.status == 'Pending').count()
 
     return render_template('feedbacks.html', feedback=feedback, user_feedback_count=user_feedback_count)
+
+@app.route('/feedback-archive', methods=['GET', 'POST'])
+@login_required
+def feedbacks_archive():
+    feedback = Feedback.query.filter(Feedback.status == 'Resolved').order_by(Feedback.date_added.desc()).all()
+
+    user_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id, Feedback.status == 'Resolved').count()
+
+    return render_template('feedbacks-archive.html', feedback=feedback, user_feedback_count=user_feedback_count)
     
 @app.route('/new-entry/feedback', methods=['GET', 'POST'])
 def add_feedback():
@@ -1804,3 +1813,16 @@ def verify_email_update(token):
     except BadSignature:
         flash('Invalid verification link.', 'danger')
         return redirect(url_for('profile'))
+    
+
+# RENDER ERROR PAGES
+# Invalid URL
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
+
+# Internal Server Error
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template("500.html"), 500
+
