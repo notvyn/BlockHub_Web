@@ -100,6 +100,8 @@ A centralized class management system for CS 2103.
 - Added description key for Earned badges
 - Refined styling of profile page
 
+**July 20, 2026**
+- Added Form validation for Profile Security Forms
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

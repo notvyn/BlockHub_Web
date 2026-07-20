@@ -160,11 +160,16 @@
                     <!-- Update Email Form -->
                     <form id="updateEmailForm" class="mb-4 p-3 border rounded">
                         <label class="form-label small fw-bold text-muted" style="letter-spacing: 1px;">EMAIL ADDRESS</label>
+                        
                         <div class="input-group">
                             <span class="input-group-text border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
                             <input type="email" id="newEmailInput" class="form-control border-start-0 ps-0 shadow-none" value="{{ current_user.email }}" required>
                             <button type="submit" class="btn btn-outline-secondary px-4">Update</button>
                         </div>
+                        <!-- OUTSIDE the input-group: Live-typing validation -->
+                        <div class="invalid-feedback fw-bold" id="error-newEmailInput"></div>
+                        
+                        <!-- OUTSIDE the input-group: Server Submission Message -->
                         <div id="emailMessage" class="small mt-2" style="display: none;"></div>
                     </form>
 
@@ -173,18 +178,34 @@
                         <label class="form-label small fw-bold text-muted" style="letter-spacing: 1px;">CHANGE PASSWORD</label>
                         <div class="row g-2 mb-3">
                             <div class="col-12 col-md-6">
-                                <input type="password" id="currentPassword" class="form-control" placeholder="Current Password" required>
+                                <div class="input-group">
+                                    <input type="password" id="currentPassword" class="form-control" placeholder="Current Password" required>
+                                    <button type="button" class="input-group-text eye-toggle">
+                                        <i class="fa-solid fa-eye-slash"></i>
+                                    </button>
+                                </div>
+                                <!-- OUTSIDE the input-group: Live-typing validation -->
+                                <div class="invalid-feedback fw-bold" id="error-currentPassword"></div>
                             </div>
+                            
                             <div class="col-12 col-md-6">
-                                <input type="password" id="newPassword" class="form-control" placeholder="New Password" required>
+                                <div class="input-group">
+                                    <input type="password" id="newPassword" class="form-control" placeholder="New Password" required>
+                                    <button type="button" class="input-group-text eye-toggle">
+                                        <i class="fa-solid fa-eye-slash"></i>
+                                    </button>
+                                </div>
+                                <!-- OUTSIDE the input-group: Live-typing validation -->
+                                <div class="invalid-feedback fw-bold" id="error-newPassword"></div>
                             </div>
                         </div>
+                        
                         <div class="text-end">
+                            <!-- Server Submission Message (next to the button) -->
                             <span id="passwordMessage" class="small me-3" style="display: none;"></span>
                             <button type="submit" class="btn btn-submit px-4"><i class="fa-solid fa-key me-2"></i>Save Password</button>
                         </div>
                     </form>
-                </div>
 
                 <!-- Danger Zone -->
                 <div class="card-wrapper p-4 border border-danger" style="background-color: #fffafb;">

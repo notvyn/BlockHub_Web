@@ -501,51 +501,104 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. Update Email via Fetch
+    /* =========================================
+       ACCOUNT SETTINGS: LIVE VALIDATION & SUBMIT
+       ========================================= */
+
+    const profileEmailInput = document.getElementById('newEmailInput');
+    const currentPasswordInput = document.getElementById('currentPassword');
+    const newPasswordInput = document.getElementById('newPassword');
+
+    // LIVE TYPING: Email
+    if (profileEmailInput) {
+        profileEmailInput.addEventListener('input', function() {
+            const isValid = window.globalConfig.emailRegex.test(this.value);
+            window.setValidation(this, isValid, 'Format: 25-00000@g.batstate-u.edu.ph');
+        });
+    }
+
+    // LIVE TYPING: New Password
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', function() {
+            const isValid = window.globalConfig.passRegex.test(this.value);
+            window.setValidation(this, isValid, 'Min 8 chars, 1 uppercase, 1 lowercase, 1 number.');
+        });
+    }
+
+    // LIVE TYPING: Current Password (Clears error if they retry)
+    if (currentPasswordInput) {
+        currentPasswordInput.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                window.setValidation(this, true, '');
+                this.classList.remove('is-valid'); 
+            }
+        });
+    }
+
+    // SUBMIT: Update Email
     const updateEmailForm = document.getElementById('updateEmailForm');
     if (updateEmailForm) {
         updateEmailForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const newEmail = document.getElementById('newEmailInput').value;
+            
+            // Block submission if live typing regex failed
+            if (profileEmailInput.classList.contains('is-invalid')) return;
+
             const msgBox = document.getElementById('emailMessage');
+            msgBox.style.display = 'none'; // Reset message box
 
             fetch('/api/settings/update-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: newEmail })
+                body: JSON.stringify({ email: profileEmailInput.value })
             })
             .then(res => res.json())
             .then(data => {
+                // Show SERVER message at the bottom of the form
                 msgBox.style.display = 'block';
                 msgBox.textContent = data.message;
                 msgBox.className = data.success ? 'small mt-2 text-success fw-bold' : 'small mt-2 text-danger fw-bold';
-                setTimeout(() => msgBox.style.display = 'none', 3000);
+                
+                if (data.success) {
+                    setTimeout(() => msgBox.style.display = 'none', 3000);
+                }
             });
         });
     }
 
-    // 4. Update Password via Fetch
+    // SUBMIT: Update Password
     const changePasswordForm = document.getElementById('changePasswordForm');
     if (changePasswordForm) {
         changePasswordForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const currentPw = document.getElementById('currentPassword').value;
-            const newPw = document.getElementById('newPassword').value;
+            
+            // Block submission if live typing regex failed
+            if (newPasswordInput.classList.contains('is-invalid')) return;
+
             const msgBox = document.getElementById('passwordMessage');
+            msgBox.style.display = 'none'; // Reset message box
 
             fetch('/api/settings/update-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ current_password: currentPw, new_password: newPw })
+                body: JSON.stringify({ 
+                    current_password: currentPasswordInput.value, 
+                    new_password: newPasswordInput.value 
+                })
             })
             .then(res => res.json())
             .then(data => {
+                // Show SERVER message next to the save button
                 msgBox.style.display = 'inline';
                 msgBox.textContent = data.message;
                 msgBox.className = data.success ? 'small me-3 text-success fw-bold' : 'small me-3 text-danger fw-bold';
                 
-                if (data.success) changePasswordForm.reset(); // Clear passwords on success
-                setTimeout(() => msgBox.style.display = 'none', 4000);
+                if (data.success) {
+                    changePasswordForm.reset(); 
+                    currentPasswordInput.classList.remove('is-valid', 'is-invalid');
+                    newPasswordInput.classList.remove('is-valid', 'is-invalid');
+                    setTimeout(() => msgBox.style.display = 'none', 4000);
+                }
             });
         });
     }
