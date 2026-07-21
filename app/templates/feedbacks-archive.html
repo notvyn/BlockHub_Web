@@ -9,8 +9,18 @@
 
 {% block extra_header %}
     <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3 ">
-        <a href="{{ url_for('add_feedback') }}" class="btn btn-outline-secondary">New Feedback</a>
-        <a href="{{ url_for('feedbacks') }}" class="btn btn-outline-secondary">View Pending</a>
+        <div class="d-flex align-items-center gap-3">
+            <!-- Segmented Toggle -->
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('feedbacks') }}" class="btn btn-sm btn-outline-secondary">Pending</a>
+                <a href="{{ url_for('feedbacks_archive') }}" class="btn btn-sm btn-primary active">Resolved</a>
+            </div>
+
+            <!-- Compact Primary Action -->
+            <a href="{{ url_for('add_feedback') }}" class="btn btn-sm btn-outline-primary fw-bold">
+                <i class="fa-solid fa-plus me-1"></i> Submit
+            </a>
+        </div>
         <div style="color: var(--text-muted);">
         Total Feedbacks: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">
             {%if current_user.role == 'Officer'%}
@@ -63,14 +73,16 @@
         <div class="feedback-actions d-flex flex-row flex-md-column justify-content-between align-items-md-end pt-3 pt-md-0 ps-md-4 mt-2 mt-md-0" style="min-width: 140px;">
             {% if current_user.role == 'Officer' %}
                 {% if f.status == 'Pending' %}
-                    <button type="button" class="btn btn-sm btn-outline-success fw-bold reply-trigger-btn" 
+                    <!-- RESOLVE BUTTON: Added mt-md-auto -->
+                    <button type="button" class="btn btn-sm btn-outline-success fw-bold reply-trigger-btn order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto order-1 order-md-2" 
                             data-bs-toggle="modal" 
                             data-bs-target="#replyModal" 
                             data-id="{{ f.id }}">
                         <i class="fa-solid fa-check me-1"></i> Resolve
                     </button>
                 {% else %}
-                    <span class="badge bg-success">Resolved</span>
+                    <!-- BADGE: Added mt-md-auto -->
+                    <span class="badge bg-success order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto">Resolved</span>
                 {% endif %}
             {% endif %}
         </div>
@@ -94,40 +106,8 @@
         {% else %}
             <div class="text-center py-5">
                 <i class="fa-regular fa-folder-open mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
-                <h5>Seen a bug? Have a question or suggestion? Relay it to the Officers ! ;)</h5>
+                <h5>Feedback hasn't been resolved yet.</h5>
             </div>
         {% endif %}
-    </div>
-
-    <!-- Admin Reply Modal -->
-    <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content card-wrapper border-0 shadow">
-                
-                <div class="modal-header border-bottom-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="replyModalLabel">Resolve Feedback</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                <div class="modal-body">
-                    <p class="text-muted small mb-3">Add a note to explain how this was resolved. The student will see this on their dashboard.</p>
-                    <form id="replyForm">
-                        <!-- Hidden input to store which feedback we are replying to -->
-                        <input type="hidden" id="feedbackIdInput">
-                        
-                        <div class="mb-3">
-                            <label for="adminReplyText" class="form-label small fw-bold">Admin Reply</label>
-                            <textarea class="form-control" id="adminReplyText" rows="4" placeholder="e.g., The professor updated the syllabus, check the latest announcement!"></textarea>
-                        </div>
-                    </form>
-                </div>
-                
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary fw-bold" id="submitReplyBtn">Resolve Feedback</button>
-                </div>
-                
-            </div>
-        </div>
     </div>
 {% endblock %}
