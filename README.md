@@ -110,6 +110,11 @@ A centralized class management system for CS 2103.
 - Fixed light blinking dark mode 
 - Fixed Wallpaper Page and Template 1, added card and background opacity bar
 
+**July 21, 2026**
+- Created two more templates for Wallpaper Generator
+- Refined styling of wallpaper generator
+- Fixed tools navbar
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
@@ -128,7 +133,7 @@ A centralized class management system for CS 2103.
 - [/] Have a live update on the total content count for each action on a page
 - [ ] Fix mobile sidebar screen UI issue 
 - [/] Fix Total Units live update count
-- [ ] Have conditional text for no entry pages (Summaries and Deadlines already done, added archives, links, announcements, courses)
+- [/] Have conditional text for no entry pages (Summaries and Deadlines already done, added archives, links, announcements, courses)
 - [/] Add Room to the Master Schedule and Model
 - [/] Fix total count badge of deadline on dashboard
 - [ ] Refine logic of Announcement query on dashboard
@@ -137,4 +142,7 @@ A centralized class management system for CS 2103.
 - [ ] Create list of badges for profiles
 - [/] Create new model for each user completion of Task
 - [ ] Add is_pinned on Announcements and Links
-- [ ] Fix styling of Wallpaper Generator
+- [/] Fix styling of Wallpaper Generator
+- [/] Create two more templates for Wallpaper generator
+- [/] Fix Tools sidebar navigation and interaction
+- [ ] Fix Feedback action buttons positioning

@@ -50,14 +50,21 @@
                 <span>Links</span>
             </a>
         </li>
-        
+
         <li class="sidebar-item">
-            <a href="{{ url_for('wallpaper_generator') }}" class="sidebar-link">
-                <i class="fa-solid fa-toolbox"></i>                
-                <span>Wallpaper Generator</span>
-            </a>
+            <a href="#" class="sidebar-link has-dropdown collapsed" data-bs-toggle="collapse" data-bs-target="#auth" aria-expanded="false" aria-controls="auth">
+                <i class="fa-solid fa-toolbox"></i>
+                <span>Tools</span>
+            </a>    
+            <ul id="auth" class="sidebar-dropdown list-unstyled collapse">
+                <li class="sidebar-item">
+                    <a href="{{ url_for('wallpaper_generator') }}" class="sidebar-link">
+                        <i class="fa-regular fa-file-image"></i>            
+                        <span>Wallpaper Generator</span>
+                    </a>
+                </li>
+            </ul>
         </li>
-        
         
     </ul>
     <div class="sidebar-footer">
