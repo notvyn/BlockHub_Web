@@ -33,3 +33,33 @@
     box-shadow: 0 0 0 0 var(--accent-purple);
     border-color: var(--text-dark);
 }
+
+/* Container Box (Input wrapper itself) */
+input[type="file"].custom-file-upload {
+    width: 100%;
+    background-color: #12131c; /* Dark surface color */
+    color: #a0a0b0;            /* Text color for 'No file chosen' */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* --- THE BUTTON ('Choose File') --- */
+input[type="file"].custom-file-upload::file-selector-button {
+    background-color: var(--text-muted);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 600;
+    margin-right: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+/* Hover Effect for the button */
+input[type="file"].custom-file-upload::file-selector-button:hover {
+    background-color: #5a4bcf; /* Slightly darker shade on hover */
+}

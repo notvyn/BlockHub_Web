@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css')}}">
 {% endblock %}
 
 {% block page_title %}Settings{% endblock %}
@@ -23,7 +24,7 @@
                         
                         <!-- The File Input is often ugly, you can style it using Bootstrap classes -->
                         <div class="small">
-                            {{ form.profile_pic(class="form-control form-control-sm") }}
+                            {{ form.profile_pic(class="form-control form-control-sm custom-file-upload") }}
                         </div>
                     </div>
 

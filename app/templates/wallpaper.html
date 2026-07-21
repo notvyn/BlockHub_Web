@@ -2,9 +2,10 @@
 
 {% block head %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&family=Mea+Culpa&family=Metamorphous&family=Miltonian+Tattoo&family=Niconne&family=Oldenburg&family=Quicksand:wght@300..700&family=Ribeye&family=Rye&family=Uncial+Antiqua&family=WindSong:wght@400;500&family=Young+Serif&display=swap" rel="stylesheet">
     
-    <!-- Added Alex Brush for the cursive title, DM Serif for the days -->
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=DM+Serif+Display&family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/wallpaper.css')}}">
 {% endblock %}
@@ -29,10 +30,26 @@
 
             <!-- Template Selection -->
             <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">2. Choose Template</label>
+                <div class="d-flex gap-3">
+                    <button onclick="setTemplate('template-sunset')" id="btn-template-sunset" class="btn btn-template flex-grow-1 btn-dark">
+                        <i class="fa-solid fa-sun"></i> Sunset
+                    </button>
+                    <button onclick="setTemplate('template-vintage')" id="btn-template-vintage" class="btn btn-template flex-grow-1 btn-outline-dark">
+                        <i class="fa-solid fa-leaf "></i> Vintage
+                    </button>
+                    <button onclick="setTemplate('template-modern')" id="btn-template-modern" class="btn btn-template flex-grow-1 btn-outline-dark">
+                        <i class="fa-solid fa-shapes"></i> Modern
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card Theme Selection -->
+            <div class="mb-4">
                 <label class="form-label fw-bold small text-uppercase">2. Choose Theme</label>
                 <div class="d-flex gap-2">
-                    <button id="btn-template-dark" class="btn btn-dark flex-grow-1 theme-btn" onclick="changeTemplate('template-dark')">Dark Glass</button>
-                    <button id="btn-template-light" class="btn btn-outline-dark flex-grow-1 theme-btn" onclick="changeTemplate('template-light')">Light Glass</button>
+                    <button id="btn-theme-dark" class="btn btn-dark flex-grow-1 theme-btn" onclick="changeCardTheme('theme-dark')">Dark Glass</button>
+                    <button id="btn-theme-light" class="btn btn-outline-dark flex-grow-1 theme-btn" onclick="changeCardTheme('theme-light')">Light Glass</button>
                 </div>
             </div>
 
@@ -51,8 +68,8 @@
             <!-- Custom Background -->
             <div class="mb-4">
                 <label class="form-label fw-bold small text-uppercase">5. Custom Background</label>
-                <input class="form-control" type="file" id="bg-upload" accept="image/png, image/jpeg, image/jpg">
-                <div class="form-text">Recommended size: 1080x1920 (9:16 aspect ratio)</div>
+                <input class="form-control custom-file-upload" type="file" id="bg-upload" accept="image/png, image/jpeg, image/jpg">
+                <div class="form-text text-muted">Recommended size: 1080x1920 (9:16 aspect ratio)</div>
             </div>
 
             <!-- Download Button -->
@@ -68,7 +85,7 @@
             <div class="preview-wrapper border border-4 border-white">
                 
                 <!-- THE ACTUAL WALLPAPER EXPORT DIV (1080x1920) -->
-                <div id="wallpaper-export" class="template-dark">
+                <div id="wallpaper-export" class="template-modern theme-dark">
 
                     <div id="wallpaper-bg-layer"></div>
 
@@ -122,6 +139,7 @@
         const bgLayer = document.getElementById('wallpaper-bg-layer');
         const blockInput = document.getElementById('block-input');
         const wallpaperTitle = document.querySelector('.wallpaper-title-2'); 
+        const wallpaperHeader = document.querySelector('.wallpaper-header');
         
         // Sliders
         const opacitySlider = document.getElementById('opacity-slider');         // Card opacity
@@ -138,14 +156,29 @@
             });
         }
 
-        // --- 1. THEME SWITCHING ---
-        function changeTemplate(templateName) {
-            wallpaper.classList.remove('template-dark', 'template-light');
+        function setTemplate(templateName) {
+            // Remove existing templates
+            wallpaper.classList.remove('template-sunset', 'template-vintage', 'template-modern');
+            // Add new template
             wallpaper.classList.add(templateName);
 
-            const alpha = opacitySlider ? opacitySlider.value : 0.85;
+            // Update UI buttons
+            document.querySelectorAll('.btn-template').forEach(btn => {
+                btn.classList.replace('btn-dark', 'btn-outline-dark');
+            });
+            
+            const activeBtn = document.getElementById('btn-' + templateName);
+            activeBtn.classList.replace('btn-outline-dark', 'btn-dark');
+        }
+
+        // --- 1. THEME SWITCHING ---
+        function changeCardTheme(themeName) {
+            wallpaper.classList.remove('theme-dark', 'theme-light');
+            wallpaper.classList.add(themeName);
+
+            const alpha = opacitySlider ? opacitySlider.value : 0;
             if (glassCard) {
-                if (templateName === 'template-light') {
+                if (themeName === 'theme-light') {
                     glassCard.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
                 } else {
                     glassCard.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
@@ -153,26 +186,35 @@
             }
 
             document.querySelectorAll('.theme-btn').forEach(btn => {
-                btn.classList.remove('btn-dark');
-                btn.classList.add('btn-outline-dark');
+                btn.classList.replace('btn-dark', 'btn-outline-dark');
             });
             
-            const activeBtn = document.getElementById('btn-' + templateName);
-            activeBtn.classList.remove('btn-outline-dark');
-            activeBtn.classList.add('btn-dark');
+            const activeBtn = document.getElementById('btn-' + themeName);
+            activeBtn.classList.replace('btn-outline-dark', 'btn-dark');
         }
 
         // --- 2. LIVE CARD OPACITY ADJUSTMENT ---
         if (opacitySlider && glassCard) {
-            opacitySlider.addEventListener('input', function() {
-                const alpha = this.value;
-                if (wallpaper.classList.contains('template-light')) {
-                    glassCard.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
-                } else {
-                    glassCard.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+        opacitySlider.addEventListener('input', function() {
+            const alpha = this.value;
+            const isLight = wallpaper.classList.contains('theme-light');
+            const isVintage = wallpaper.classList.contains('template-vintage');
+
+            if (isLight) {
+                // LIGHT THEME (White Base)
+                glassCard.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
+                if (isVintage && wallpaperHeader) {
+                    wallpaperHeader.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
                 }
-            });
-        }
+            } else {
+                // DARK THEME (Dark Base)
+                glassCard.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+                if (isVintage && wallpaperHeader) {
+                    wallpaperHeader.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+                }
+            }
+        });
+    }
 
         // --- 3. LIVE BACKGROUND OPACITY ADJUSTMENT ---
         if (bgOpacitySlider && bgLayer) {

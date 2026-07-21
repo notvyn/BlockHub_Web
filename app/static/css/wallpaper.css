@@ -1,37 +1,12 @@
-/* --- HEADER STYLING --- */
-.wallpaper-header {
-    margin-bottom: 17px; /* Adds space before the schedule rows */
-    width: 70%;            /* Span the entire width of the card */
-    text-align: right;      /* Push the text to the right side */
-    padding-right: 2rem;    /* Optional: Add spacing so it doesn't touch the very edge */
-}
-
-.wallpaper-title-1 {
-    font-family: var(--WindSongFont);
-    font-size: 22px;
-    /* font-weight: 800; */
-    /* letter-spacing: -2px; */
-    margin: 0;
-    padding: 0;
-}
-
-.wallpaper-title-2 {
-    font-family: var(--UncialAntiquaFont);
-    font-size: 40px;
-    /* font-weight: 500; */
-    margin: 0;
-    padding: 0;
-}
-
 /* --- THEME COLORS FOR HEADER --- */
-.template-dark .wallpaper-title-1,
-.template-dark .wallpaper-title-2 {
+.theme-dark .wallpaper-title-1,
+.theme-dark .wallpaper-title-2 {
     color: #ffffff;
     text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
 }
 
-.template-light .wallpaper-title-1,
-.template-light .wallpaper-title-2 {
+.theme-light .wallpaper-title-1,
+.theme-light .wallpaper-title-2 {
     color: #0b0f16;
     font-weight: 800;
 }
@@ -69,7 +44,6 @@
     left: 0;
     width: 1080px;
     height: 1920px;
-    background-image: url(../img/wallpaper-default-bg.jpg); 
     background-size: cover;
     background-position: center;
     z-index: 1; /* Sits at the very back */
@@ -82,13 +56,165 @@
     z-index: 2; /* Sits above the background layer */
 }
 
+.wallpaper-title-1, .wallpaper-title-2 {
+    margin: 0;
+    padding: 0;
+}
+
+.template-sunset {
+    #wallpaper-bg-layer {
+        background-image: url(../img/template-sunset.jpg); 
+    }
+
+    .wallpaper-header {
+        margin-bottom: 17px; /* Adds space before the schedule rows */
+        width: 70%;            /* Span the entire width of the card */
+        text-align: right;      /* Push the text to the right side */
+        padding-right: 2rem;    /* Optional: Add spacing so it doesn't touch the very edge */
+    }
+
+    .wallpaper-title-1 {
+        font-family: var(--WindSongFont);
+        font-size: 22px;
+        /* font-weight: 800; */
+        /* letter-spacing: -2px; */
+    }
+
+    .wallpaper-title-2 {
+        font-family: var(--UncialAntiquaFont);
+        font-size: 40px;
+        /* font-weight: 500; */
+    }
+
+    .schedule-glass-card {
+        border-radius: 20px;
+    }
+
+    /* --- TYPOGRAPHY --- */
+    .day-text {
+        font-family: "Ribeye", serif;
+    }
+
+    /* Shared styling for time and course details */
+    .time-text p, .right-panel p {
+        font-family: "Quicksand", sans-serif;
+    }
+}
+
+.template-vintage {
+    #wallpaper-bg-layer {
+        background-image: url(../img/template-vintage.jpg); 
+    }
+
+    .wallpaper-header {
+        width: 70%;
+        border-radius: 20px 20px 0 0;
+        padding: 1rem 0 1rem 2rem;
+        text-align: center;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        border-bottom: 4px solid #ffffff;
+    }
+
+    &.theme-dark{
+        .wallpaper-header {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.3), rgba(0, 0, 0, 0.3));
+        }
+    }
+
+    &.theme-light {
+        .wallpaper-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(240, 240, 245, 0.2));
+        }
+    }
+
+    .wallpaper-title-1 {
+        font-family: "Mea Culpa", cursive;
+        font-size: 40px;
+    }
+    
+    .wallpaper-title-2::before, .wallpaper-title-2::after {
+        content: " — ";
+    }
+
+    .wallpaper-title-2 {
+        font-family: "Rye", serif;
+        font-size: 60px;
+    }
+
+    .schedule-glass-card {
+        border-radius: 0 0 20px 20px;
+        border-top: none;
+    }
+
+    /* --- TYPOGRAPHY --- */
+    .day-text {
+        font-family: "Metamorphous", serif;
+        font-weight: 800;
+        font-size: 40px;
+    }
+
+    /* Shared styling for time and course details */
+    .time-text p, .right-panel p {
+        font-family: "Oldenburg", serif; 
+        font-weight: 300;
+        font-size: 20px;   
+    }
+}
+
+.template-modern {
+    #wallpaper-bg-layer {
+        background-image: url(../img/template-modern.jpg); 
+    }
+
+    .wallpaper-header {
+        width: 70%;
+        border-radius: 20px 20px 0 0;
+        padding: 1rem 0 1rem 2rem;
+        text-align: start;
+    }
+
+    .wallpaper-title-1 {
+        font-family: "Niconne", cursive;
+        font-size: 35px;
+    }
+
+    .wallpaper-title-2 {
+        font-family: "Miltonian Tattoo", serif;
+        font-size: 50px;
+    }
+
+    .schedule-glass-card {
+        border-radius: 20px;
+    }
+
+    /* LEFT SIDE: Day & Time (Holds the borders) */
+    .left-panel {
+        width: 73%;
+    }
+
+    .right-panel {
+        width: 27%;
+        padding-left: 25px;
+    }
+
+    /* --- TYPOGRAPHY --- */
+    .day-text {
+        font-family: "Young Serif", serif;
+    }
+
+    /* Shared styling for time and course details */
+    .time-text p, .right-panel p {
+        font-family: "Cormorant SC", serif;
+        font-size: 24px;
+    }
+}
+
 /* --- THE NEW GLASS CARD LAYOUT --- */
 .schedule-glass-card {
     width: 70%;
     /* max-width: 950px; */
     padding: 40px 60px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
+    /* transition: all 0.3s ease; */
     margin-bottom: 9rem;
 }
 
@@ -102,7 +228,7 @@
 /* LEFT SIDE: Day & Time (Holds the borders) */
 .left-panel {
     width: 70%;
-    padding: 40px 20px 40px 0; /* Padding for breathing room */
+    padding: 30px 20px 30px 0; /* Padding for breathing room */
     margin: 0 10px 0 0;
     display: flex;
     align-items: flex-start; /* Aligns the day text to the top */
@@ -117,7 +243,7 @@
 /* RIGHT SIDE: Course & Room (No borders) */
 .right-panel {
     width: 30%;
-    padding: 40px 40px 40px 30px;
+    padding: 30px 25px 30px 30px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -127,9 +253,8 @@
 
 /* --- TYPOGRAPHY --- */
 .day-text {
-    width: 40%;
-    font-family: 'DM Serif Display', serif;
     font-size: 50px; /* Massive HD text */
+    width: 40%;
     line-height: 0.8; /* Pulls it up to perfectly align with the time */
     text-transform: lowercase;
     text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
@@ -145,7 +270,6 @@
 /* Shared styling for time and course details */
 .time-text p, .right-panel p {
     margin: 0;
-    font-family: 'Inter', sans-serif;
     font-size: 22px; 
     font-weight: 600; 
     letter-spacing: 0.5px;
@@ -165,29 +289,127 @@
 }
 
 /* --- THEMES --- */
-.template-dark .schedule-glass-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.3), rgba(0, 0, 0, 0.6));
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-}
-.template-dark .left-panel {
-    border-right-color: #ffffff;
-    border-bottom-color: rgba(255, 255, 255, 0.3);
-}
-.template-dark .day-text, .template-dark p {
-    color: #ffffff;
+.theme-dark {
+    .wallpaper-title-1, .wallpaper-title-2 {
+        text-shadow: 0 0 20px rgb(0, 0, 0, 0.2);
+        color: #ffffff;
+    }
+    .schedule-glass-card {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.3), rgba(0, 0, 0, 0.3));
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+    .day-text, p {
+        color: #ffffff;
+    }
 }
 
-.template-light .schedule-glass-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(240, 240, 245, 0.8));
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+.left-panel {
+        border-bottom-color: rgba(255, 255, 255, 0.3);
 }
-.template-light .left-panel {
-    border-right-color: #1e293b;
-    border-bottom-color: rgba(30, 41, 59, 0.2);
+.right-panel {
+    border-left-color: #ffffff;
 }
-.template-light .day-text, .template-light p {
-    color: #1e293b;
-    text-shadow: none;
+
+
+.theme-light {
+    .wallpaper-title-1, .wallpaper-title-2 {
+        text-shadow: 0 0 20px rgb(0, 0, 0, 0.8);
+        color: #ffffff;
+    }
+    .schedule-glass-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(240, 240, 245, 0.2));
+        border: 2px solid rgba(0, 0, 0, 0.15);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+    }
+    .day-text, p {
+        color: #ffffff;
+        text-shadow: 0 0 20px rgb(0, 0, 0, 0.8);
+    }
+}
+
+.btn-dark {
+    color: var(--main-bg);
+}
+
+[data-theme='dark'] .btn-dark {
+    color: var(--text-muted);
+}
+
+.btn-outline-dark {
+    color: var(--text-dark);
+}
+
+/* Base resets */
+input[type="range"].form-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #ffffff; /* Track background color */
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+}
+
+
+/* --- THE THUMB (The draggable circle) --- */
+
+/* Chrome, Safari, Edge, Opera */
+input[type="range"].form-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-purple, #6c5ce7); /* Accent color */
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+/* Firefox */
+input[type="range"].form-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent-purple, #6c5ce7);
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+/* Hover & Active Feedback */
+input[type="range"].form-range::-webkit-slider-thumb:hover,
+input[type="range"].form-range::-moz-range-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* Container Box (Input wrapper itself) */
+input[type="file"].custom-file-upload {
+    width: 100%;
+    background-color: #12131c; /* Dark surface color */
+    color: #a0a0b0;            /* Text color for 'No file chosen' */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* --- THE BUTTON ('Choose File') --- */
+input[type="file"].custom-file-upload::file-selector-button {
+    background-color: var(--text-muted);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 600;
+    margin-right: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+/* Hover Effect for the button */
+input[type="file"].custom-file-upload::file-selector-button:hover {
+    background-color: #5a4bcf; /* Slightly darker shade on hover */
 }
