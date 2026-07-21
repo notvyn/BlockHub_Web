@@ -114,6 +114,8 @@ A centralized class management system for CS 2103.
 - Created two more templates for Wallpaper Generator
 - Refined styling of wallpaper generator
 - Fixed tools navbar
+- Fixed Feedbacks' action buttons positioning
+- Refined update profile styling and tag creation logic
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -146,3 +148,5 @@ A centralized class management system for CS 2103.
 - [/] Create two more templates for Wallpaper generator
 - [/] Fix Tools sidebar navigation and interaction
 - [ ] Fix Feedback action buttons positioning
+- [ ] Fix edit mode of CreateTagModal
+- [ ] Create a dedicated individual page for feedback entries

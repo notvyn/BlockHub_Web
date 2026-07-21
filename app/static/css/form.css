@@ -261,6 +261,101 @@ input:-webkit-autofill:active {
     }
 }
 
+.add-feedback-btn {
+    border: 1px solid var(--accent-purple); 
+    color: var(--accent-purple);
+}
+
+/* --- COMPOSITE TAG PILLS WITH ACTIONS --- */
+.custom-tag-pill {
+    border: 1px solid var(--text-muted);
+    border-radius: 50px;
+    transition: all 0.2s ease;
+    background-color: transparent;
+    overflow: hidden; /* Keeps hover effects inside the rounded borders */
+}
+
+/* Base Hover State */
+.custom-tag-pill:hover {
+    border-color: var(--text-dark);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+[data-theme="dark"] .custom-tag-pill:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* The Clickable Label */
+.tag-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0.4rem 0.5rem 0.4rem 1rem; /* Less padding on the right to hug the divider */
+}
+
+.custom-tag-pill:hover .tag-label {
+    color: var(--text-dark);
+}
+
+/* Actions Divider */
+.tag-divider {
+    width: 1px;
+    height: 16px;
+    background-color: var(--text-muted);
+    opacity: 0.3;
+    margin: 0 4px;
+    transition: background-color 0.2s ease;
+}
+
+/* Action Buttons */
+.tag-actions {
+    padding-right: 10px; /* Breathing room against the right border */
+}
+
+.tag-action-btn {
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    opacity: 0.6;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.tag-action-btn:hover {
+    opacity: 1;
+}
+.tag-action-btn.edit-btn:hover {
+    color: var(--accent-purple);
+}
+.tag-action-btn.delete-btn:hover {
+    color: #dc3545; /* Standard danger red */
+}
+
+/* --- THE MAGIC CHECKED (SELECTED) STATE --- */
+/* Changes the entire pill background when the hidden checkbox is true */
+.custom-tag-pill:has(.btn-check:checked) {
+    background-color: var(--text-muted);
+    border-color: var(--text-muted);
+}
+
+/* Invert the text and icon colors to pop against the filled background */
+.custom-tag-pill:has(.btn-check:checked) .tag-label {
+    color: var(--main-bg) !important;
+}
+
+.custom-tag-pill:has(.btn-check:checked) .tag-action-btn {
+    color: var(--main-bg);
+    opacity: 0.7;
+}
+
+.custom-tag-pill:has(.btn-check:checked) .tag-action-btn:hover {
+    opacity: 1;
+}
+
+.custom-tag-pill:has(.btn-check:checked) .tag-divider {
+    background-color: var(--main-bg);
+}
+
 
 /* --- EasyMDE Core Styling --- */
 .CodeMirror {

@@ -93,5 +93,5 @@ class ProfileForm(FlaskForm):
 
 class CreateTagForm(FlaskForm):
     tag_name = StringField('Tag Name', validators=[DataRequired()])
-    tag_category = SelectField('Category', choices=[('Technical', 'Technical'), ('Interest', 'Interest'), ('Role', 'Role')])
+    tag_category = RadioField('Category', choices=[('Technical', 'Technical'), ('Interest', 'Interest'), ('Role', 'Role')])
     submit = SubmitField('Create Tag')

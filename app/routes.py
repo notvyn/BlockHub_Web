@@ -1,6 +1,6 @@
 """(Page Manager) - This is where the magic happens. It connects the URL (e.g., /dashboard) to the right HTML page."""
 
-from flask import render_template, redirect, url_for, request, jsonify, send_from_directory, flash
+from flask import render_template, redirect, url_for, request, jsonify, send_from_directory, flash, abort
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func, and_, or_, text
 from sqlalchemy.orm import joinedload
@@ -1358,6 +1358,61 @@ def delete_link(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/delete-entry/feedback/<int:id>', methods=['POST', 'DELETE'])
+@login_required
+def delete_feedback(id):
+    # Only allow the author (or an admin) to delete it
+    feedback_to_delete = Feedback.query.get_or_404(id)
+    
+    # if current_user.id != feedback_to_delete.user_id:
+    #     return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    try:
+        db.session.delete(feedback_to_delete)
+        db.session.commit()
+
+        remaining_feedback = Feedback.query.count()
+
+        return jsonify({'success': True, 'new_total': remaining_feedback})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/tag/<int:tag_id>/edit', methods=['POST'])
+@login_required
+def edit_tag(tag_id):
+    # 1. Fetch the tag and ensure it belongs to the current user
+    tag = Tag.query.get_or_404(tag_id)
+        
+    # 2. Instantiate your WTForm to capture the incoming POST data
+    tag_form = CreateTagForm()
+    
+    # 3. Validate and Update
+    if tag_form.validate_on_submit():
+        tag.name = tag_form.tag_name.data
+        tag.category = tag_form.tag_category.data
+        
+        db.session.commit()
+        # flash('Tag updated successfully!', 'success')
+    # else:
+        # If validation fails (e.g., empty string bypasses JS), flash the first error
+        # flash('Failed to update tag. Please check your inputs.', 'danger')
+
+    # Redirect back to the settings profile page (change 'update_profile' to your actual endpoint name)
+    return redirect(url_for('update_profile'))
+
+
+@app.route('/tag/<int:tag_id>/delete', methods=['POST', 'DELETE'])
+@login_required
+def delete_tag(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+        
+    db.session.delete(tag)
+    db.session.commit()
+    
+    # Return a success JSON instead of a redirect!
+    return jsonify({'success': True})
 
 @app.route('/notifications')
 def notifications():

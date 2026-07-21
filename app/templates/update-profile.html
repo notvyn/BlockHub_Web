@@ -47,28 +47,54 @@
                         <label class="form-label fw-bold text-muted small mb-0" style="letter-spacing: 1px;">PROFILE TAGS</label>
                         
                         <!-- THE TRIGGER BUTTON -->
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createTagModal">
-                            <i class="fa-solid fa-plus"></i> New Tag
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createTagModal" data-is-add="true">
+                            <i class="fa-solid fa-plus me-1"></i> New Tag
                         </button>
                     </div>
                     
-                    <!-- The Pill Checkboxes -->
-                    <div class="d-flex flex-wrap gap-2 pill-group" id="tags-container">
+                    <!-- The Composite Pill Group -->
+                    <div class="d-flex flex-wrap gap-2" id="tags-container">
+                        {% set is_officer = current_user.role == 'Officer' %}
+
                         {% for subfield in form.tags %}
-                            <!-- This hidden input is the actual checkbox -->
-                            {{ subfield(class="btn-check") }}
-                            
-                            <!-- This label acts as the visual pill -->
-                            <!-- If you have custom CSS for 'btn-pill', you can use that instead of the btn-outline-primary classes! -->
-                            <label class="btn btn-outline-primary rounded-pill btn-sm px-3" for="{{ subfield.id }}">
-                                {{ subfield.label.text }}
-                            </label>
+                            <div class="custom-tag-pill d-flex align-items-center">
+                                <!-- 1. The hidden checkbox -->
+                                {{ subfield(class="btn-check") }}
+                                
+                                <!-- 2. The Tag Label (Clickable area for selection) -->
+                                <label class="tag-label mb-0" {% if not is_officer %}style="padding-right: 1rem;"{% endif %} for="{{ subfield.id }}">
+                                    {{ subfield.label.text }}
+                                </label>
+                                
+                                {% if is_officer %}
+                                <!-- 3. Actions Divider -->
+                                <div class="tag-divider"></div>
+                                
+                                <!-- 4. Action Buttons -->
+                                <div class="tag-actions d-flex align-items-center">
+                                    <button type="button" class="tag-action-btn edit-btn px-1" title="Edit Tag" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#createTagModal"
+                                            data-action="{{ url_for('edit_tag', tag_id=subfield.data) }}"
+                                            data-name="{{ subfield.label.text }}"
+                                            data-category="{{ subfield.data.category }}">
+                                        <i class="fa-solid fa-pencil" style="font-size: 0.75rem;"></i>
+                                    </button>
+                                    
+                                    <!-- NO MORE NESTED FORM! Triggers the JS function directly -->
+                                    <button type="button" class="tag-action-btn delete-btn px-1" title="Delete Tag"
+                                            onclick="deleteTag({{ subfield.data }}, this)">
+                                        <i class="fa-solid fa-xmark" style="font-size: 0.85rem;"></i>
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-end border-top pt-4">
-                    {{ form.submit(class="btn btn-outline-secondary") }}
+                    {{ form.submit(class="btn btn-submit fw-bold px-4") }}
                 </div>
             </form>
         </div>
@@ -76,39 +102,200 @@
 </div>
 
 <!-- ==========================================
-     FORM 2: THE CREATE TAG MODAL (Outside the main form!)
+     FORM 2: THE CREATE TAG MODAL
      ========================================== -->
 <div class="modal fade" id="createTagModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-wrapper border-0 shadow-lg">
             
-            <!-- Make sure you pass your tag_form from the route! -->
-            <form id="createTagForm" method="POST">
+            <!-- Changed ID to avoid global script hooks -->
+            <form id="exclusiveTagForm" novalidate>
                 {{ tag_form.hidden_tag() }}
                 
-                <div class="modal-header">
-                    <h5 class="modal-title">Create a New Tag</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header border-bottom-0 pt-4 px-4 pb-0">
+                    <h5 class="modal-title fw-bold" style="color: var(--text-dark);">Create a New Tag</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: var(--btn-close-filter);"></button>
                 </div>
                 
-                <div class="modal-body">
+                <div class="modal-body px-4">
+                    <!-- NEW: Inline Alert Box for "Already Exists" backend errors -->
+                    <div class="alert alert-danger d-none fw-bold small py-2" id="modalAlertBox"></div>
+
                     <div class="mb-3">
-                        {{ tag_form.tag_name.label(class="form-label") }}
+                        {{ tag_form.tag_name.label(class="form-label small fw-bold text-muted") }}
                         {{ tag_form.tag_name(class="form-control") }}
+                        <div class="invalid-feedback fw-bold mt-1" id="error-tag_name"></div>
                     </div>
-                    <div class="mb-3">
-                        {{ tag_form.tag_category.label(class="form-label") }}
-                        {{ tag_form.tag_category(class="form-select") }}
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">Category</label>
+                        <div class="d-flex flex-wrap gap-2 pill-group" id="categoryContainer">
+                            {% for subfield in tag_form.tag_category %}
+                                {{ subfield(class="btn-check course-radio") }}
+                                <label class="btn-pill" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                            {% endfor %}
+                        </div>
+                        <div class="invalid-feedback fw-bold mt-1" id="error-tag_category"></div>
                     </div>
                 </div>
                 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    {{ tag_form.submit(class="btn btn-primary") }}
+                <div class="modal-footer border-top-0 pb-4 px-4 pt-0">
+                    <button type="button" class="btn btn-outline-secondary fw-bold px-4" data-bs-dismiss="modal">Cancel</button>
+                    <!-- CRITICAL FIX: type="button" bypasses global JS alerts -->
+                    <button type="button" class="btn btn-submit fw-bold px-4" id="exclusiveSubmitBtn">Create Tag</button>
                 </div>
             </form>
             
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        // --- 1. INSTANT DELETE FUNCTION ---
+        function deleteTag(tagId, buttonElement) {
+            if (!confirm('Are you sure you want to delete this tag?')) return;
+
+            fetch(`/tag/${tagId}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    buttonElement.closest('.custom-tag-pill').remove();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() { 
+            const tagModal = document.getElementById('createTagModal');
+            const form = document.getElementById('exclusiveTagForm');
+            const submitBtn = document.getElementById('exclusiveSubmitBtn');
+            const alertBox = document.getElementById('modalAlertBox');
+
+            if (tagModal && submitBtn) {
+                // --- 2. MODAL SETUP ---
+                tagModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const isAdd = button.getAttribute('data-is-add');
+                    
+                    const title = tagModal.querySelector('.modal-title');
+                    const nameInput = form.querySelector('#tag_name');
+                    
+                    // Reset all visual errors every time the modal opens
+                    alertBox.classList.add('d-none');
+                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                    form.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
+                    form.querySelector('#categoryContainer').classList.remove('border', 'border-danger', 'p-2', 'rounded');
+
+                    if (isAdd) {
+                        title.textContent = 'Create a New Tag';
+                        submitBtn.textContent = 'Create Tag';
+                        form.setAttribute('data-target-url', '/api/create-tag'); 
+                        nameInput.value = '';
+                        form.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+                    } else {
+                        title.textContent = 'Edit Tag';
+                        submitBtn.textContent = 'Save Changes';
+                        form.setAttribute('data-target-url', button.getAttribute('data-action'));
+                        nameInput.value = button.getAttribute('data-name');
+                        
+                        const category = button.getAttribute('data-category');
+                        const targetRadio = form.querySelector(`input[value="${category}"]`);
+                        if (targetRadio) targetRadio.checked = true;
+                    }
+                });
+
+                // --- 3. THE CUSTOM CLICK HANDLER ---
+                submitBtn.addEventListener('click', function() {
+                    // Clear previous visual errors before submitting
+                    alertBox.classList.add('d-none');
+                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                    form.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
+                    const catContainer = form.querySelector('#categoryContainer');
+                    catContainer.classList.remove('border', 'border-danger', 'p-2', 'rounded');
+
+                    const formData = new FormData(form);
+                    const targetUrl = form.getAttribute('data-target-url');
+                    const isEdit = targetUrl.includes('/edit');
+
+                    // Add a quick loading state to the button
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Saving...';
+                    submitBtn.disabled = true;
+
+                    fetch(targetUrl, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+
+                        if (data.success) {
+                            if (isEdit) {
+                                // If it's an edit, reload to show changes cleanly
+                                window.location.reload(); 
+                            } else {
+                                // IF CREATING: Dynamically build the new pill WITH action buttons
+                                const container = document.getElementById('tags-container');
+                                const newPill = document.createElement('div');
+                                newPill.className = 'custom-tag-pill d-flex align-items-center';
+                                
+                                newPill.innerHTML = `
+                                    <input class="btn-check" id="tags-${data.tag.id}" name="tags" type="checkbox" value="${data.tag.id}">
+                                    <label class="tag-label mb-0" for="tags-${data.tag.id}">${data.tag.name}</label>
+                                    <div class="tag-divider"></div>
+                                    <div class="tag-actions d-flex align-items-center">
+                                        <button type="button" class="tag-action-btn edit-btn px-1" title="Edit Tag"
+                                                data-bs-toggle="modal" data-bs-target="#createTagModal"
+                                                data-action="/tag/${data.tag.id}/edit"
+                                                data-name="${data.tag.name}" data-category="${data.tag.category}">
+                                            <i class="fa-solid fa-pencil" style="font-size: 0.75rem;"></i>
+                                        </button>
+                                        <button type="button" class="tag-action-btn delete-btn px-1" title="Delete Tag"
+                                                onclick="deleteTag(${data.tag.id}, this)">
+                                            <i class="fa-solid fa-xmark" style="font-size: 0.85rem;"></i>
+                                        </button>
+                                    </div>
+                                `;
+                                
+                                container.appendChild(newPill);
+                                bootstrap.Modal.getInstance(tagModal).hide();
+                            }
+                        } else {
+                            // Catch Custom Backend Errors (e.g. "Tag already exists!")
+                            if (data.error) {
+                                alertBox.textContent = data.error;
+                                alertBox.classList.remove('d-none');
+                            }
+                            
+                            // Catch WTForms Validation Errors Inline
+                            if (data.errors) {
+                                if (data.errors.tag_name) {
+                                    form.querySelector('#tag_name').classList.add('is-invalid');
+                                    const errName = form.querySelector('#error-tag_name');
+                                    errName.textContent = data.errors.tag_name[0];
+                                    errName.style.display = 'block';
+                                }
+                                if (data.errors.tag_category) {
+                                    catContainer.classList.add('border', 'border-danger', 'p-2', 'rounded');
+                                    const errCat = form.querySelector('#error-tag_category');
+                                    errCat.textContent = data.errors.tag_category[0];
+                                    errCat.style.display = 'block';
+                                }
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Fetch Error:", err);
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
+        });
+    </script>
 {% endblock %}
