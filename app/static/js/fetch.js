@@ -667,4 +667,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    document.querySelectorAll('.btn-pin').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const announcementId = this.getAttribute('data-id');
+            const icon = this.querySelector('i');
+            
+            // Disable button while processing
+            this.disabled = true;
+
+            fetch(`/api/toggle-pin/${announcementId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.disabled = false;
+                
+                if (data.success) {
+                    // If you want the list to instantly re-sort, the cleanest 
+                    // UX is to just reload the page smoothly!
+                    window.location.reload(); 
+                    
+                    /* OR, if you just want to change the icon without reloading:
+                    if (data.is_pinned) {
+                        icon.className = 'fa-solid fa-thumbtack-slash';
+                        this.setAttribute('title', 'Unpin');
+                    } else {
+                        icon.className = 'fa-solid fa-thumbtack';
+                        this.setAttribute('title', 'Pin');
+                    }
+                    */
+                } else {
+                    alert(data.error || "Failed to pin announcement.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.disabled = false;
+            });
+        });
+    });
+
 });

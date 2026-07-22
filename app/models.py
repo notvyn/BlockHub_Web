@@ -12,6 +12,7 @@ class Announcement(db.Model):
     content = db.Column(db.Text, nullable=False)
     url = db.Column(db.Text, nullable=True)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    is_pinned = db.Column(db.Boolean, default=False, nullable=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
@@ -54,7 +55,7 @@ class ClassSummary(db.Model):
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(50), nullable=False)
+    code = db.Column(db.String(50), unique=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
     instructor = db.Column(db.String(200), nullable=False)
     instructor_email = db.Column(db.String(200), nullable=True)

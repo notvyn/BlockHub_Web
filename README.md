@@ -120,6 +120,8 @@ A centralized class management system for CS 2103.
 **July 22, 2026**
 - Created Feedback page and added view post on Feedbacks
 - Fixed edit mode of tag creation modal
+- Updated back button url 
+- Added pin feature for announcements and changed action button UI to dropdown
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -131,7 +133,7 @@ A centralized class management system for CS 2103.
 - [/] Construct Templates for entries.
 - [/] Create route for individual viewing of announcement
 - [/] Fix total deadline visual number
-- [/] Fix style and structure dedicated pages for each content (i.e. Announcement ✔️, Courses, Deadlines, Summaries)
+- [/] Fix style and structure dedicated pages for each content (i.e. Announcement ✔️, Courses✔️, Deadlines✔️, Summaries✔️)
 - [/] Create new model for Courses' schedule
 - [/] Include total number of content and other labels on each dedicated pages
 - [ ] Add small red dot on sidebar for pages with new content
@@ -147,10 +149,13 @@ A centralized class management system for CS 2103.
 - [ ] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates (Login and Signup done)
 - [ ] Create list of badges for profiles
 - [/] Create new model for each user completion of Task
-- [ ] Add is_pinned on Announcements and Links
+- [/] Add is_pinned on Announcements and Links
 - [/] Fix styling of Wallpaper Generator
 - [/] Create two more templates for Wallpaper generator
 - [/] Fix Tools sidebar navigation and interaction
 - [/] Fix Feedback action buttons positioning
 - [/] Fix edit mode of CreateTagModal
 - [/] Create a dedicated individual page for feedback entries
+- [/] Make each course unique in models
+- [ ] Fix tag seed initialization.
+- [ ] Fix date value for editing deadlines

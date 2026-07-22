@@ -7,6 +7,7 @@
 
 {% block page_title %}Announcements{% endblock %}
 {% block page_title_txt %}New Sagap Around the Corner ;P{% endblock %}
+{% block url_back %}{{ url_for('announcements')}}{% endblock %}
 
 {% block content %}
     <div id="announcement-{{ announcement.id }}" class="card-wrapper announcement-card d-flex flex-column">
@@ -25,21 +26,52 @@
                 </div>
 
                 {% if current_user.id == announcement.author.id %}
-                    <div class="d-flex gap-2">
-                        <a href="{{ url_for('update_announcement', id=announcement.id)}}" class="btn btn-icon-action" title="Edit">
-                            <i class="fa-solid fa-pencil"></i>
-                        </a>
-                        <a href="{{ url_for('delete_announcement', id=announcement.id) }}" type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-redirect="{{ url_for('announcements') }}" data-type="announcement" data-id="{{ announcement.id }}" title="Delete">
-                            <i class="fa-solid fa-trash"></i>
-                        </a>
+                    <div class="dropdown">
+                        <!-- 1. The Three Dots Trigger Button -->
+                        <button class="btn btn-icon-action px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background-color: transparent; box-shadow: none;">
+                            <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
+                        </button>
+                        
+                        <!-- 2. The Dropdown Menu -->
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px;">
+                            
+                            <!-- Pin / Unpin Action -->
+                            <li>
+                                <button type="button" class="dropdown-item py-2 btn-pin" data-id="{{ announcement.id }}">
+                                    <i class="fa-solid {{ 'fa-thumbtack-slash' if announcement.is_pinned else 'fa-thumbtack' }} me-2" style="width: 16px;"></i> 
+                                    {{ 'Unpin' if announcement.is_pinned else 'Pin' }}
+                                </button>
+                            </li>
+                            
+                            <!-- Edit Action -->
+                            <li>
+                                <a class="dropdown-item py-2" href="{{ url_for('update_announcement', id=announcement.id)}}">
+                                    <i class="fa-solid fa-pencil me-2" style="width: 16px;"></i> Edit
+                                </a>
+                            </li>
+                            
+                            <!-- Divider -->
+                            <li><hr class="dropdown-divider opacity-10"></li>
+                            
+                            <!-- Delete Action (Highlighted in Red) -->
+                            <li>
+                                <button type="button" class="dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ announcement.id }}" data-type="announcement">
+                                    <i class="fa-solid fa-trash me-2" style="width: 16px;"></i> Delete
+                                </button>
+                            </li>
+                            
+                        </ul>
                     </div>
                 {% endif %}
                 
             </div>
 
             <!-- TITLE -->
-            <div>
-                <div class="card-title">{{ announcement.title }}</div>
+            <div class="mb-2">
+                {% if announcement.is_pinned %}
+                <i class="fa-solid {{ 'fa-map-pin' if announcement.is_pinned else '' }}" style="color: var(--accent-purple) !important; font-size: 1.3rem; transform: rotate(30deg);"></i> 
+                {% endif %}
+                <div class="card-title" style="display: inline;">{{ announcement.title }}</div>
             </div>
 
             <!-- 1. Split the data using our new Python filters -->

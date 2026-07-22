@@ -8,6 +8,7 @@
 {% block page_title %}Announcements{% endblock %}
 {% block page_title_txt %}New Sagap Around the Corner ;P{% endblock %}
 
+
 {% block extra_header %}
     <div class="d-flex justify-content-end">
         <div style="color: var(--text-muted);">Total Announcements: <span id="announcement-page-total-count" style="transition: all 0.3s ease;">{{ announcements|length }}</span></div>
@@ -43,20 +44,51 @@
                 </div>
 
                 {% if current_user.id == a.author.id %}
-                    <div class="d-flex gap-2">
-                        <a href="{{ url_for('update_announcement', id=a.id)}}" class="btn btn-icon-action" title="Edit">
-                            <i class="fa-solid fa-pencil"></i>
-                        </a>
-                        <button class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" data-type="announcement">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
+                <div class="dropdown">
+                    <!-- 1. The Three Dots Trigger Button -->
+                    <button class="btn btn-icon-action px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background-color: transparent; box-shadow: none;">
+                        <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
+                    </button>
+                    
+                    <!-- 2. The Dropdown Menu -->
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px;">
+                        
+                        <!-- Pin / Unpin Action -->
+                        <li>
+                            <button type="button" class="dropdown-item py-2 btn-pin" data-id="{{ a.id }}">
+                                <i class="fa-solid {{ 'fa-thumbtack-slash' if a.is_pinned else 'fa-thumbtack' }} me-2" style="width: 16px;"></i> 
+                                {{ 'Unpin' if a.is_pinned else 'Pin' }}
+                            </button>
+                        </li>
+                        
+                        <!-- Edit Action -->
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('update_announcement', id=a.id)}}">
+                                <i class="fa-solid fa-pencil me-2" style="width: 16px;"></i> Edit
+                            </a>
+                        </li>
+                        
+                        <!-- Divider -->
+                        <li><hr class="dropdown-divider opacity-10"></li>
+                        
+                        <!-- Delete Action (Highlighted in Red) -->
+                        <li>
+                            <button type="button" class="dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" data-type="announcement">
+                                <i class="fa-solid fa-trash me-2" style="width: 16px;"></i> Delete
+                            </button>
+                        </li>
+                        
+                    </ul>
+                </div>
                 {% endif %}
                 
             </div>
 
             <!-- TITLE -->
             <div>
+                {% if a.is_pinned %}
+                <i class="fa-solid {{ 'fa-map-pin' if a.is_pinned else '' }}" style="color: var(--accent-purple) !important; font-size: 1.3rem; transform: rotate(30deg);"></i> 
+                {% endif %}
                 <a href="{{ url_for('announcement', id=a.id) }}" class="card-title">{{ a.title }}</a>
                 {% if a.id not in read_ids %}
                     <span class="badge bg-danger rounded-pill" style="font-size: 0.7rem;">NEW</span>

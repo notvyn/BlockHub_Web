@@ -104,10 +104,10 @@
                     <div class="tb-txt d-flex align-items-center gap-3">
                     {% if not is_auth %}
                         
-                        {% if has_back_btn == true %}
-                        <a href="javascript:history.back()" class="back-btn">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </a>
+                        {% if has_back_btn %}
+                            <a href="{% block url_back %}javascript:history.back(){% endblock %}" class="back-btn">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </a>
                         {% endif %}
                         
                         <div>

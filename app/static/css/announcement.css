@@ -45,3 +45,16 @@
 .heart-count {
     font-size: 0.8rem;
 }
+
+.dropdown-menu {
+    background-color: var(--main-bg);
+}
+
+.dropdown-item {
+    color: var(--text-dark);
+}
+
+.dropdown-item:hover {
+    background-color: var(--card-bg) !important;
+    color: var(--text-muted);
+}

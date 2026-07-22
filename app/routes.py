@@ -726,7 +726,10 @@ def announcement(id):
 @login_required
 def announcements():
     # 1. Fetch all announcements, newest first
-    announcements = Announcement.query.order_by(Announcement.date_posted.desc()).all()
+    announcements = Announcement.query.order_by(
+        Announcement.is_pinned.desc(), 
+        Announcement.date_posted.desc()
+    ).all()
     
     # 2. Prepare empty containers for our frontend data
     heart_counts = {}
@@ -783,6 +786,22 @@ def announcements():
                            read_ids=read_ids, # <-- Pass the list to the template
                            is_dedicated_page=True,
                            page_title="Announcement")
+
+@app.route('/api/toggle-pin/<int:id>', methods=['POST'])
+@login_required
+def toggle_pin(id):
+    announcement = Announcement.query.get_or_404(id)
+    
+    # Security: Ensure only the author can pin their own announcements
+    # if announcement.user_id != current_user.id:
+    #     return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+        
+    # Toggle the boolean value
+    announcement.is_pinned = not announcement.is_pinned
+    db.session.commit()
+    
+    # Return the new status so the frontend knows which icon to show
+    return jsonify({'success': True, 'is_pinned': announcement.is_pinned})
 
 @app.route('/update-entry/announcement/<int:id>', methods=['GET', 'POST'])
 @login_required
