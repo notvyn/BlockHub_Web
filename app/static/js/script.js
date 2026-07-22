@@ -523,63 +523,82 @@ document.addEventListener('DOMContentLoaded', function() {
 
         /* =========================================
             DYNAMIC BADGE COUNTER
-            ========================================= */
+        ========================================= */
         function updateAnnouncementBadge() {
-            const badge = document.getElementById('announcement-badge');
-            let unreadCount = 0;
+            // 1. Update the Dashboard Pill (Counts physical tags on the screen)
+            const dashBadge = document.getElementById('announcement-badge');
+            if (dashBadge) {
+                let unreadCount = 0;
+                document.querySelectorAll('.new-tag').forEach(tag => {
+                    if (tag.style.display !== 'none') unreadCount++;
+                });
+                dashBadge.textContent = unreadCount;
+                dashBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+            }
 
-            // Loop through all the "NEW" tags on the page
-            document.querySelectorAll('.new-tag').forEach(tag => {
-                // If the tag is NOT hidden, it means it's unread!
-                if (tag.style.display !== 'none') {
-                    unreadCount++;
+            // 2. Update the Global Sidebar Pill & Dot (Simply decrements the number by 1)
+            const sidebarBadge = document.getElementById('sidebar-announcement-badge');
+            if (sidebarBadge) {
+                let currentCount = parseInt(sidebarBadge.textContent) || 0;
+                let newCount = currentCount - 1;
+                
+                if (newCount > 0) {
+                    sidebarBadge.textContent = newCount;
+                } else {
+                    // If it hits 0, hide the pill AND force the red dot to disappear
+                    sidebarBadge.style.display = 'none'; 
+                    const dot = sidebarBadge.closest('.sidebar-link').querySelector('.sidebar-badge-dot');
+                    if (dot) dot.style.setProperty('display', 'none', 'important');
                 }
-            });
-
-            // Update the badge UI
-            if (unreadCount > 0) {
-                badge.textContent = unreadCount;
-                badge.style.display = 'inline-block'; // Show it
-            } else {
-                badge.style.display = 'none'; // Hide it if 0
             }
         }
 
         // 1. Run the counter immediately when the page loads
-        updateAnnouncementBadge();
+        // updateAnnouncementBadge();
 
-        // 3. The Click Event
+        // 3. The Click Event (With Navigation Pause)
         document.querySelectorAll('.announcement-link').forEach(link => {
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function(e) {
+                // 🛑 STOP the browser from navigating instantly
+                e.preventDefault(); 
+                
+                const targetUrl = this.getAttribute('href'); 
                 const announcementId = this.getAttribute('data-id');
                 const tag = document.getElementById(`tag-${announcementId}`);
                 
+                // Visually hide the 'NEW' tag instantly
                 if (tag && tag.style.display !== 'none') {
-                    // Visually hide it instantly for EVERYONE
                     tag.style.display = 'none';
 
-                    // Run the counter again to decrease the badge number instantly!
-                    updateAnnouncementBadge();
-                    
-                    if (isLoggedIn) {
-                        // LOGGED IN: Tell the Python server to save it to the database
-                        fetch(`/mark-announcement-read/${announcementId}`, {
-                            method: 'POST'
-                        }).catch(error => console.error('Database error:', error));
-                    } else {
-                        // GUEST: Save it to the browser's local memory instead
-                        let guestReadIds = JSON.parse(localStorage.getItem('guestReadAnnouncements')) || [];
-                        
-                        // Add the new ID to the list if it isn't already there
-                        if (!guestReadIds.includes(announcementId)) {
-                            guestReadIds.push(announcementId);
-                            // Save the updated list back to the browser
-                            localStorage.setItem('guestReadAnnouncements', JSON.stringify(guestReadIds));
-                        }
+                    // Run the counter again to decrease the badge number instantly
+                    if (typeof updateAnnouncementBadge === 'function') {
+                        updateAnnouncementBadge();
                     }
                 }
+
+                const container = document.getElementById('dashboard-container');
+                const isLoggedIn = container ? container.getAttribute('data-logged-in') === 'true' : true;
+
+                if (isLoggedIn) {
+                    // Send the network request, and wait for it to finish
+                    fetch(`/mark-announcement-read/${announcementId}`, {
+                        method: 'POST'
+                    })
+                    .finally(() => {
+                        // 🟢 NAVIGATE to the post ONLY after the server gets the message
+                        window.location.href = targetUrl;
+                    });
+                } else {
+                    // GUEST: Save to memory and navigate instantly
+                    let guestReadIds = JSON.parse(localStorage.getItem('guestReadAnnouncements')) || [];
+                    if (!guestReadIds.includes(announcementId)) {
+                        guestReadIds.push(announcementId);
+                        localStorage.setItem('guestReadAnnouncements', JSON.stringify(guestReadIds));
+                    }
+                    window.location.href = targetUrl; 
+                }
             });
-        });  
+        });
     });
 
     /* =========================================

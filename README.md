@@ -123,7 +123,10 @@ A centralized class management system for CS 2103.
 - Updated back button url 
 - Added pin feature for announcements and changed action button UI to dropdown
 - Fixed update_deadline date route issue
-- Fixed sidebar two layer tool navigation and badge/dot display 
+- Fixed sidebar two layer tool navigation and badge/dot display
+- Fixed announcement page mark as read issue
+- Refined Dashboard Announcement Section query (Unread vs Recently added) limited to only 3
+- Changed read by to users' profile image 
 
 
 ## TO-DO LIST
@@ -139,17 +142,17 @@ A centralized class management system for CS 2103.
 - [/] Fix style and structure dedicated pages for each content (i.e. Announcement ✔️, Courses✔️, Deadlines✔️, Summaries✔️)
 - [/] Create new model for Courses' schedule
 - [/] Include total number of content and other labels on each dedicated pages
-- [ ] Add small red dot on sidebar for pages with new content
-- [ ] Fix Recent Announcements Total Count and refine Query (Dashboard) 
+- [/] Add small red dot on sidebar for pages with new content
+- [/] Fix Recent Announcements Total Count and refine Query (Dashboard) 
 - [/] Have a live update on the total content count for each action on a page
 - [ ] Fix mobile sidebar screen UI issue 
 - [/] Fix Total Units live update count
 - [/] Have conditional text for no entry pages (Summaries and Deadlines already done, added archives, links, announcements, courses)
 - [/] Add Room to the Master Schedule and Model
 - [/] Fix total count badge of deadline on dashboard
-- [ ] Refine logic of Announcement query on dashboard
+- [/] Refine logic of Announcement query on dashboard
 - [ ] Refine styling of dashboard
-- [ ] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates (Login and Signup done)
+- [/] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates (Login and Signup done)
 - [ ] Create list of badges for profiles
 - [/] Create new model for each user completion of Task
 - [/] Add is_pinned on Announcements and Links
@@ -162,4 +165,8 @@ A centralized class management system for CS 2103.
 - [/] Make each course unique in models
 - [ ] Fix tag seed initialization.
 - [/] Fix date value for editing deadlines
-- [ ] Fix announcements page mark as read issue 
+- [/] Fix announcements page mark as read issue 
+
+FUTURE VISION
+- [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)
+- [ ] Maybe add a grading computation for Course (possibly creation of a dedicated page for each course)

@@ -46,7 +46,7 @@
     font-size: 0.8rem;
 }
 
-.dropdown-menu {
+/* .dropdown-menu {
     background-color: var(--main-bg);
 }
 
@@ -54,7 +54,7 @@
     color: var(--text-dark);
 }
 
-.dropdown-item:hover {
+.dropdown-menu .dropdown-item:hover {
     background-color: var(--card-bg) !important;
     color: var(--text-muted);
-}
+} */

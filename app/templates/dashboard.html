@@ -27,7 +27,7 @@
                 <div class="md-section">
                     <div class="md-h2-container d-flex justify-content-between">
                         <a href="{{ url_for('deadlines') }}" class="md-title d-flex align-items-center gap-2">
-                            <div class="md-h2 mb-0">Upcoming Deadlines</div>
+                            <div class="md-h2 mb-0">Pending Deadlines</div>
                             {% set badge_display = 'inline-block' if deadlines else 'none' %}
                             <span id="deadline-badge" class="badge bg-danger rounded-pill" style="display: {{ badge_display }};">{{ deadlines|length }}</span>
                             <i class="fa-solid fa-chevron-right text-muted"></i>

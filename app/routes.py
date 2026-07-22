@@ -60,13 +60,55 @@ def save_subscription():
 
     return jsonify({'status': 'success', 'message': 'Subscription saved!'}), 200
 
+# 1. Deals only with global forms
 @app.context_processor
 def inject_global_forms():
-    """
-    This makes the LinkForm available to every single HTML template automatically,
-    so our global modal.html never crashes.
-    """
+    """Makes LinkForm available everywhere for the global modal."""
     return dict(link_form=LinkForm())
+
+# 2. Deals only with dynamic user data
+@app.context_processor
+def inject_global_badges():
+    """Calculates notification badges for the sidebar."""
+    badges = {}
+    
+    if current_user.is_authenticated:
+        now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+        ph_time = now_utc + timedelta(hours=8)
+        
+        # --- DEADLINES BADGE ---
+        cutoff = ph_time - timedelta(days=1)
+        completed = [c.deadline_id for c in DeadlineCompletion.query.filter_by(user_id=current_user.id).all()]
+        
+        active_query = Deadline.query.filter(Deadline.due_date >= cutoff)
+        if completed:
+            active_query = active_query.filter(Deadline.id.notin_(completed))
+            
+        badges['deadlines'] = active_query.count()
+
+        # 1. Get the list of IDs the user has already read
+        read_records = AnnouncementRead.query.filter_by(user_id=current_user.id).all()
+        read_ids = [record.announcement_id for record in read_records]
+
+        # 2. Count the announcements that are NOT in that list
+        if read_ids:
+            unread_count = Announcement.query.filter(Announcement.id.notin_(read_ids)).count()
+        else:
+            # If they haven't read anything, then EVERY announcement is unread!
+            unread_count = Announcement.query.count()
+
+        badges['announcements'] = unread_count
+        
+        # --- SUMMARIES BADGE (With Fallback for Existing Users) ---
+        # Defaults to datetime.min if the database returns None
+        last_summaries = current_user.last_viewed_summaries or datetime.min
+        badges['summaries'] = ClassSummary.query.filter(ClassSummary.date_added > last_summaries).count()
+        
+        # --- LINKS BADGE (With Fallback for Existing Users) ---
+        last_links = current_user.last_viewed_links or datetime.min
+        badges['links'] = Link.query.filter(Link.date_added > last_links).count()
+
+    return dict(badges=badges)
 
 @app.route('/api/search')
 # @login_required # Keeps search data private to logged-in users
@@ -283,29 +325,34 @@ def dashboard():
         read_records = AnnouncementRead.query.filter_by(user_id=current_user.id).all()
         read_announcement_ids = [record.announcement_id for record in read_records]
 
-        # Fetch ALL unread announcements for this user
-        unread_announcements = Announcement.query.filter(
-            ~Announcement.id.in_(read_announcement_ids)
-        ).all()
+        # 1. Fetch up to 3 UNREAD announcements (Newest first)
+        if read_announcement_ids:
+            unread_announcements = Announcement.query.filter(
+                ~Announcement.id.in_(read_announcement_ids)
+            ).order_by(Announcement.date_posted.desc()).limit(3).all()
+        else:
+            # If the user hasn't read anything yet, everything is unread
+            unread_announcements = Announcement.query.order_by(Announcement.date_posted.desc()).limit(3).all()
 
-        # Fetch the absolute latest 3 announcements (for dashboard context)
-        latest_announcements = Announcement.query.order_by(
-            Announcement.date_posted.desc()
-        ).limit(3).all()
+        final_announcements = unread_announcements
 
-        # Merge them using a dictionary to automatically remove duplicates
-        merged_dict = {a.id: a for a in unread_announcements}
-        for a in latest_announcements:
-            if a.id not in merged_dict:
-                merged_dict[a.id] = a
+        # 2. If there are less than 3 unread, fill the gap with the newest READ announcements
+        if len(final_announcements) < 3 and read_announcement_ids:
+            gap = 3 - len(final_announcements)
+            read_announcements = Announcement.query.filter(
+                Announcement.id.in_(read_announcement_ids)
+            ).order_by(Announcement.date_posted.desc()).limit(gap).all()
+            
+            final_announcements.extend(read_announcements)
 
-        # Sort the final merged list by date (newest at the top)
-        final_announcements = sorted(merged_dict.values(), key=lambda x: x.date_posted, reverse=True)
+        # 3. Sort the final combined list of 3 chronologically 
+        final_announcements.sort(key=lambda x: x.date_posted, reverse=True)
+        
     else:
         user = None
         # Fallback for logged-out users
         final_announcements = Announcement.query.order_by(Announcement.date_posted.desc()).limit(3).all()
-
+    
     # announcement = Announcement.query.order_by(Announcement.date_posted.desc()).limit(3).all()
 
     # # THE FIX: Only check read receipts if they are actually logged in
@@ -668,34 +715,45 @@ def update_link(id):
 def announcement(id):
     announcement = Announcement.query.get_or_404(id)
     
+    # --- NEW: BACKEND READ RECEIPT SAFETY NET ---
+    # Automatically mark as read if they view the dedicated page
+    if current_user.is_authenticated:
+        existing_receipt = AnnouncementRead.query.filter_by(
+            user_id=current_user.id, 
+            announcement_id=id
+        ).first()
+        
+        if not existing_receipt:
+            receipt = AnnouncementRead(user_id=current_user.id, announcement_id=id)
+            db.session.add(receipt)
+            db.session.commit()
+    # ---------------------------------------------
+    
     read_stats = {}
     
     # --- Heart Logic ---
     heart_counts = AnnouncementHeart.query.filter_by(announcement_id=id).count()
         
-    # --- Read Receipt Logic (For the "Read by X" footer) ---
-    read_count = AnnouncementRead.query.filter_by(announcement_id=id).count()
-        
-    if read_count > 0:
-        first_read = AnnouncementRead.query.filter_by(announcement_id=id).first()
-        first_user = User.query.get(first_read.user_id)
+    # --- Read Receipt Logic (Excluding current_user) ---
+    read_records = AnnouncementRead.query.filter_by(announcement_id=id).all()
+    readers = []
+    seen_user_ids = set()
+    
+    for record in read_records:
+        # Skip the current user so they don't see themselves in the read list
+        if current_user.is_authenticated and record.user_id == current_user.id:
+            continue
             
-        # Format the name
-        name_parts = first_user.name.split()
-        if len(name_parts) > 1:
-            display_name = f"{name_parts[0]} {name_parts[-1][0]}."
-        else:
-            display_name = first_user.name
-                
-        read_stats[id] = {
-            'count': read_count,
-            'first_reader': display_name
-        }
-    else:
-        read_stats[id] = {
-            'count': 0,
-            'first_reader': None
-        }
+        if record.user_id not in seen_user_ids:
+            reader_user = User.query.get(record.user_id)
+            if reader_user:
+                readers.append(reader_user)
+                seen_user_ids.add(record.user_id)
+            
+    read_stats[id] = {
+        'count': len(read_records), # Keeps the true global total count (e.g. "Seen by 5")
+        'readers': readers          # But only shows other people's avatars in the facepile
+    }
 
     # 4. Fetch the CURRENT USER'S specific interactions
     # FIX: Define this variable outside the if-statement so logged-out users don't crash the page!
@@ -743,29 +801,26 @@ def announcements():
         count = AnnouncementHeart.query.filter_by(announcement_id=a.id).count()
         heart_counts[a.id] = count
         
-        # --- Read Receipt Logic (For the "Read by X" footer) ---
-        read_count = AnnouncementRead.query.filter_by(announcement_id=a.id).count()
+        # --- Read Receipt Logic (Excluding current_user) ---
+        read_records = AnnouncementRead.query.filter_by(announcement_id=a.id).all()
+        readers = []
+        seen_user_ids = set()
         
-        if read_count > 0:
-            first_read = AnnouncementRead.query.filter_by(announcement_id=a.id).first()
-            first_user = User.query.get(first_read.user_id)
-            
-            # Format the name
-            name_parts = first_user.name.split()
-            if len(name_parts) > 1:
-                display_name = f"{name_parts[0]} {name_parts[-1][0]}."
-            else:
-                display_name = first_user.name
+        for record in read_records:
+            # Skip the current user here as well
+            if current_user.is_authenticated and record.user_id == current_user.id:
+                continue
                 
-            read_stats[a.id] = {
-                'count': read_count,
-                'first_reader': display_name
-            }
-        else:
-            read_stats[a.id] = {
-                'count': 0,
-                'first_reader': None
-            }
+            if record.user_id not in seen_user_ids:
+                reader_user = User.query.get(record.user_id)
+                if reader_user:
+                    readers.append(reader_user)
+                    seen_user_ids.add(record.user_id)
+                
+        read_stats[a.id] = {
+            'count': len(read_records),
+            'readers': readers
+        }
 
     # 4. Fetch the CURRENT USER'S specific interactions
     if current_user.is_authenticated:
@@ -877,6 +932,8 @@ def deadlines():
         
     active_deadlines = active_query.order_by(Deadline.due_date.asc()).all()
 
+    total_deadlines = Deadline.query.count()
+
     # --- NEW: Give the date a clock (11:59 PM) so Jinja can do exact hour math ---
     for d in active_deadlines:
         if type(d.due_date) is date:
@@ -885,7 +942,7 @@ def deadlines():
             d.due_datetime = d.due_date
 
     # today = date.today()
-    return render_template('deadlines.html', deadlines=active_deadlines, completed_ids=completed_ids, today=ph_time, is_dedicated_page=True, page_title="Deadline")
+    return render_template('deadlines.html', deadlines=active_deadlines, completed_ids=completed_ids, total_deadlines=total_deadlines, today=ph_time, is_dedicated_page=True, page_title="Deadline")
 
 @app.route('/deadlines/archive')
 def deadlines_archive():
@@ -943,10 +1000,10 @@ def update_deadline(id):
         form.course.data = deadline_to_update.course_id
         form.description.data = deadline_to_update.description
         form.category.data = deadline_to_update.category
-        deadline_to_update.date_given = form.date_given.data
-        deadline_to_update.due_date = form.due_date.data
-        deadline_to_update.status = form.status.data
-        deadline_to_update.note = form.note.data
+        form.date_given.data = deadline_to_update.date_given  
+        form.due_date.data = deadline_to_update.due_date 
+        form.status.data = deadline_to_update.status 
+        form.note.data = deadline_to_update.note 
     else:
         # If it's a POST but validate_on_submit() failed, print the exact errors to the terminal!
         print("FORM VALIDATION FAILED:", form.errors)
@@ -1226,6 +1283,9 @@ def summaries():
     prev_year, prev_week, _ = prev_monday.isocalendar()
     next_year, next_week, _ = next_monday.isocalendar()
 
+    current_user.last_viewed_summaries = datetime.now(timezone.utc)
+    db.session.commit()
+
     return render_template('summaries.html', 
                            grouped_summaries=grouped_summaries, 
                            total_count=total_count,
@@ -1291,6 +1351,9 @@ def add_summary():
         return redirect(url_for('summaries'))
     else:
         print(form.errors)
+
+    current_user.last_viewed_courses = datetime.now(timezone.utc)
+    db.session.commit()
     
     return render_template('add-summary.html', form=form, has_back_btn=True, is_entry=True)
 
@@ -1355,6 +1418,9 @@ def get_schedules(course_id):
 @login_required
 def links():
     links = Link.query.all()
+
+    current_user.last_viewed_links = datetime.now(timezone.utc)
+    db.session.commit()
 
     return render_template('links.html', links=links, is_dedicated_page=True)
 

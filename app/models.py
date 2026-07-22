@@ -27,6 +27,9 @@ class AnnouncementRead(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     announcement_id = db.Column(db.Integer, db.ForeignKey('announcement.id'), nullable=False)
 
+    # Enforce uniqueness at the database level
+    __table_args__ = (db.UniqueConstraint('user_id', 'announcement_id', name='unique_user_announcement_read'),)
+
 class AnnouncementHeart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # The user who clicked the heart
@@ -149,6 +152,11 @@ class User(db.Model, UserMixin):
     announcement_hearts = db.relationship('AnnouncementHeart', backref='user', lazy=True, cascade="all, delete-orphan")
     deadline_completions = db.relationship('DeadlineCompletion', backref='user', lazy=True, cascade="all, delete-orphan")
     push_subscriptions = db.relationship('PushSubscription', backref='user', lazy=True, cascade="all, delete-orphan")
+
+    # NEW: Watermark timestamps for page-level tracking
+    last_viewed_summaries = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    last_viewed_links = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    last_viewed_courses = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # --- NEW HELPER METHODS --- 
     def set_password(self, password):

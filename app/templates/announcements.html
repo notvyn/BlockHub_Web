@@ -34,9 +34,7 @@
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div class="auth-wrapper">
                     <!-- Placeholder for an avatar, optional but looks great in feeds -->
-                    <div class="author-avatar rounded-circle">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
+                    <img src="{{ a.author.profile_image }}" class="rounded-circle" style="width: 50px; height: 50px; border: 3px solid var(--accent-purple);">
                     <div class="auth-txt">
                         <div class="auth-name">{{ a.author.name }}</div>
                         <div class="auth-posted">{{ a.date_posted.strftime("%A - %b %d, %Y | %I:%M %p") }}</div>
@@ -46,7 +44,7 @@
                 {% if current_user.id == a.author.id %}
                 <div class="dropdown">
                     <!-- 1. The Three Dots Trigger Button -->
-                    <button class="btn btn-icon-action px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background-color: transparent; box-shadow: none;">
+                    <button class="btn btn-icon-action px-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="">
                         <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
                     </button>
                     
@@ -55,7 +53,7 @@
                         
                         <!-- Pin / Unpin Action -->
                         <li>
-                            <button type="button" class="dropdown-item py-2 btn-pin" data-id="{{ a.id }}">
+                            <button type="button" class="dropdown-item md-dropdown-item py-2 btn-pin" data-id="{{ a.id }}">
                                 <i class="fa-solid {{ 'fa-thumbtack-slash' if a.is_pinned else 'fa-thumbtack' }} me-2" style="width: 16px;"></i> 
                                 {{ 'Unpin' if a.is_pinned else 'Pin' }}
                             </button>
@@ -63,7 +61,7 @@
                         
                         <!-- Edit Action -->
                         <li>
-                            <a class="dropdown-item py-2" href="{{ url_for('update_announcement', id=a.id)}}">
+                            <a class="dropdown-item md-dropdown-item py-2" href="{{ url_for('update_announcement', id=a.id)}}">
                                 <i class="fa-solid fa-pencil me-2" style="width: 16px;"></i> Edit
                             </a>
                         </li>
@@ -73,7 +71,7 @@
                         
                         <!-- Delete Action (Highlighted in Red) -->
                         <li>
-                            <button type="button" class="dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" data-type="announcement">
+                            <button type="button" class="dropdown-item md-dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" data-type="announcement">
                                 <i class="fa-solid fa-trash me-2" style="width: 16px;"></i> Delete
                             </button>
                         </li>
@@ -87,11 +85,13 @@
             <!-- TITLE -->
             <div>
                 {% if a.is_pinned %}
-                <i class="fa-solid {{ 'fa-map-pin' if a.is_pinned else '' }}" style="color: var(--accent-purple) !important; font-size: 1.3rem; transform: rotate(30deg);"></i> 
+                <i class="fa-solid {{ 'fa-map-pin' if a.is_pinned else '' }}" style="color: var(--accent-red) !important; font-size: 1.3rem; transform: rotate(30deg);"></i> 
                 {% endif %}
-                <a href="{{ url_for('announcement', id=a.id) }}" class="card-title">{{ a.title }}</a>
+                <a href="{{ url_for('announcement', id=a.id) }}" class="card-title announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
+                
                 {% if a.id not in read_ids %}
-                    <span class="badge bg-danger rounded-pill" style="font-size: 0.7rem;">NEW</span>
+                    <!-- Added the id and the new-tag class here! -->
+                    <span id="tag-{{ a.id }}" class="badge bg-danger rounded-pill new-tag" style="font-size: 0.7rem;">NEW</span>
                 {% endif %}
             </div>
 
@@ -155,25 +155,41 @@
             <!-- FOOTER: Read Receipts & Reactions -->
             <div class="card-footer">
                 
-                <!-- Read By List (UI Mockup) -->
-                <div class="read-receipts">
-                    <i class="fa-solid fa-eye me-1"></i> 
+                <!-- Read By List (Avatar Facepile) -->
+                <div class="read-receipts d-flex align-items-center">
+                    <i class="fa-solid fa-eye me-2 text-muted"></i> 
                     
-                    <!-- Grab the specific stats for this announcement -->
                     {% set stats = read_stats[a.id] %}
                     
                     <!-- Scenario 1: Nobody has read it -->
                     {% if stats.count == 0 %}
-                        Not read yet
+                        <span class="text-muted" style="font-size: 0.85rem;">Not read yet</span>
                         
-                    <!-- Scenario 2: Exactly one person read it -->
-                    {% elif stats.count == 1 %}
-                        Read by <strong>{{ stats.first_reader }}</strong>
-                        
-                    <!-- Scenario 3: Multiple people read it -->
+                    <!-- Scenario 2: People have read it -->
                     {% else %}
-                        <!-- We subtract 1 from the total count because the first reader is already named! -->
-                        Read by <strong>{{ stats.first_reader }}</strong> and <strong>{{ stats.count - 1 }} others</strong>
+                        <div class="d-flex align-items-center">
+                            <!-- Loop through only the first 5 readers -->
+                            {% for reader in stats.readers[:5] %}
+                                <img src="{{ reader.profile_image }}" 
+                                     alt="{{ reader.name }}" 
+                                     title="{{ reader.name }}" 
+                                     class="rounded-circle border border-2 border-white"
+                                     style="width: 28px; height: 28px; object-fit: cover; position: relative; margin-left: {{ '-10px' if not loop.first else '0' }}; z-index: {{ 10 - loop.index0 }};">
+                            {% endfor %}
+                            
+                            <!-- If there are more than 5 readers, show a +X bubble -->
+                            {% if stats.count > 5 %}
+                                <div class="rounded-circle border border-2 border-white bg-secondary text-white d-flex justify-content-center align-items-center" 
+                                     style="width: 28px; height: 28px; position: relative; margin-left: -10px; z-index: 1; font-size: 0.7rem; font-weight: bold;">
+                                    +{{ stats.count - 5 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Simple total count to the right -->
+                        <span class="ms-2 text-muted" style="font-size: 0.8rem; font-weight: 500;">
+                            Seen by {{ stats.count }}
+                        </span>
                     {% endif %}
                 </div>
 
@@ -195,7 +211,7 @@
                         
                     </button>
                     
-                    <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-view-post">View Post</a>
+                    <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-view-post announcement-link" data-id="{{ a.id }}">View Post</a>
                 </div>
             </div>
 
