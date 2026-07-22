@@ -20,7 +20,7 @@
                 {{ form.hidden_tag() }}
 
                 <div class="mb-3">
-                    {{ render_field(form.email, placeholder="Enter your email", icon='fa-envelope')}}
+                    {{ render_field(form.email, placeholder="Enter your email", icon='fa-envelope', id='loginEmail')}}
                 </div>
                 
                 <div class="mb-4">
@@ -31,7 +31,7 @@
                             <i class="fa-solid fa-lock"></i>
                         </label>
                         
-                        {{ form.password(class="form-control", placeholder="Enter your email") }}
+                        {{ form.password(id="loginPassword", class="form-control", placeholder="Enter your email") }}
 
                         <button type="button" class="input-group-text eye-toggle">
                             <i class="fa-solid fa-eye-slash"></i>
@@ -58,7 +58,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
     });
 </script>
 {% endblock %}

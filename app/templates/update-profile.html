@@ -47,10 +47,14 @@
                         <label class="form-label fw-bold text-muted small mb-0" style="letter-spacing: 1px;">PROFILE TAGS</label>
                         
                         <!-- THE TRIGGER BUTTON -->
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createTagModal" data-is-add="true">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createTagModal" data-is-add="true">
                             <i class="fa-solid fa-plus me-1"></i> New Tag
                         </button>
                     </div>
+
+                    {% if tag_count < 1 %}
+                        <div class="small">No available tags yet.</div>
+                    {% endif %}
                     
                     <!-- The Composite Pill Group -->
                     <div class="d-flex flex-wrap gap-2" id="tags-container">
@@ -72,15 +76,18 @@
                                 
                                 <!-- 4. Action Buttons -->
                                 <div class="tag-actions d-flex align-items-center">
+                                    <!-- 1. Use Jinja to find the matching Tag object based on the integer ID -->
+                                    {% set tag_obj = all_tags | selectattr("id", "equalto", subfield.data | int) | first %}
+
                                     <button type="button" class="tag-action-btn edit-btn px-1" title="Edit Tag" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#createTagModal"
                                             data-action="{{ url_for('edit_tag', tag_id=subfield.data) }}"
                                             data-name="{{ subfield.label.text }}"
-                                            data-category="{{ subfield.data.category }}">
+                                            data-category="{{ tag_obj.category if tag_obj else '' }}"> <!-- 2. Safely extract the category -->
                                         <i class="fa-solid fa-pencil" style="font-size: 0.75rem;"></i>
                                     </button>
-                                    
+                                                                        
                                     <!-- NO MORE NESTED FORM! Triggers the JS function directly -->
                                     <button type="button" class="tag-action-btn delete-btn px-1" title="Delete Tag"
                                             onclick="deleteTag({{ subfield.data }}, this)">
@@ -114,7 +121,7 @@
                 
                 <div class="modal-header border-bottom-0 pt-4 px-4 pb-0">
                     <h5 class="modal-title fw-bold" style="color: var(--text-dark);">Create a New Tag</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: var(--btn-close-filter);"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: var(--text-muted);"></button>
                 </div>
                 
                 <div class="modal-body px-4">
@@ -202,7 +209,9 @@
                         nameInput.value = button.getAttribute('data-name');
                         
                         const category = button.getAttribute('data-category');
+                        // console.log(category);
                         const targetRadio = form.querySelector(`input[value="${category}"]`);
+                        console.log(targetRadio);
                         if (targetRadio) targetRadio.checked = true;
                     }
                 });
@@ -245,7 +254,7 @@
                                 newPill.className = 'custom-tag-pill d-flex align-items-center';
                                 
                                 newPill.innerHTML = `
-                                    <input class="btn-check" id="tags-${data.tag.id}" name="tags" type="checkbox" value="${data.tag.id}">
+                                    <input class="btn-check" id="tags-${data.tag.id}" name="tags" type="checkbox" value="${data.tag.name}">
                                     <label class="tag-label mb-0" for="tags-${data.tag.id}">${data.tag.name}</label>
                                     <div class="tag-divider"></div>
                                     <div class="tag-actions d-flex align-items-center">
@@ -264,6 +273,7 @@
                                 
                                 container.appendChild(newPill);
                                 bootstrap.Modal.getInstance(tagModal).hide();
+                                window.location.reload(); 
                             }
                         } else {
                             // Catch Custom Backend Errors (e.g. "Tag already exists!")

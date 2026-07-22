@@ -1382,25 +1382,18 @@ def delete_feedback(id):
 @app.route('/tag/<int:tag_id>/edit', methods=['POST'])
 @login_required
 def edit_tag(tag_id):
-    # 1. Fetch the tag and ensure it belongs to the current user
     tag = Tag.query.get_or_404(tag_id)
-        
-    # 2. Instantiate your WTForm to capture the incoming POST data
     tag_form = CreateTagForm()
     
-    # 3. Validate and Update
     if tag_form.validate_on_submit():
         tag.name = tag_form.tag_name.data
         tag.category = tag_form.tag_category.data
-        
         db.session.commit()
-        # flash('Tag updated successfully!', 'success')
-    # else:
-        # If validation fails (e.g., empty string bypasses JS), flash the first error
-        # flash('Failed to update tag. Please check your inputs.', 'danger')
-
-    # Redirect back to the settings profile page (change 'update_profile' to your actual endpoint name)
-    return redirect(url_for('update_profile'))
+        # FIX: Return a JSON success instead of a redirect
+        return jsonify({'success': True})
+        
+    # FIX: Return JSON errors if validation fails
+    return jsonify({'success': False, 'errors': tag_form.errors})
 
 
 @app.route('/tag/<int:tag_id>/delete', methods=['POST', 'DELETE'])
@@ -1587,9 +1580,14 @@ def update_profile():
     form = ProfileForm()
     tag_form = CreateTagForm()
 
-    # 1. DYNAMICALLY LOAD CHOICES
+    tag_count = Tag.query.count()
+
+    # 1. Fetch all tags and store them in a variable
+    all_tags = Tag.query.all()
+    
+    # 2. Use that variable for your choices
     # This fetches all tags and formats them as (id, name) for WTForms
-    form.tags.choices = [(tag.id, tag.name) for tag in Tag.query.all()]
+    form.tags.choices = [(tag.id, tag.name) for tag in all_tags]
 
     if form.validate_on_submit():
         # 1. Update the text fields
@@ -1630,7 +1628,7 @@ def update_profile():
     else:
         print("FORM VALIDATION FAILED:", form.errors)
 
-    return render_template('update-profile.html', form=form, tag_form=tag_form, page_title="Profile", has_back_btn=True)
+    return render_template('update-profile.html', form=form, tag_form=tag_form, all_tags=all_tags, tag_count=tag_count, page_title="Profile", has_back_btn=True)
 
 @app.route('/api/settings/update-email', methods=['POST'])
 @login_required
