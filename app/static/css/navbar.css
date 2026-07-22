@@ -126,24 +126,33 @@ a.sidebar-link {
 }
 
 /* 2. BADGE VISIBILITY LOGIC */
-/* Hide the number badge when collapsed */
+/* The Number Pill is visible by default, but hidden when collapsed */
 #sidebar:not(.expand) .sidebar-badge-num {
     display: none !important;
 }
 
-/* Hide the red dot when expanded */
-#sidebar.expand .sidebar-badge-dot {
-    display: none !important;
-}
-
-/* Precisely position the red dot over the top-right of the icon */
+/* 🛑 THE FIX: Make the red dot hidden by default! */
 .sidebar-badge-dot {
+    display: none !important;
     position: absolute;
     top: 10px;
     left: 38px;
     width: 10px;
     height: 10px;
-    border: 2px solid var(--sidebar-bg); /* Creates a cutout effect against the icon */
+    border: 2px solid var(--sidebar-bg);
+}
+
+/* --- NEW: Anti-Flash Animation --- */
+@keyframes preventFlash {
+    0% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Only show the red dot when the sidebar is collapsed, but delay it by 0.15s */
+#sidebar:not(.expand) .sidebar-badge-dot {
+    display: block !important; 
+    animation: preventFlash 0.15s forwards;
 }
 
 /* 3. FIX THE COLLAPSED 2-LAYER NAVBAR */

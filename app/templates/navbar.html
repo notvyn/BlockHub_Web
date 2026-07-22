@@ -20,33 +20,34 @@
                 <span>Blockmates</span>
             </a>
         </li>
+        <!-- ANNOUNCEMENTS SIDEBAR ITEM -->
         <li class="sidebar-item">
             <a href="{{ url_for('announcements') }}" class="sidebar-link">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Announcements</span>
 
-                <!-- Conditional Jinja to check the global 'badges' dict you made -->
                 {% if badges and badges.get('announcements', 0) > 0 %}
-                    <!-- 1. The Tiny Dot (Visible when collapsed) -->
+                    <!-- Cleaned up the inline style here -->
                     <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
-                    <!-- 2. The Number Pill (Visible when expanded) -->
-                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="deadline-badge">
+                    
+                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="sidebar-announcement-badge">
                         {{ badges.announcements }}
                     </span>
                 {% endif %}
             </a>
         </li>
+        
+        <!-- DEADLINES SIDEBAR ITEM -->
         <li class="sidebar-item">
             <a href="{{ url_for('deadlines') }}" class="sidebar-link">
                 <i class="fa-solid fa-alarm-clock"></i>
                 <span>Deadlines</span>
                 
-                <!-- Conditional Jinja to check the global 'badges' dict you made -->
                 {% if badges and badges.get('deadlines', 0) > 0 %}
-                    <!-- 1. The Tiny Dot (Visible when collapsed) -->
+                    <!-- Cleaned up the inline style here -->
                     <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
-                    <!-- 2. The Number Pill (Visible when expanded) -->
-                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="deadline-badge">
+                    
+                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="sidebar-deadline-badge">
                         {{ badges.deadlines }}
                     </span>
                 {% endif %}
