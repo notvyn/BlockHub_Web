@@ -122,6 +122,9 @@ A centralized class management system for CS 2103.
 - Fixed edit mode of tag creation modal
 - Updated back button url 
 - Added pin feature for announcements and changed action button UI to dropdown
+- Fixed update_deadline date route issue
+- Fixed sidebar two layer tool navigation and badge/dot display 
+
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -158,4 +161,5 @@ A centralized class management system for CS 2103.
 - [/] Create a dedicated individual page for feedback entries
 - [/] Make each course unique in models
 - [ ] Fix tag seed initialization.
-- [ ] Fix date value for editing deadlines
+- [/] Fix date value for editing deadlines
+- [ ] Fix announcements page mark as read issue 

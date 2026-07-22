@@ -24,12 +24,32 @@
             <a href="{{ url_for('announcements') }}" class="sidebar-link">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Announcements</span>
+
+                <!-- Conditional Jinja to check the global 'badges' dict you made -->
+                {% if badges and badges.get('announcements', 0) > 0 %}
+                    <!-- 1. The Tiny Dot (Visible when collapsed) -->
+                    <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
+                    <!-- 2. The Number Pill (Visible when expanded) -->
+                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="deadline-badge">
+                        {{ badges.announcements }}
+                    </span>
+                {% endif %}
             </a>
         </li>
         <li class="sidebar-item">
             <a href="{{ url_for('deadlines') }}" class="sidebar-link">
                 <i class="fa-solid fa-alarm-clock"></i>
                 <span>Deadlines</span>
+                
+                <!-- Conditional Jinja to check the global 'badges' dict you made -->
+                {% if badges and badges.get('deadlines', 0) > 0 %}
+                    <!-- 1. The Tiny Dot (Visible when collapsed) -->
+                    <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
+                    <!-- 2. The Number Pill (Visible when expanded) -->
+                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="deadline-badge">
+                        {{ badges.deadlines }}
+                    </span>
+                {% endif %}
             </a>
         </li>
         <li class="sidebar-item">
@@ -42,12 +62,26 @@
             <a href="{{ url_for('summaries') }}" class="sidebar-link">
                 <i class="fa-solid fa-chalkboard-user"></i>
                 <span>Class Summaries</span>
+                
+                {% if badges and badges.get('summaries', 0) > 0 %}
+                    <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
+                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num">
+                        {{ badges.summaries }}
+                    </span>
+                {% endif %}
             </a>
         </li>
         <li class="sidebar-item">
             <a href="{{ url_for('links') }}" class="sidebar-link">
                 <i class="fa-solid fa-link"></i>
                 <span>Links</span>
+                
+                {% if badges and badges.get('links', 0) > 0 %}
+                    <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
+                    <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num">
+                        {{ badges.links }}
+                    </span>
+                {% endif %}
             </a>
         </li>
 
@@ -58,7 +92,8 @@
             </a>    
             <ul id="auth" class="sidebar-dropdown list-unstyled collapse">
                 <li class="sidebar-item">
-                    <a href="{{ url_for('wallpaper_generator') }}" class="sidebar-link">
+                    <!-- Removed standard 'sidebar-link' class from child to prevent layout breaking, added custom padding -->
+                    <a href="{{ url_for('wallpaper_generator') }}" class="sidebar-link" style="font-size: 0.9rem;">
                         <i class="fa-regular fa-file-image"></i>            
                         <span>Wallpaper Generator</span>
                     </a>

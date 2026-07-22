@@ -104,7 +104,62 @@ main {
     flex: 1 1 auto;
 }
 
+/* 1. UPDATE THE LINK TO USE FLEXBOX FOR PERFECT ALIGNMENT */
 a.sidebar-link {
+    padding: .625rem 1.625rem;
+    color: #FFF;
+    display: flex; /* Changed from block */
+    align-items: center; /* Vertically centers the icon, text, and badge */
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-left: 3px solid transparent;
+    position: relative; /* Needed for the tiny red dot */
+    gap: 1rem;
+}
+
+/* Ensure the icon stays perfectly sized and aligned */
+.sidebar-link i {
+    font-size: 1.1rem;
+    margin-right: .75rem;
+    min-width: 25px; /* Prevents icons from shifting the text */
+    text-align: center;
+}
+
+/* 2. BADGE VISIBILITY LOGIC */
+/* Hide the number badge when collapsed */
+#sidebar:not(.expand) .sidebar-badge-num {
+    display: none !important;
+}
+
+/* Hide the red dot when expanded */
+#sidebar.expand .sidebar-badge-dot {
+    display: none !important;
+}
+
+/* Precisely position the red dot over the top-right of the icon */
+.sidebar-badge-dot {
+    position: absolute;
+    top: 10px;
+    left: 38px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--sidebar-bg); /* Creates a cutout effect against the icon */
+}
+
+/* 3. FIX THE COLLAPSED 2-LAYER NAVBAR */
+/* Shows the dropdown menu to the right when hovered in collapsed mode */
+#sidebar:not(.expand) .sidebar-item:focus .sidebar-dropdown {
+    display: block;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Stop the tiny arrow from rotating when hovered in collapsed mode */
+#sidebar:not(.expand) .sidebar-link[data-bs-toggle="collapse"]::after {
+    display: none;
+}
+
+/* a.sidebar-link {
     padding: .625rem 1.625rem;
     color: #FFF;
     display: block;
@@ -117,12 +172,13 @@ a.sidebar-link {
     font-size: 1.1rem;
     margin-right: .75rem;
 }
-
+*/
 a.sidebar-link:hover {
     background-color: rgba(255,255,255,.075);
     border-left:3px solid var(--accent-purple);
-}
+} 
 
+/*
 .sidebar-footer .sidebar-item a.sidebar-link:hover {
     background-color: rgba(86, 86, 91, 0.075);
     border-left: 3px solid var(--sidebar-bg);
@@ -136,9 +192,9 @@ a.sidebar-link:hover {
     margin: 0.5rem 0 0 0;
 }
 
-.m-nav {
+/* .m-nav {
     background-color: var(--sidebar-bg);
-}
+} */
 
 
 
@@ -147,7 +203,7 @@ a.sidebar-link:hover {
     font-size: 0.95rem;
 }
 
-#sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
+/* #sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
     position: absolute;
     top: 0;
     left: 70px;
@@ -155,7 +211,7 @@ a.sidebar-link:hover {
     padding: 0;
     min-width: 15rem;
     display: none;
-}
+} */
 
 #sidebar.expand .sidebar-link[data-bs-toggle="collapse"]::after {
     border: solid;
@@ -165,7 +221,7 @@ a.sidebar-link:hover {
     padding: 2px;
     position: absolute;
     right: 1.5rem;
-    top: 1.4rem;
+    top: 1.15rem;
     transform: rotate(-135deg);
     transition: all .2s ease-out;
 }
@@ -174,4 +230,3 @@ a.sidebar-link:hover {
     transform: rotate(45deg);
     transition: all .2s ease-out;
 }
-
