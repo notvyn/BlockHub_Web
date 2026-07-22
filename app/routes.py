@@ -1491,7 +1491,14 @@ def notifications():
         page_title="Notifications"
     )
 
-@app.route('/feedback', methods=['GET', 'POST'])
+@app.route('/feedback/<int:id>', methods=['GET', 'POST'])
+@login_required
+def feedback(id):
+    feedback = Feedback.query.get_or_404(id)
+
+    return render_template('feedback.html', feedback=feedback, has_back_btn=True)
+
+@app.route('/feedbacks', methods=['GET', 'POST'])
 @login_required
 def feedbacks():
     feedback = Feedback.query.filter(Feedback.status == 'Pending').order_by(Feedback.date_added.desc()).all()

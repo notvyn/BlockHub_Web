@@ -52,9 +52,9 @@
         <div class="feedback-content flex-grow-1">
             <!-- Added flex-wrap so badges don't overflow on small screens -->
             <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-                <div class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
+                <a href="{{ url_for('feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
                     {{ f.title }}
-                </div>
+                </a>
                 <!-- Swapped p-2 to px-2 py-1 for sleeker pill badges -->
                 <div class="rounded-pill px-2 py-1" style="color: var(--accent-purple); border: 1px solid var(--accent-purple); font-size: 0.8rem;">
                     <i class="fa-solid {{ icon_map.get(f.category) }}"></i> {{ f.category }}
@@ -63,7 +63,7 @@
                     {{ f.status }}
                 </div>
             </div>
-            <div class="mb-2" style="color: var(--text-muted);">{{ f.message | markdown }}</div>
+            <div class="mb-2" style="color: var(--text-muted);">{{ f.message | markdown | truncate(200, true, '...') | safe }}</div>
             {% if f.admin_reply %}
                 <div class="mb-1 fw-medium">ADMIN REPLY:</div>
                 <div class="" style="color: var(--text-muted);">{{ f.admin_reply }}</div>
@@ -86,20 +86,23 @@
             </div>
             {% endif %}
 
-            {% if current_user.role == 'Officer' %}
-                {% if f.status == 'Pending' %}
-                    <!-- RESOLVE BUTTON: Added mt-md-auto -->
-                    <button type="button" class="btn btn-sm btn-outline-success fw-bold reply-trigger-btn order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto order-1 order-md-2" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#replyModal" 
-                            data-id="{{ f.id }}">
-                        <i class="fa-solid fa-check me-1"></i> Resolve
-                    </button>
-                {% else %}
-                    <!-- BADGE: Added mt-md-auto -->
-                    <span class="badge bg-success order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto">Resolved</span>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('feedback', id=f.id) }}" class="btn btn-sm btn-outline-secondary align-self-center align-self-md-auto">View Feedback</a>
+                {% if current_user.role == 'Officer' or current_user.is_admin %}
+                    {% if f.status == 'Pending' %}
+                        <!-- RESOLVE BUTTON: Added mt-md-auto -->
+                        <button type="button" class="btn btn-sm btn-outline-success fw-bold reply-trigger-btn order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto order-1 order-md-2" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#replyModal" 
+                                data-id="{{ f.id }}">
+                            <i class="fa-solid fa-check me-1"></i> Resolve
+                        </button>
+                    {% else %}
+                        <!-- BADGE: Added mt-md-auto -->
+                        <span class="badge bg-success order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto">Resolved</span>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
+            </div>
         </div>
     </div>
 {% endmacro %}
