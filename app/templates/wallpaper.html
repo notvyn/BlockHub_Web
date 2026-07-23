@@ -46,28 +46,80 @@
 
             <!-- Card Theme Selection -->
             <div class="mb-4">
-                <label class="form-label fw-bold small text-uppercase">2. Choose Theme</label>
+                <label class="form-label fw-bold small text-uppercase">3. Choose Theme</label>
                 <div class="d-flex gap-2">
                     <button id="btn-theme-dark" class="btn btn-dark flex-grow-1 theme-btn" onclick="changeCardTheme('theme-dark')">Dark Glass</button>
                     <button id="btn-theme-light" class="btn btn-outline-dark flex-grow-1 theme-btn" onclick="changeCardTheme('theme-light')">Light Glass</button>
                 </div>
             </div>
 
-            <!-- Glass Opacity Control -->
-            <div class="mb-4">
-                <label class="form-label fw-bold small text-uppercase">3. Card Opacity</label>
-                <input type="range" id="opacity-slider" class="form-range" min="0" max="1" step="0.05" value="0">
-            </div>
+            <!-- Accordion for Advanced Sliders -->
+            <div class="accordion mb-4" id="advancedSettingsAccordion">
+                <div class="accordion-item bg-transparent">
+                    
+                    <h2 class="accordion-header" id="headingSliders">
+                        <!-- The Accordion Button -->
+                        <button class="accordion-button collapsed bg-transparent shadow-none text-muted fw-bold small text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSliders" aria-expanded="false" aria-controls="collapseSliders" style="font-size: 0.85rem;">
+                            <i class="fa-solid fa-sliders me-2"></i> Advanced Adjustments
+                        </button>
+                    </h2>
+                    
+                    <div id="collapseSliders" class="accordion-collapse collapse" aria-labelledby="headingSliders" data-bs-parent="#advancedSettingsAccordion">
+                        <div class="accordion-body" style="border-top: 1px solid var(--hue-shade)">
+                            
+                            <!-- Glass Opacity Control -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small text-uppercase w-100 d-flex justify-content-between align-items-center mb-1">
+                                    <span>Card Opacity</span>
+                                    <span class="text-muted text-lowercase" style="font-size: 0.75rem; font-weight: 500;">
+                                        <span id="opacity-val">0</span> (default: 0)
+                                    </span>
+                                </label>
+                                <input type="range" id="opacity-slider" class="form-range" min="0" max="1" step="0.01" value="0">
+                            </div>
 
-            <!-- Background Opacity Control -->
-            <div class="mb-4">
-                <label class="form-label fw-bold small text-uppercase">4. Background Opacity</label>
-                <input type="range" id="bg-opacity-slider" class="form-range" min="0" max="1" step="0.05" value="1">
+                            <!-- Background Opacity Control -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small text-uppercase w-100 d-flex justify-content-between align-items-center mb-1">
+                                    <span>Background Opacity</span>
+                                    <span class="text-muted text-lowercase" style="font-size: 0.75rem; font-weight: 500;">
+                                        <span id="bg-opacity-val">1</span> (default: 1)
+                                    </span>
+                                </label>
+                                <input type="range" id="bg-opacity-slider" class="form-range" min="0" max="1" step="0.01" value="1">
+                            </div>
+                            
+                            <!-- Card Position -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small text-uppercase w-100 d-flex justify-content-between align-items-center mb-1">
+                                    <span>Card Position</span>
+                                    <span class="text-muted text-lowercase" style="font-size: 0.75rem; font-weight: 500;">
+                                        <span id="card-pos-val">9</span> (default: 9)
+                                    </span>
+                                </label>
+                                <input type="range" id="card-position-slider" class="form-range" min="0" max="105" step="1" value="9">
+                            </div>
+
+                            <!-- Background Zoom Control -->
+                            <div class="mb-2">
+                                <label class="form-label fw-bold small text-uppercase w-100 d-flex justify-content-between align-items-center mb-1">
+                                    <span>Background Zoom</span>
+                                    <span class="text-muted text-lowercase" style="font-size: 0.75rem; font-weight: 500;">
+                                        <span id="bg-zoom-val">100</span>% (default: 100%)
+                                    </span>
+                                </label>
+                                <!-- Range from 100% (Normal cover) up to 200% (2x Zoom) -->
+                                <input type="range" id="bg-zoom-slider" class="form-range" min="100" max="200" step="1" value="100">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Custom Background -->
             <div class="mb-4">
-                <label class="form-label fw-bold small text-uppercase">5. Custom Background</label>
+                <label class="form-label fw-bold small text-uppercase">4. Custom Background</label>
                 <input class="form-control custom-file-upload" type="file" id="bg-upload" accept="image/png, image/jpeg, image/jpg">
                 <div class="form-text text-muted">Recommended size: 1080x1920 (9:16 aspect ratio)</div>
             </div>
@@ -144,6 +196,7 @@
         // Sliders
         const opacitySlider = document.getElementById('opacity-slider');         // Card opacity
         const bgOpacitySlider = document.getElementById('bg-opacity-slider');   // Background opacity
+        const cardPositionSlider = document.getElementById('card-position-slider');
         const glassCard = wallpaper.querySelector('.schedule-glass-card');
 
         if (wallpaperTitle) {
@@ -151,7 +204,7 @@
                 if (blockInput.value.trim() !== "") {
                     wallpaperTitle.textContent = blockInput.value;
                 } else {
-                    wallpaperTitle.textContent = 'CS 2103';
+                    wallpaperTitle.textContent = 'Block/Section';
                 }
             });
         }
@@ -195,31 +248,62 @@
 
         // --- 2. LIVE CARD OPACITY ADJUSTMENT ---
         if (opacitySlider && glassCard) {
-        opacitySlider.addEventListener('input', function() {
-            const alpha = this.value;
-            const isLight = wallpaper.classList.contains('theme-light');
-            const isVintage = wallpaper.classList.contains('template-vintage');
+            const opacityValDisplay = document.getElementById('opacity-val'); // Target the new label
 
-            if (isLight) {
-                // LIGHT THEME (White Base)
-                glassCard.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
-                if (isVintage && wallpaperHeader) {
-                    wallpaperHeader.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
+            opacitySlider.addEventListener('input', function() {
+                const alpha = this.value;
+                
+                // Update the text on the screen dynamically
+                if (opacityValDisplay) opacityValDisplay.textContent = alpha; 
+
+                const isLight = wallpaper.classList.contains('theme-light');
+                const isVintage = wallpaper.classList.contains('template-vintage');
+
+                if (isLight) {
+                    glassCard.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
+                    if (isVintage && wallpaperHeader) wallpaperHeader.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
+                } else {
+                    glassCard.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
+                    if (isVintage && wallpaperHeader) wallpaperHeader.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
                 }
-            } else {
-                // DARK THEME (Dark Base)
-                glassCard.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
-                if (isVintage && wallpaperHeader) {
-                    wallpaperHeader.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
-                }
-            }
-        });
-    }
+            });
+        }
 
         // --- 3. LIVE BACKGROUND OPACITY ADJUSTMENT ---
         if (bgOpacitySlider && bgLayer) {
+            const bgOpacityValDisplay = document.getElementById('bg-opacity-val'); // Target the new label
+            
             bgOpacitySlider.addEventListener('input', function() {
+                // Update the text on the screen dynamically
+                if (bgOpacityValDisplay) bgOpacityValDisplay.textContent = this.value; 
                 bgLayer.style.opacity = this.value;
+            });
+        }
+
+        // --- LIVE CARD POSITION ADJUSTMENT ---
+        if (cardPositionSlider && glassCard) {
+            const cardPosValDisplay = document.getElementById('card-pos-val'); // Target the new label
+            
+            cardPositionSlider.addEventListener('input', function() {
+                // Update the text on the screen dynamically
+                if (cardPosValDisplay) cardPosValDisplay.textContent = this.value;
+                glassCard.style.marginBottom = `${this.value}rem`;
+            });
+        }
+
+        // --- LIVE BACKGROUND ZOOM ADJUSTMENT ---
+        const bgZoomSlider = document.getElementById('bg-zoom-slider');
+        const bgZoomValDisplay = document.getElementById('bg-zoom-val');
+
+        if (bgZoomSlider && bgLayer) {
+            bgZoomSlider.addEventListener('input', function() {
+                const zoomValue = this.value;
+                
+                // Update the numeric label
+                if (bgZoomValDisplay) bgZoomValDisplay.textContent = zoomValue;
+                
+                // Scale the background-size dynamically while keeping it centered
+                bgLayer.style.backgroundSize = `${zoomValue}%`;
             });
         }
 

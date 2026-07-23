@@ -1,3 +1,9 @@
+.accordion-item {
+    border: 1px solid var(--hue-shade); 
+    border-radius: 8px; 
+    overflow: hidden;
+}
+
 /* --- THEME COLORS FOR HEADER --- */
 .theme-dark .wallpaper-title-1,
 .theme-dark .wallpaper-title-2 {
@@ -13,23 +19,29 @@
 
 /* The container that holds the scaled-down preview safely */
 .preview-wrapper {
-    width: 378px;  
-    height: 672px; 
+    /* 🟢 THE FIX: Calculate width and height dynamically based on the scale factor */
+    width: calc(1080px * var(--scale-factor));  
+    height: calc(1920px * var(--scale-factor)); 
+    
     overflow: hidden;
     position: relative;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     background-color: #000;
+    margin: 0 auto; /* Failsafe to guarantee horizontal centering */
 }
 
 /* The actual HD wallpaper (1080x1920) */
 #wallpaper-export {
     width: 1080px;
     height: 1920px;
-    transform: scale(0.35);
+    
+    /* 🟢 THE FIX: Apply the dynamic scale variable */
+    transform: scale(var(--scale-factor));
     transform-origin: top left;
-    position: relative; /* Essential for containing absolute children */
-    overflow: hidden;    /* Locks everything inside the 1080x1920 boundary */
+    
+    position: relative; 
+    overflow: hidden;    
     display: flex;
     flex-direction: column;
     align-items: center; 
