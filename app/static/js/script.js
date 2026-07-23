@@ -1027,4 +1027,40 @@ document.addEventListener('DOMContentLoaded', function() {
             window.setValidation(this, (isMatch && isMainValid), 'Passwords do not match or main password is weak.');
         });
     }
+
+    /* =========================================
+       SMART FILE ATTACHMENT ICONS
+       ========================================= */
+    document.querySelectorAll('.card-content a').forEach(link => {
+        const url = link.href.toLowerCase();
+        let iconClass = 'fa-link'; // Default icon
+        let iconColor = 'var(--accent-purple)'; // Default color
+
+        // Check the extension and assign the right icon and color
+        if (url.endsWith('.pdf')) { 
+            iconClass = 'fa-file-pdf'; 
+            iconColor = '#ff5252'; 
+        } else if (url.endsWith('.docx') || url.endsWith('.doc')) { 
+            iconClass = 'fa-file-word'; 
+            iconColor = '#42a5f5'; 
+        } else if (url.endsWith('.xlsx') || url.endsWith('.csv')) { 
+            iconClass = 'fa-file-excel'; 
+            iconColor = '#66bb6a'; 
+        } else if (url.endsWith('.pptx')) { 
+            iconClass = 'fa-file-powerpoint'; 
+            iconColor = '#ff7043'; 
+        } else if (url.endsWith('.zip') || url.endsWith('.rar')) { 
+            iconClass = 'fa-file-zipper'; 
+            iconColor = '#ffca28'; 
+        }
+
+        // Create the HTML icon element
+        const icon = document.createElement('i');
+        icon.className = `fa-solid ${iconClass} me-2`;
+        icon.style.color = iconColor;
+
+        // Insert the icon right at the beginning of the link text
+        link.prepend(icon);
+    });
+
 });

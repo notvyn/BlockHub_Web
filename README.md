@@ -135,6 +135,7 @@ A centralized class management system for CS 2103.
 - Added individual read entry on dashboard announcement and summary section
 - Refined Tags by making it each category collapsible, has tag limitation, and sliced user tags for visual clarity
 - Restyled lightbox modal and files uploaded in easymde content
+- Updated file uploaded icons
 
 
 ## TO-DO LIST
@@ -176,6 +177,7 @@ A centralized class management system for CS 2103.
 - [/] Fix announcements page mark as read issue
 - [/] Fix duplicate entries for summaries
 - [/] Add constraint to summaries and deadlines if there's no courses found yet.
+- [ ] Fix master schedule no live update
 
 FUTURE VISION
 - [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)

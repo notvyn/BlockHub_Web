@@ -71,11 +71,11 @@
                             </button>
                             
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="mobileAddEntryDropdown">
-                                {% if course|length > 0 %}
+                                {% if has_courses %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_deadline') }}"><i class="fa-solid fa-clock"></i> Post Deadline</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_announcement') }}"><i class="fa-solid fa-bullhorn"></i> Post Announcement</a></li>
-                                {% if course|length > 0 %}
+                                {% if has_courses %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_summary') }}"><i class="fa-solid fa-book-open"></i> Add Summary</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_course') }}"><i class="fa-solid fa-address-book"></i> Add Course</a></li>
@@ -144,9 +144,13 @@
                             </button>
                             
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="desktopAddEntryDropdown">
+                                {% if has_courses %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_deadline') }}"><i class="fa-solid fa-clock"></i> Post Deadline</a></li>
+                                {% endif %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_announcement')}}"><i class="fa-solid fa-bullhorn"></i> Post Announcement</a></li>
+                                {% if has_courses %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_summary') }}"><i class="fa-solid fa-book-open"></i> Add Summary</a></li>
+                                {% endif %}
                                 <li><a class="dropdown-item md-dropdown-item" href="{{ url_for('add_course') }}"><i class="fa-solid fa-address-book"></i> Add Course</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item md-dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addLinkModal" data-mode="add"><i class="fa-solid fa-link"></i> Add Quick Link</a></li>

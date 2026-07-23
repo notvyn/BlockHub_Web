@@ -98,6 +98,14 @@ def inject_global_forms():
     """Makes LinkForm available everywhere for the global modal."""
     return dict(link_form=LinkForm())
 
+@app.context_processor
+def inject_course_state():
+    """Makes 'has_courses' available globally to toggle UI elements."""
+    # Using .first() is highly optimized. It just checks if AT LEAST ONE course 
+    # exists without downloading the entire table into memory!
+    has_courses = Course.query.first() is not None
+    return dict(has_courses=has_courses)
+
 # 2. Deals only with dynamic user data
 @app.context_processor
 def inject_global_badges():
