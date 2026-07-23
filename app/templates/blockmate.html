@@ -53,14 +53,15 @@
 
                     {% if earned_badges %}
                     <div class="">
-                        <h6 class="fw-bold text-muted mb-3">ACHIEVEMENTS</h6>
+                        <h6 class="fw-bold text-muted mb-3">BADGES EARNED</h6>
                         
                             <div class="d-flex flex-wrap gap-3">
                                 {% for badge in earned_badges %}
                                     <!-- Render each dynamically generated badge -->
-                                    <div class="text-center p-3 rounded" style="background-color: rgba(0,0,0,0.03); width: 100px;">
+                                    <div class="pf-badge text-center p-3 rounded">
                                         <i class="fa-solid {{ badge.icon }} fa-2x mb-2 text-{{ badge.color }}"></i>
                                         <div class="small fw-bold" style="font-size: 0.75rem;">{{ badge.name }}</div>
+                                        <div class="small" style="font-size: 0.7rem; color: var(--text-muted);">{{ badge.description }}</div>
                                     </div>
                                 {% endfor %}
                             </div>

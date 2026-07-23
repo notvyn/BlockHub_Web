@@ -128,6 +128,9 @@ A centralized class management system for CS 2103.
 - Refined Dashboard Announcement Section query (Unread vs Recently added) limited to only 3
 - Changed read by to users' profile image 
 
+**July 23, 2026**
+- Created new badges
+- Added unique constraint to ClassSummary models and added error catching 
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -165,7 +168,9 @@ A centralized class management system for CS 2103.
 - [/] Make each course unique in models
 - [ ] Fix tag seed initialization.
 - [/] Fix date value for editing deadlines
-- [/] Fix announcements page mark as read issue 
+- [/] Fix announcements page mark as read issue
+- [/] Fix duplicate entries for summaries
+- [/] Add constraint to summaries and deadlines if there's no courses found yet.
 
 FUTURE VISION
 - [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)

@@ -4,6 +4,7 @@ from flask import render_template, redirect, url_for, request, jsonify, send_fro
 from flask_login import current_user, login_user, login_required, logout_user
 from sqlalchemy import func, and_, or_, text
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import IntegrityError
 from datetime import date, timedelta, datetime, timezone, time
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -25,6 +26,35 @@ from app.utility import send_web_push, send_verification_email
 def load_user(user_id):
     # This looks up the user in your database by their ID
     return User.query.get(int(user_id))
+
+def check_earned_badges(user_id):
+
+    total_hearts = AnnouncementHeart.query.filter_by(user_id=user_id).count()
+    total_suggestion = Feedback.query.filter(Feedback.user_id == user_id, Feedback.category == 'Suggestion').count()
+    total_bug = Feedback.query.filter(Feedback.user_id == user_id, Feedback.category == 'Bug').count()
+    total_deadlines = DeadlineCompletion.query.filter(DeadlineCompletion.user_id == user_id).count()
+    # total_summaries = ClassSummary.query.filter_by(user_id=user_id).count()
+    # (You would need to add a user_id to ClassSummary for this to work!)
+
+    # Create a dynamic list to pass to the HTML
+    earned_badges = []
+
+    if total_hearts >= 5:
+        earned_badges.append({'name': 'Active Supporter', 'description': 'React on 5 Posted Announcements', 'icon': 'fa-hand-holding-heart', 'color': 'danger'})
+
+    if total_deadlines == 5:
+        earned_badges.append({'name': 'Achiever', 'description': 'Complete 5 Deadline Tasks', 'icon': 'fa-circle-check', 'color': 'success'})
+
+    if total_suggestion >= 3:
+        earned_badges.append({'name': 'Visionary', 'description': 'Suggest 3 ideas on Feedbacks', 'icon': 'fa-lightbulb', 'color': 'warning'})
+
+    if total_bug >= 1:
+        earned_badges.append({'name': 'Bug Finder', 'description': 'Find a bug on the program', 'icon': 'fa-bug-slash', 'color': 'secondary'})
+
+    return earned_badges
+        
+    # if total_summaries >= 3:
+    #     earned_badges.append({'name': 'Top Contributor', 'icon': 'fa-book-open', 'color': 'success'})
 
 # Put this alongside your other routes!
 @app.route('/sw.js')
@@ -432,7 +462,7 @@ def dashboard():
             record_date = record_date.date()
             
         # 3. Calculate how many days old it is
-        days_old = (ph_time - record_date).days
+        days_old = (ph_time.date() - record_date).days
         
         # 4. If it is 3 days old or less, fetch all summaries for that calendar day
         if days_old <= 3:
@@ -539,32 +569,29 @@ def add_course():
         form.units.data = ''
 
         db.session.add(new_course)
-        db.session.commit()
-
-        # Grab all saved browser subscriptions from the database
-        all_subscriptions = PushSubscription.query.all()
-
-        for sub in all_subscriptions:
-            # Use the helper method we made in models.py to turn the text back into a dictionary
-            sub_dict = sub.get_subscription_dict()
+        
+        try:
+            db.session.commit()
             
-            # Fire the message!
-            status = send_web_push(
-                subscription_dict=sub_dict, 
-                notification_title="New Class Course!", 
-                notification_body=new_course.title,
-                target_url=f"/courses#course-{new_course.id}"
-            )
+            # Push Notifications
+            all_subscriptions = PushSubscription.query.all()
+            for sub in all_subscriptions:
+                sub_dict = sub.get_subscription_dict()
+                status = send_web_push(
+                    subscription_dict=sub_dict, 
+                    notification_title="New Class Course!", 
+                    notification_body=new_course.title,
+                    target_url=f"/courses#course-{new_course.id}"
+                )
+                if status == "expired":
+                    db.session.delete(sub)
+            db.session.commit()
 
-            # NEW: Automatically clean the database if the address is dead!
-            if status == "expired":
-                db.session.delete(sub)
-
-        db.session.commit()
-
-        # flash("Course Added Successfully")
-
-        return redirect(url_for('courses'))
+            return redirect(url_for('courses'))
+            
+        except IntegrityError:
+            db.session.rollback()
+            form.code.errors.append('This Course Code already exists in the system.')
     
     return render_template('add-course.html', form=form, has_back_btn=True, is_entry=True)
 
@@ -1122,8 +1149,12 @@ def update_course(id):
         course_to_update.instructor_email = form.instructor_email.data
         course_to_update.units = form.units.data
 
-        db.session.commit()
-        return redirect(url_for('courses'))
+        try:
+            db.session.commit()
+            return redirect(url_for('courses'))
+        except IntegrityError:
+            db.session.rollback()
+            form.code.errors.append('This Course Code already exists in the system.')
         
     elif request.method == 'GET':
         # GET REQUEST: Pre-fill the form fields with the existing database data
@@ -1327,28 +1358,29 @@ def add_summary():
 
         db.session.add(new_summary)
 
-        # Grab all saved browser subscriptions from the database
-        all_subscriptions = PushSubscription.query.all()
-        
-        for sub in all_subscriptions:
-            # Use the helper method we made in models.py to turn the text back into a dictionary
-            sub_dict = sub.get_subscription_dict()
+        try:
+            db.session.commit() # Try to save to the database FIRST
             
-            # Fire the message!
-            status = send_web_push(
-                subscription_dict=sub_dict, 
-                notification_title="New Class Summary!", 
-                notification_body=new_summary.content,
-                target_url=f"/class-summaries#summary-{new_summary.id}"
-            )
+            # If successful, send the push notifications!
+            all_subscriptions = PushSubscription.query.all()
+            for sub in all_subscriptions:
+                sub_dict = sub.get_subscription_dict()
+                status = send_web_push(
+                    subscription_dict=sub_dict, 
+                    notification_title="New Class Summary!", 
+                    notification_body=new_summary.content,
+                    target_url=f"/class-summaries#summary-{new_summary.id}"
+                )
+                if status == "expired":
+                    db.session.delete(sub)
+            db.session.commit() # Commit any deleted dead subscriptions
 
-            # NEW: Automatically clean the database if the address is dead!
-            if status == "expired":
-                db.session.delete(sub)
-
-        db.session.commit()
-
-        return redirect(url_for('summaries'))
+            return redirect(url_for('summaries'))
+            
+        except IntegrityError:
+            db.session.rollback() # Undo the crash
+            # Inject a custom error directly into the WTForms date field
+            form.date_held.errors.append('A summary for this course on this exact date already exists.')
     else:
         print(form.errors)
 
@@ -1380,8 +1412,12 @@ def update_summary(id):
         summary_to_update.date_held = form.date_held.data 
         summary_to_update.note = form.note.data
 
-        db.session.commit()
-        return redirect(url_for('summaries'))
+        try:
+            db.session.commit()
+            return redirect(url_for('summaries'))
+        except IntegrityError:
+            db.session.rollback()
+            form.date_held.errors.append('Another summary for this course already exists on this date.')
         
     elif request.method == 'GET':
         # GET REQUEST: Pre-fill the form fields with the existing database data
@@ -1773,15 +1809,15 @@ def api_delete_account():
 def profile():
     form = LoginForm()
     # Inside your profile route...
-    total_hearts = AnnouncementHeart.query.filter_by(user_id=current_user.id).count()
+    # total_hearts = AnnouncementHeart.query.filter_by(user_id=current_user.id).count()
     # total_summaries = ClassSummary.query.filter_by(user_id=current_user.id).count()
     # (You would need to add a user_id to ClassSummary for this to work!)
 
     # Create a dynamic list to pass to the HTML
-    earned_badges = []
+    earned_badges = check_earned_badges(current_user.id)
 
-    if total_hearts >= 5:
-        earned_badges.append({'name': 'Active Supporter', 'description': 'React on 5 Posted Announcements' , 'icon': 'fa-heart', 'color': 'danger'})
+    # if total_hearts >= 5:
+    #     earned_badges.append({'name': 'Active Supporter', 'description': 'React on 5 Posted Announcements' , 'icon': 'fa-heart', 'color': 'danger'})
         
     # if total_summaries >= 3:
     #     earned_badges.append({'name': 'Top Contributor', 'icon': 'fa-book-open', 'color': 'success'})
@@ -1836,11 +1872,7 @@ def blockmate(id):
     blockmate = User.query.get_or_404(id)
 
     # Create a dynamic list to pass to the HTML
-    earned_badges = []
-    total_hearts = AnnouncementHeart.query.filter_by(user_id=blockmate.id).count()
-
-    if total_hearts >= 5:
-        earned_badges.append({'name': 'Active Supporter', 'icon': 'fa-heart', 'color': 'danger'})
+    earned_badges = check_earned_badges(blockmate.id)
 
     return render_template('blockmate.html', blockmate=blockmate, earned_badges=earned_badges, has_back_btn=True)
 

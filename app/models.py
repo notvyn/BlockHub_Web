@@ -53,6 +53,9 @@ class ClassSummary(db.Model):
     note = db.Column(db.Text, nullable=True)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
 
+    # Enforce that a course can only have one summary per specific date
+    __table_args__ = (db.UniqueConstraint('course_id', 'date_held', name='unique_course_date_summary'),)
+
     def __repr__(self):
         return f'<ClassSummary {self.content}>'
 
