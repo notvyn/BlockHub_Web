@@ -412,6 +412,18 @@ input:-webkit-autofill:active {
     color: var(--text-dark) !important;
 }
 
+/* 1. Target the actual text color when it is highlighted */
+.CodeMirror-line::selection, 
+.CodeMirror-line *::selection {
+    color: #ffffff !important; /* Change this to whatever color you want the text to be */
+    background-color: rgba(163, 163, 163, 0.5) !important; /* A semi-transparent purple */
+}
+
+/* 2. Target CodeMirror's custom highlight box layer */
+.CodeMirror-selected {
+    background-color: rgba(163, 163, 163, 0.5) !important; /* Match the background color above */
+}
+
 /* --- DARK MODE DYNAMIC OVERRIDES --- */
 [data-theme="dark"] .add-entry-form .form-control,
 [data-theme="dark"] .CodeMirror,

@@ -35,15 +35,22 @@
                             
                             <!-- Pin / Unpin Action -->
                             <li>
-                                <button type="button" class="dropdown-item py-2 btn-pin" data-id="{{ announcement.id }}">
+                                <button type="button" class="dropdown-item md-dropdown-item py-2 btn-pin" data-id="{{ announcement.id }}">
                                     <i class="fa-solid {{ 'fa-thumbtack-slash' if announcement.is_pinned else 'fa-thumbtack' }} me-2" style="width: 16px;"></i> 
                                     {{ 'Unpin' if announcement.is_pinned else 'Pin' }}
+                                </button>
+                            </li>
+
+                            <!-- Copy Action -->
+                            <li>
+                                <button type="button" class="dropdown-item md-dropdown-item py-2" onclick="copyAnnouncement('{{ announcement.id }}')">
+                                    <i class="fa-regular fa-copy me-2" style="width: 16px;"></i> Copy
                                 </button>
                             </li>
                             
                             <!-- Edit Action -->
                             <li>
-                                <a class="dropdown-item py-2" href="{{ url_for('update_announcement', id=announcement.id)}}">
+                                <a class="dropdown-item md-dropdown-item py-2" href="{{ url_for('update_announcement', id=announcement.id)}}">
                                     <i class="fa-solid fa-pencil me-2" style="width: 16px;"></i> Edit
                                 </a>
                             </li>
@@ -53,7 +60,7 @@
                             
                             <!-- Delete Action (Highlighted in Red) -->
                             <li>
-                                <button type="button" class="dropdown-item py-2 text-danger fw-bold" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ announcement.id }}" data-type="announcement">
+                                <button type="button" class="dropdown-item md-dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ announcement.id }}" data-type="announcement">
                                     <i class="fa-solid fa-trash me-2" style="width: 16px;"></i> Delete
                                 </button>
                             </li>
@@ -69,7 +76,7 @@
                 {% if announcement.is_pinned %}
                 <i class="fa-solid {{ 'fa-map-pin' if announcement.is_pinned else '' }} text-danger" style="font-size: 1.3rem; transform: rotate(30deg);"></i> 
                 {% endif %}
-                <div class="card-title" style="display: inline;">{{ announcement.title }}</div>
+                <div id="copy-title-{{ announcement.id }}" class="card-title" style="display: inline;">{{ announcement.title }}</div>
             </div>
 
             <!-- 1. Split the data using our new Python filters -->
@@ -77,7 +84,7 @@
             {% set text_only = announcement.content | remove_images %}
 
             <!-- CONTENT: Truncated to prevent massive walls of text -->
-            <div class="card-content full-post">
+            <div id="copy-content-{{ announcement.id }}" class="card-content full-post">
                 <!-- striptags removes Markdown/HTML formatting so it truncates cleanly -->
                 {{ text_only | markdown }}
             </div>
@@ -106,19 +113,20 @@
                     {% if attached_links %}
                         <div class="d-flex justify-content-start flex-wrap">
                             {% for title, link_url in attached_links %}
-                                <a href="{{ link_url }}" target="_blank" class="attached-link-card">
-                                    <i class="fa-solid fa-link me-2"></i>
+                                <!-- ADDED: download="{{ title }}" -->
+                                <a href="{{ link_url }}" target="_blank" download="{{ title }}" class="attached-link-card">
+                                    <i class="fa-solid fa-file-arrow-down me-2"></i> <!-- Changed icon to a download file icon -->
                                     <span>{{ title }}</span>
                                 </a>
                             {% endfor %}
                         </div>
                         
-                    <!-- Scenario B: Fallback for raw URLs already in the database -->
+                    <!-- Scenario B: Fallback for raw URLs -->
                     {% else %}
-                        <a href="{{ announcement.url }}" target="_blank" class="attached-link-card">
+                        <!-- ADDED: download attribute -->
+                        <a href="{{ announcement.url }}" target="_blank" download class="attached-link-card">
                             <i class="fa-solid fa-link me-2"></i>
                             <span class="text-break">{{ announcement.url }}</span>
-                            </div>
                         </a>
                     {% endif %}
                     
@@ -190,4 +198,31 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        async function copyAnnouncement(id) {
+            const titleEl = document.getElementById(`copy-title-${id}`);
+            const contentEl = document.getElementById(`copy-content-${id}`);
+
+            // Create a combined HTML string (Bold title + line breaks + content)
+            const htmlContent = `<strong>${titleEl.innerText}</strong><br><br>${contentEl.innerHTML}`;
+            // Create a plain text fallback for apps that don't support rich text pasting
+            const plainText = `${titleEl.innerText}\n\n${contentEl.innerText}`;
+
+            try {
+                const clipboardItem = new ClipboardItem({
+                    "text/html": new Blob([htmlContent], { type: "text/html" }),
+                    "text/plain": new Blob([plainText], { type: "text/plain" })
+                });
+                
+                await navigator.clipboard.write([clipboardItem]);
+                alert("Announcement copied to clipboard!"); 
+            } catch (err) {
+                console.error("Failed to copy:", err);
+                alert("Failed to copy text. Your browser might not support this feature.");
+            }
+        }
+    </script>
 {% endblock %}

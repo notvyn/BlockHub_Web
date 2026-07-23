@@ -44,7 +44,7 @@
                 {% if current_user.id == a.author.id %}
                 <div class="dropdown">
                     <!-- 1. The Three Dots Trigger Button -->
-                    <button class="btn btn-icon-action px-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="">
+                    <button class="btn btn-icon-action px-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
                     </button>
                     
@@ -56,6 +56,13 @@
                             <button type="button" class="dropdown-item md-dropdown-item py-2 btn-pin" data-id="{{ a.id }}">
                                 <i class="fa-solid {{ 'fa-thumbtack-slash' if a.is_pinned else 'fa-thumbtack' }} me-2" style="width: 16px;"></i> 
                                 {{ 'Unpin' if a.is_pinned else 'Pin' }}
+                            </button>
+                        </li>
+
+                        <!-- Copy Action -->
+                        <li>
+                            <button type="button" class="dropdown-item md-dropdown-item py-2" onclick="copyAnnouncement('{{ a.id }}')">
+                                <i class="fa-regular fa-copy me-2" style="width: 16px;"></i> Copy
                             </button>
                         </li>
                         
@@ -71,7 +78,7 @@
                         
                         <!-- Delete Action (Highlighted in Red) -->
                         <li>
-                            <button type="button" class="dropdown-item md-dropdown-item py-2 text-danger fw-bold" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" data-type="announcement">
+                            <button type="button" class="dropdown-item md-dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ a.id }}" data-type="announcement">
                                 <i class="fa-solid fa-trash me-2" style="width: 16px;"></i> Delete
                             </button>
                         </li>
@@ -218,4 +225,31 @@
         </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        async function copyAnnouncement(id) {
+            const titleEl = document.getElementById(`copy-title-${id}`);
+            const contentEl = document.getElementById(`copy-content-${id}`);
+
+            // Create a combined HTML string (Bold title + line breaks + content)
+            const htmlContent = `<strong>${titleEl.innerText}</strong><br><br>${contentEl.innerHTML}`;
+            // Create a plain text fallback for apps that don't support rich text pasting
+            const plainText = `${titleEl.innerText}\n\n${contentEl.innerText}`;
+
+            try {
+                const clipboardItem = new ClipboardItem({
+                    "text/html": new Blob([htmlContent], { type: "text/html" }),
+                    "text/plain": new Blob([plainText], { type: "text/plain" })
+                });
+                
+                await navigator.clipboard.write([clipboardItem]);
+                alert("Announcement copied to clipboard!"); 
+            } catch (err) {
+                console.error("Failed to copy:", err);
+                alert("Failed to copy text. Your browser might not support this feature.");
+            }
+        }
+    </script>
 {% endblock %}

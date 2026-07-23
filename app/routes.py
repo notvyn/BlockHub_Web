@@ -14,8 +14,10 @@ from app import app, login_manager, db
 
 import cloudinary
 import cloudinary.uploader
-import os
 import json
+import os
+import uuid
+from werkzeug.utils import secure_filename
 
 from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion
 from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm, FeedbackForm, ProfileForm, CreateTagForm
@@ -315,8 +317,29 @@ def upload_image():
     file = request.files['image']
     
     try:
-        # NEW: Tell Cloudinary to auto-detect if it's an image, video, or raw file (like a PDF)
-        upload_result = cloudinary.uploader.upload(file, resource_type='auto')
+        # 1. Safely extract the original name and extension (e.g., "Test", ".docx")
+        original_filename = secure_filename(file.filename) or "uploaded_file"
+        name, ext = os.path.splitext(original_filename)
+        
+        # 2. Generate a random 8-character string so users don't overwrite each other's files
+        random_id = uuid.uuid4().hex[:8]
+        
+        # 3. Smart ID Generation
+        # List of common media formats that Cloudinary handles automatically
+        media_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4', '.mov']
+        
+        if ext.lower() in media_extensions:
+            # For Images/Videos: Cloudinary adds the extension to the URL itself
+            custom_public_id = f"{name}_{random_id}"
+        else:
+            # 🟢 THE FIX: For Raw files (.docx, .pdf, .zip): We MUST force the extension into the ID
+            custom_public_id = f"{name}_{random_id}{ext}"
+            
+        upload_result = cloudinary.uploader.upload(
+            file, 
+            resource_type='auto',
+            public_id=custom_public_id
+        )
         
         image_url = upload_result.get("secure_url")
         

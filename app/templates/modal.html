@@ -76,20 +76,57 @@
 
 <!-- Fullscreen Image Lightbox Modal -->
 <div class="modal fade" id="imageLightboxModal" tabindex="-1" aria-hidden="true">
-    <!-- modal-xl makes it as wide as possible, modal-dialog-centered keeps it in the middle -->
-    <div class="modal-dialog modal-dialog-centered modal-xl"> 
-        <div class="modal-content bg-transparent border-0 shadow-none">
-        
-            <div class="modal-header border-0 p-0 justify-content-end mb-2">
-                <!-- Close button positioned at the top right -->
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
-            </div>
+    <!-- ADDED: d-flex justify-content-center to squeeze the wrapper tightly around the image -->
+    <div class="modal-dialog modal-dialog-centered modal-xl d-flex justify-content-center"> 
+        <div class="modal-content bg-transparent border-0 shadow-none" style="width: auto;">
             
-            <div class="modal-body p-0 text-center">
-                <!-- The empty image tag that JavaScript will fill -->
+            <!-- We removed the wide modal-header entirely. Everything is now inside the body! -->
+            <div class="modal-body p-0 text-center position-relative d-inline-block">
+                
+                <!-- 🟢 FLOATING BUTTONS: Perfectly aligned, identically styled -->
+                <div class="position-absolute top-0 end-0 p-2 d-flex gap-2 align-items-center" style="z-index: 1055;">
+                    
+                    <!-- Download Button -->
+                    <button type="button" id="lightboxDownloadBtn" class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center border-0" onclick="forceDownloadImage(this.dataset.url)" style="width: 36px; height: 36px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); transition: all 0.2s;">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                    
+                    <!-- Custom Close Button (Replacing Bootstrap's broken btn-close) -->
+                    <button type="button" class="btn btn-sm text-white rounded-circle d-flex align-items-center justify-content-center border-0 m-0" data-bs-dismiss="modal" aria-label="Close" style="width: 36px; height: 36px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); transition: all 0.2s;">
+                        <i class="fa-solid fa-xmark fs-5"></i>
+                    </button>
+                    
+                </div>
+
+                <!-- The Image -->
                 <img id="lightboxImage" src="" alt="Fullscreen View" class="img-fluid rounded shadow-lg" style="max-height: 85vh; object-fit: contain;">
             </div>
         
         </div>
     </div>
 </div>
+
+<script>
+    function forceDownloadImage(url) {
+        // 🟢 EXTRACT THE EXTENSION: Chops the URL at the last '/' to grab the exact filename and extension (e.g., "photo.png")
+        const extractedFilename = url.split('/').pop().split('?')[0] || 'downloaded_image.jpg';
+        
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                
+                // 🟢 APPLY THE NAME: The browser will now save it as a proper image file
+                a.download = extractedFilename; 
+                
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(a);
+            })
+            .catch(() => alert('Could not download image.'));
+    }
+</script>

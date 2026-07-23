@@ -412,6 +412,59 @@ main {
 }
 
 
+/* =========================================
+   SMART MARKDOWN LINKS (File Attachments)
+   ========================================= */
+
+/* 1. Turn all standard links into sleek, auto-truncating "pill" buttons */
+.card-content a {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;       
+    white-space: nowrap;   
+    overflow: hidden;      
+    text-overflow: ellipsis; 
+    
+    background-color: rgba(255, 255, 255, 0.05); /* Subtle dark background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--accent-purple); 
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    
+    /* The key to separating them from text! Adds margin all around */
+    margin: 0.5rem 0.5rem 0.5rem 0; 
+    
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.card-content a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    color: var(--accent-purple);
+}
+
+/* 2. Set a default "Link" icon for all links */
+.card-content a::before {
+    content: "\f0c1"; /* FontAwesome fa-link */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-right: 8px;
+    opacity: 0.8;
+}
+
+/* 3. DYNAMIC ICONS: Read the URL extension and swap the icon automatically! */
+.card-content a[href$=".pdf"]::before { content: "\f1c1"; color: #ff5252; } 
+.card-content a[href$=".docx"]::before, 
+.card-content a[href$=".doc"]::before { content: "\f1c2"; color: #42a5f5; } 
+.card-content a[href$=".xlsx"]::before,
+.card-content a[href$=".csv"]::before { content: "\f1c3"; color: #66bb6a; } 
+.card-content a[href$=".pptx"]::before { content: "\f1c4"; color: #ff7043; } 
+.card-content a[href$=".zip"]::before,
+.card-content a[href$=".rar"]::before { content: "\f1c6"; color: #ffca28; }
+
 
 /* =========================================
    CUSTOM SCROLLBAR

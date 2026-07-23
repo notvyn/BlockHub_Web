@@ -134,6 +134,7 @@ A centralized class management system for CS 2103.
 - Added pin feature on links
 - Added individual read entry on dashboard announcement and summary section
 - Refined Tags by making it each category collapsible, has tag limitation, and sliced user tags for visual clarity
+- Restyled lightbox modal and files uploaded in easymde content
 
 
 ## TO-DO LIST
@@ -170,7 +171,7 @@ A centralized class management system for CS 2103.
 - [/] Fix edit mode of CreateTagModal
 - [/] Create a dedicated individual page for feedback entries
 - [/] Make each course unique in models
-- [ ] Fix tag seed initialization.
+- [/] Fix tag seed initialization.
 - [/] Fix date value for editing deadlines
 - [/] Fix announcements page mark as read issue
 - [/] Fix duplicate entries for summaries

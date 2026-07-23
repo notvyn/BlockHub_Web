@@ -166,10 +166,20 @@ document.addEventListener('DOMContentLoaded', function() {
         lightboxModal.addEventListener('show.bs.modal', function (event) {
             const triggerImage = event.relatedTarget;
             const imageUrl = triggerImage.getAttribute('data-img-url');
+            
+            // 1. Set the image source for the user to see
             const modalImageDisplay = document.getElementById('lightboxImage');
             modalImageDisplay.src = imageUrl;
+
+            // 2. 🟢 THE FIX: Give the exact same URL to the download button!
+            const downloadBtn = document.getElementById('lightboxDownloadBtn');
+            if (downloadBtn) {
+                downloadBtn.setAttribute('data-url', imageUrl);
+            }
         });
     }
+
+    
 
 
     /* =========================================
@@ -707,5 +717,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+
 
 });
