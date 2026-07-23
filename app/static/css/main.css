@@ -12,6 +12,7 @@
 } */
 
 :root {
+    --scale-factor: 0.35; /* Default Desktop Scale */
     --sidebar-bg: #31226b;
     --sidebar-footer: #15102c;
     --main-bg: #E7DFC6;
@@ -108,8 +109,8 @@ body {
 main {
     flex-grow: 1;
     padding: 2rem;
-    max-height: 100vh;
-    max-width: 100vw;
+    max-height: 100dvh;
+    max-width: 100dvw;
     overflow-y: auto;
 
     /* ADD THIS HERE: The bumper for the scrollable container! */
@@ -129,6 +130,7 @@ main {
 
 .wrapper {
     width: 100%;
+    height: 100dvh;
     display: flex;
     /* flex-grow: 1; */
 }
@@ -484,4 +486,3 @@ main {
     scrollbar-width: thin;
     scrollbar-color: var(--text-muted) transparent;
 }
-
