@@ -40,23 +40,17 @@
                                 <div class="badge rounded-pill bg-danger">Admin</div>
                             {% endif %}
                             <span class="badge rounded-pill" style="background-color: var(--accent-purple);">{{ student.role }}</span>
-                            {% for tag in student.tags %}
+                                <!-- Slice the list to only loop through the first 3 tags -->
+                                {% for tag in student.tags[:3] %}
+                                    <span class="badge rounded-pill bg-secondary">{{ tag.name }}</span>
+                                {% endfor %}
 
-                                <!-- Set a default color -->
-                                {% set badge_color = 'bg-secondary' %}
-                                
-                                <!-- Change the color based on the tag's category -->
-                                {% if tag.category == 'Technical' %}
-                                    {% set badge_color = 'bg-primary' %}
-                                {% elif tag.category == 'Role' %}
-                                    {% set badge_color = 'bg-danger' %}
-                                {% elif tag.category == 'Interest' %}
-                                    {% set badge_color = 'bg-info text-dark' %}
+                                <!-- If they have more than 3, calculate the remainder and show it -->
+                                {% if student.tags|length > 3 %}
+                                    <span class="badge rounded-pill" style="color: var(--text-dark); border: 1px solid var(--text-muted);">
+                                        +{{ student.tags|length - 3 }} more
+                                    </span>
                                 {% endif %}
-
-                                <span class="badge rounded-pill {{ badge_color }}">{{ tag.name }}</span>
-                                
-                            {% endfor %}
                         </div>
                     </div>
                 </div>

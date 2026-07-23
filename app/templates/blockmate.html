@@ -34,7 +34,7 @@
                             {% elif tag.category == 'Role' %}
                                 {% set badge_color = 'bg-danger' %}
                             {% elif tag.category == 'Interest' %}
-                                {% set badge_color = 'bg-info text-dark' %}
+                                {% set badge_color = 'bg-info' %}
                             {% endif %}
 
                             <span class="badge rounded-pill {{ badge_color }}">{{ tag.name }}</span>
