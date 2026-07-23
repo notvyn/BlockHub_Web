@@ -107,6 +107,7 @@
                                 <span class="md-code text-white bg-danger border-0 ms-2 new-tag" id="tag-{{ a.id }}">NEW</span>
                             {% endif %}
                         </div>
+                        <div class="md-code md-date p-0">Posted by: {{ a.author.name }} @ {{ a.date_posted.strftime("%b %d, %Y") }}</div>
                         <div class="md-quote-content">
                             <!-- 1. Split the data using our new Python filters -->
                             {% set images = a.content | extract_images %}
@@ -133,8 +134,11 @@
                             {% endif %}
                         </div>
 
-                        
-                        <div class="md-code md-date p-0">Posted by: {{ a.author.name }} @ {{ a.date_posted.strftime("%b %d, %Y") }}</div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-sm announcement-link announcement-link-btn" data-id="{{ a.id }}">
+                                Read Post <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                     {% endfor %}
                     {% else %}
@@ -195,7 +199,7 @@
                                     {% endif %}
 
                                     <!-- FIX: The link is now tied directly to the individual summary loop -->
-                                    <a href="{{ url_for('summary', id=summary.id) }}" style="font-size: 0.8rem; font-weight: 600;">
+                                    <a href="{{ url_for('summary', id=summary.id) }}" class="read-summary">
                                         Read Full Summary <i class="fa-solid fa-arrow-right ms-1"></i>
                                     </a>
 

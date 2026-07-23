@@ -434,7 +434,7 @@ def dashboard():
         else:
             d.due_datetime = d.due_date
 
-    links = Link.query.order_by(Link.date_added).limit(3).all()
+    links = Link.query.order_by(Link.is_pinned.desc(), Link.date_added.desc()).all()
 
     # 1. Grab the exact UTC time, remove timezone info, and add 8 hours for PHT
     now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -1453,12 +1453,23 @@ def get_schedules(course_id):
 @app.route('/links')
 @login_required
 def links():
-    links = Link.query.all()
+    links = Link.query.order_by(Link.is_pinned.desc(), Link.date_added.desc()).all()
 
     current_user.last_viewed_links = datetime.now(timezone.utc)
     db.session.commit()
 
     return render_template('links.html', links=links, is_dedicated_page=True)
+
+@app.route('/api/toggle-link-pin/<int:id>', methods=['POST'])
+@login_required
+def toggle_link_pin(id):
+    link_to_pin = Link.query.get_or_404(id)
+    
+    # Toggle the boolean value
+    link_to_pin.is_pinned = not link_to_pin.is_pinned
+    db.session.commit()
+    
+    return jsonify({'success': True, 'is_pinned': link_to_pin.is_pinned})
 
 @app.route('/delete-entry/link/<int:id>', methods=['POST', 'DELETE'])
 @login_required

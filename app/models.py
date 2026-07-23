@@ -120,6 +120,7 @@ class Link(db.Model):
     title = db.Column(db.String(200), nullable=False)
     url = db.Column(db.Text, nullable=False)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
+    is_pinned = db.Column(db.Boolean, default=False, nullable=True)
 
 # Place this helper table right above your User model
 user_tags = db.Table('user_tags',

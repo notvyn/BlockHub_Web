@@ -130,7 +130,11 @@ A centralized class management system for CS 2103.
 
 **July 23, 2026**
 - Created new badges
-- Added unique constraint to ClassSummary models and added error catching 
+- Added unique constraint to ClassSummary models and added error catching
+- Added pin feature on links
+- Added individual read entry on dashboard announcement and summary section
+- Refined Tags by making it each category collapsible, has tag limitation, and sliced user tags for visual clarity
+
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -156,7 +160,7 @@ A centralized class management system for CS 2103.
 - [/] Refine logic of Announcement query on dashboard
 - [ ] Refine styling of dashboard
 - [/] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates (Login and Signup done)
-- [ ] Create list of badges for profiles
+- [/] Create list of badges for profiles
 - [/] Create new model for each user completion of Task
 - [/] Add is_pinned on Announcements and Links
 - [/] Fix styling of Wallpaper Generator
