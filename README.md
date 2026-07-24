@@ -146,6 +146,8 @@ A centralized class management system for CS 2103.
 - Fixed styling login email focus style issue 
 - Refined Announcement url entry validation
 - Refactored/Restructured Routing to three classification (api, auth, main)
+- Refined validation of Feedback pending/resolve page
+- Partially organized and restructured javascript folder
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

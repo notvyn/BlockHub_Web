@@ -147,6 +147,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    
+
+    /* =========================================
+       LINK PINNING LOGIC
+       ========================================= */
+    document.querySelectorAll('.btn-link-pin').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const linkId = this.getAttribute('data-id');
+            
+            fetch(`/api/toggle-link-pin/${linkId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // The cleanest way to re-sort a dynamic grid is a quick page reload
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error toggling pin:', error));
+        });
+    });
+
     function updateUnits(newUnits) {
         const pageUnits = document.getElementById('course-page-total-units')
 
@@ -631,93 +657,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const replyModal = document.getElementById('replyModal');
-    const submitBtn = document.getElementById('submitReplyBtn');
     
-    if (replyModal) {
-        // 1. When the modal opens, grab the ID from the button that was clicked
-        replyModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget; // The button that triggered the modal
-            const feedbackId = button.getAttribute('data-id');
-            
-            // Put the ID into the hidden input field inside the modal
-            document.getElementById('feedbackIdInput').value = feedbackId;
-            
-            // Clear out any old text from previous replies
-            document.getElementById('adminReplyText').value = '';
-        });
-
-        // 2. When the admin clicks "Resolve Feedback" inside the modal
-        submitBtn.addEventListener('click', function() {
-            const feedbackId = document.getElementById('feedbackIdInput').value;
-            const replyText = document.getElementById('adminReplyText').value;
-            
-            // Change button text to show it's loading
-            submitBtn.textContent = 'Saving...';
-            submitBtn.disabled = true;
-
-            // Send it to the server
-            fetch(`/api/reply-feedback/${feedbackId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reply_text: replyText })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Easiest way to show the new status is a clean page reload
-                    window.location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                submitBtn.textContent = 'Resolve Feedback';
-                submitBtn.disabled = false;
-            });
-        });
-    }
-
-    document.querySelectorAll('.btn-pin').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const announcementId = this.getAttribute('data-id');
-            const icon = this.querySelector('i');
-            
-            // Disable button while processing
-            this.disabled = true;
-
-            fetch(`/api/toggle-pin/${announcementId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.disabled = false;
-                
-                if (data.success) {
-                    // If you want the list to instantly re-sort, the cleanest 
-                    // UX is to just reload the page smoothly!
-                    window.location.reload(); 
-                    
-                    /* OR, if you just want to change the icon without reloading:
-                    if (data.is_pinned) {
-                        icon.className = 'fa-solid fa-thumbtack-slash';
-                        this.setAttribute('title', 'Unpin');
-                    } else {
-                        icon.className = 'fa-solid fa-thumbtack';
-                        this.setAttribute('title', 'Pin');
-                    }
-                    */
-                } else {
-                    alert(data.error || "Failed to pin announcement.");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                this.disabled = false;
-            });
-        });
-    });
-
-
-
 });

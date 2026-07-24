@@ -43,8 +43,8 @@
 
             <!-- 2. MAIN CONTENT SECTION -->
             <!-- Removed striptags and truncate. Added 'safe' to render your EasyMDE formatting -->
-            <div class="summary-content mb-3" style="font-size: 1.05rem; line-height: 1.8;">
-                {{ summary.content | markdown | safe }}
+            <div class="card-content summary-content mb-3" style="font-size: 1.05rem; line-height: 1.8;">
+                {{ summary.content | markdown }}
             </div>
 
             <!-- 3. EXTRA NOTE SECTION -->
