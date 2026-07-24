@@ -1,9 +1,9 @@
 from pywebpush import webpush, WebPushException
-from flask import url_for
+from flask import url_for, current_app
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from wtforms.validators import ValidationError
-from app import app, mail
+from app import mail
 
 import json
 import os
@@ -44,7 +44,7 @@ def send_web_push(subscription_dict, notification_title, notification_body, targ
 
 def send_verification_email(user, new_email):
     # 1. Initialize the serializer with your app's secret key
-    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     
     # 2. Package the user's ID and the NEW email into a secure token
     # We salt it so it can only be used for email updates
@@ -88,3 +88,5 @@ def validate_password_strength(form, field):
     
     if not re.match(pattern, field.data):
         raise ValidationError('Password must be at least 8 characters and include a lowercase letter, an uppercase letter, and a number.')
+    
+    

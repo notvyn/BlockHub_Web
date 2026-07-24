@@ -6,7 +6,7 @@
 
 {% block page_title %}Settings{% endblock %}
 {% block page_title_txt %}Personalize your Hub!{% endblock %}
-{% block url_back %}{{ url_for('profile')}}{% endblock %}
+{% block url_back %}{{ url_for('main.profile')}}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-4">
@@ -21,9 +21,9 @@
                     
                     <!-- Left Side: Current Avatar -->
                     <div class="text-center">
-                        <img src="{{ current_user.profile_image }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid var(--accent-purple);">
+                        <!-- NEW: Added id="avatarPreview" -->
+                        <img id="avatarPreview" src="{{ current_user.profile_image }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid var(--accent-purple);">
                         
-                        <!-- The File Input is often ugly, you can style it using Bootstrap classes -->
                         <div class="small">
                             {{ form.profile_pic(class="form-control form-control-sm custom-file-upload") }}
                         </div>
@@ -103,7 +103,7 @@
                                                                 <div class="tag-actions d-flex align-items-center">
                                                                     <button type="button" class="tag-action-btn edit-btn px-1" title="Edit Tag" 
                                                                             data-bs-toggle="modal" data-bs-target="#createTagModal"
-                                                                            data-action="{{ url_for('edit_tag', tag_id=subfield.data) }}"
+                                                                            data-action="{{ url_for('api.edit_tag', tag_id=subfield.data) }}"
                                                                             data-name="{{ subfield.label.text }}" data-category="{{ tag_obj.category }}">
                                                                         <i class="fa-solid fa-pencil" style="font-size: 0.75rem;"></i>
                                                                     </button>
@@ -197,6 +197,24 @@
 
 {% block script %}
     <script>
+
+        // --- INSTANT AVATAR PREVIEW ---
+        // WTForms automatically gives the input the ID 'profile_pic'
+        const imageInput = document.getElementById('profile_pic'); 
+        const imagePreview = document.getElementById('avatarPreview');
+
+        if (imageInput && imagePreview) {
+            imageInput.addEventListener('change', function(event) {
+                // Grab the file the user just selected
+                const [file] = event.target.files;
+                
+                // If a file exists, create a temporary local URL and swap the image source
+                if (file) {
+                    imagePreview.src = URL.createObjectURL(file);
+                }
+            });
+        }
+
         // --- NEW: TAG SELECTION LIMITER ---
         const MAX_TAGS = 5;
         // Target only the tags inside the accordion (ignores hidden officer roles for regular users)

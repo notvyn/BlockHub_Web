@@ -1,5 +1,9 @@
-from app import app, db
+# 1. Import create_app instead of app
+from app import create_app, db
 from app.models import Tag
+
+# 2. Build the app using your factory function
+app = create_app()
 
 # Your default CS 2103 tags
 default_tags = [
@@ -36,6 +40,7 @@ default_tags = [
     {'name': 'Artist', 'category': 'Interest'}
 ]
 
+# 3. Use the newly created app to open the context
 with app.app_context():
     for tag_data in default_tags:
         # Check if it already exists so we don't cause an error
@@ -46,3 +51,14 @@ with app.app_context():
             
     db.session.commit()
     print("Tags successfully seeded!")
+
+courses_2103 = [
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+    {'code': '', 'title': '', 'units': '', 'instructor': ''},
+]

@@ -5,7 +5,7 @@ from wtforms.widgets import TextArea
 from flask_wtf.file import FileField, FileAllowed
 from datetime import date, timedelta, time
 
-from app.utility import validate_school_email, validate_password_strength
+from app.utils import validate_school_email, validate_password_strength
 
 class AnnouncementForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
@@ -36,8 +36,13 @@ class CourseScheduleForm(FlaskForm):
     room = StringField("Room", validators=[DataRequired()])
     submit = SubmitField()
 
+class CreateTagForm(FlaskForm):
+    tag_name = StringField('Tag Name', validators=[DataRequired()])
+    tag_category = RadioField('Category', choices=[('Technical', 'Technical'), ('Interest', 'Interest'), ('Role', 'Role')])
+    submit = SubmitField('Create Tag')
+
 def get_tomorrow():
-    return date.today() + timedelta(days=1)
+        return date.today() + timedelta(days=1)
 
 class DeadlineForm(FlaskForm):
     course = RadioField("Subject", validators=[DataRequired()], coerce=int)
@@ -52,6 +57,12 @@ class DeadlineForm(FlaskForm):
     note = StringField("Notes", widget=TextArea())
     submit = SubmitField()
 
+class FeedbackForm(FlaskForm):
+    title = StringField("Title", validators=[DataRequired()])
+    category = RadioField("Category", validators=[DataRequired()], choices=['Bug', 'Suggestion', 'Question', 'Other'])
+    message = StringField("Message", validators=[DataRequired()], widget=TextArea())
+    submit = SubmitField()
+
 class LinkForm(FlaskForm):
     title = StringField("Link Title", validators=[DataRequired()])
     url = URLField("URL", validators=[DataRequired(), URL()], widget=TextArea())
@@ -62,24 +73,9 @@ class LoginForm(FlaskForm):
     password = PasswordField(validators=[DataRequired()])
     submit = SubmitField()
 
-class SignupForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired(), Length(min=8, max=120, message="Name must be between 8 and 120 characters.")])
-    email = StringField("Email", validators=[DataRequired(), validate_school_email])
-    password = PasswordField("Password", validators=[DataRequired(), validate_password_strength])
-    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
-    role = RadioField("Role", choices=[("Student", "Student"), ("Officer", "Officer")], default="Student", validators=[DataRequired()])
-    submit = SubmitField('Create Account')
-
-class FeedbackForm(FlaskForm):
-    title = StringField("Title", validators=[DataRequired()])
-    category = RadioField("Category", validators=[DataRequired()], choices=['Bug', 'Suggestion', 'Question', 'Other'])
-    message = StringField("Message", validators=[DataRequired()], widget=TextArea())
-    submit = SubmitField()
-
 class ProfileForm(FlaskForm):
     # Standard text inputs
     name = StringField('Display Name', validators=[DataRequired()])
-    # email = StringField('Email Address', validators=[DataRequired(), Email()])
     bio = StringField('Profile Bio', widget=TextArea())
     
     # The image upload field with a security check to only allow images
@@ -91,7 +87,10 @@ class ProfileForm(FlaskForm):
     
     submit = SubmitField('Save Changes')
 
-class CreateTagForm(FlaskForm):
-    tag_name = StringField('Tag Name', validators=[DataRequired()])
-    tag_category = RadioField('Category', choices=[('Technical', 'Technical'), ('Interest', 'Interest'), ('Role', 'Role')])
-    submit = SubmitField('Create Tag')
+class SignupForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired(), Length(min=8, max=120, message="Name must be between 8 and 120 characters.")])
+    email = StringField("Email", validators=[DataRequired(), validate_school_email])
+    password = PasswordField("Password", validators=[DataRequired(), validate_password_strength])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
+    role = RadioField("Role", choices=[("Student", "Student"), ("Officer", "Officer")], default="Student", validators=[DataRequired()])
+    submit = SubmitField('Create Account')

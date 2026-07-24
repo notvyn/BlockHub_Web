@@ -1,53 +1,67 @@
-"""(The Setup) — This tells Python that app is a module and configures your database connection."""
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
-
 import cloudinary
 import os
 from dotenv import load_dotenv
 
+# 1. Initialize extensions globally (BUT DO NOT attach the app yet)
+db = SQLAlchemy()
+migrate = Migrate()
+login_manager = LoginManager()
+mail = Mail()
 
-# Create the App
-app = Flask(__name__)
-
-# Configure the App
-app.config['SECRET_KEY'] = 'a_super_secret_key_you_will_change_later'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blockhub.db'
-
-# Plug in the Database
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-# Plug in the LoginManager
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-# This command looks for the .env file and loads its contents into memory
+# Load env variables
 load_dotenv()
 
-# Now we pull the hidden variables using os.getenv()
 cloudinary.config(
-  cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
-  api_key = os.getenv("CLOUDINARY_API_KEY"),
-  api_secret = os.getenv("CLOUDINARY_API_SECRET")
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key = os.getenv("CLOUDINARY_API_KEY"),
+    api_secret = os.getenv("CLOUDINARY_API_SECRET")
 )
 
-# Your existing setup...
-app.config['SECRET_KEY'] = 'your-very-secret-key' # You should already have this!
+login_manager.login_view = 'auth.login'
 
-# Mail Configuration (Use Gmail SMTP for the MVP)
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-# NEVER hardcode passwords! Use environment variables (.env)
-app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') 
-app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # This must be a Gmail "App Password", not your normal login!
+@login_manager.user_loader
+def load_user(user_id):
+    # Make sure to import User inside or at the top depending on your setup
+    from app.models import User
+    return User.query.get(int(user_id))
 
-mail = Mail(app)
+# 2. The Application Factory
+def create_app():
+    # Create the App
+    app = Flask(__name__)
 
-# We import routes at the bottom to avoid circular dependencies
-from app import routes, models
+    # Configure the App
+    app.config['SECRET_KEY'] = 'your-very-secret-key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blockhub.db'
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
+    app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
+
+    # 3. Initialize the extensions WITH the app
+    db.init_app(app)
+    migrate.init_app(app, db)
+    
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login' # Notice this changes to point to the auth blueprint!
+    
+    mail.init_app(app)
+
+    # 4. Register your Blueprints here
+    from app.main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
+    from app.auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint)
+
+    from app.api import api as api_blueprint
+    app.register_blueprint(api_blueprint)
+
+    # 5. Return the fully built app
+    return app

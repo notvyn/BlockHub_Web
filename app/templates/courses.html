@@ -142,7 +142,7 @@
                                         <!-- The Mini Edit/Delete Icons -->
                                         <div class="d-flex gap-2 mt-1">
                                             <!-- Make sure to create an 'update_course_schedule' route in Python later! -->
-                                            <a href="{{ url_for('update_course_schedule', id=sched.id) }}" class="mini-action-btn edit-btn" title="Edit Schedule">
+                                            <a href="{{ url_for('main.update_course_schedule', id=sched.id) }}" class="mini-action-btn edit-btn" title="Edit Schedule">
                                                 <i class="fa-solid fa-pencil"></i>
                                             </a>
                                             <button type="button" class="mini-action-btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteScheduleModal" data-type="course-schedule" data-id="{{ sched.id }}" title="Delete Schedule">
@@ -160,7 +160,7 @@
                             {% if current_user.is_authenticated %}
                             <!-- The Circular Add Button -->
                             <!-- Using inline hover styles here for ease, but you can move these to course.css! -->
-                            <a href="{{ url_for('add_course_schedule', id=c.id) }}" class="btn-add-schedule btn rounded-circle d-flex align-items-center justify-content-center p-0 ms-1" title="Add Schedule">
+                            <a href="{{ url_for('main.add_course_schedule', id=c.id) }}" class="btn-add-schedule btn rounded-circle d-flex align-items-center justify-content-center p-0 ms-1" title="Add Schedule">
                                 <i class="fa-solid fa-plus"></i>
                             </a>
                             {% endif %}
@@ -171,7 +171,7 @@
                     <div class="course-actions d-flex flex-column align-items-end justify-content-center ps-3">
                         {% if current_user.is_authenticated %}
                         <div class="d-flex gap-2 mb-2">
-                            <a href="{{ url_for('update_course', id=c.id) }}" class="btn btn-icon-action" title="Edit">
+                            <a href="{{ url_for('main.update_course', id=c.id) }}" class="btn btn-icon-action" title="Edit">
                                 <i class="fa-solid fa-pencil"></i>
                             </a>
                             <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ c.id }}" data-type="course" title="Delete">

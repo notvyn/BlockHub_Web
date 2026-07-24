@@ -6,9 +6,16 @@ import bleach
 import markdown
 import re
 
-from app import app
+from app.main import main
 
-@app.template_filter('markdown')
+@main.app_template_filter('extract_images')
+def extract_images_filter(text):
+    if not text:
+        return []
+    # Regex hunts for ![alt text](image_url) and captures the alt and url
+    return re.findall(r'!\[([^\]]*)\]\(([^)]+)\)', text)
+
+@main.app_template_filter('markdown')
 def markdown_filter(text):
     if not text:
         return ""
@@ -35,7 +42,7 @@ def markdown_filter(text):
     # 5. Markup() tells Jinja the code is now perfectly safe to render!
     return Markup(clean_html)
 
-@app.template_filter('parse_links')
+@main.app_template_filter('parse_links')
 def parse_links_filter(text):
     if not text:
         return []
@@ -81,21 +88,14 @@ def parse_links_filter(text):
             
     return formatted_links
 
-@app.template_filter('extract_images')
-def extract_images_filter(text):
-    if not text:
-        return []
-    # Regex hunts for ![alt text](image_url) and captures the alt and url
-    return re.findall(r'!\[([^\]]*)\]\(([^)]+)\)', text)
-
-@app.template_filter('remove_images')
+@main.app_template_filter('remove_images')
 def remove_images_filter(text):
     if not text:
         return ""
     # Replaces the markdown image string with an empty space, erasing it from the text
     return re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', '', text)
 
-@app.template_filter('timeago')
+@main.app_template_filter('timeago')
 def time_ago_filter(date_obj):
     """
     Takes a Python datetime object and returns a relative 'time ago' string.

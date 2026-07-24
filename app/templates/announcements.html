@@ -68,7 +68,7 @@
                         
                         <!-- Edit Action -->
                         <li>
-                            <a class="dropdown-item md-dropdown-item py-2" href="{{ url_for('update_announcement', id=a.id)}}">
+                            <a class="dropdown-item md-dropdown-item py-2" href="{{ url_for('main.update_announcement', id=a.id)}}">
                                 <i class="fa-solid fa-pencil me-2" style="width: 16px;"></i> Edit
                             </a>
                         </li>
@@ -94,7 +94,7 @@
                 {% if a.is_pinned %}
                 <i class="fa-solid {{ 'fa-map-pin' if a.is_pinned else '' }}" style="color: var(--accent-red) !important; font-size: 1.3rem; transform: rotate(30deg);"></i> 
                 {% endif %}
-                <a href="{{ url_for('announcement', id=a.id) }}" id="copy-title-{{ a.id }}" class="card-title announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
+                <a href="{{ url_for('main.announcement', id=a.id) }}" id="copy-title-{{ a.id }}" class="card-title announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
                 
                 {% if a.id not in read_ids %}
                     <!-- Added the id and the new-tag class here! -->
@@ -218,7 +218,7 @@
                         
                     </button>
                     
-                    <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-view-post announcement-link" data-id="{{ a.id }}">View Post</a>
+                    <a href="{{ url_for('main.announcement', id=a.id) }}" class="btn btn-view-post announcement-link" data-id="{{ a.id }}">View Post</a>
                 </div>
             </div>
 

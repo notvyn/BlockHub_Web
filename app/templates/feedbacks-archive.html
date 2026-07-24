@@ -11,14 +11,14 @@
     <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3 ">
         <!-- Fixed Floating Action Button at Bottom-Right -->
          <!-- Compact Primary Action -->
-        <a href="{{ url_for('add_feedback') }}" class="btn btn-sm fw-bold add-feedback-btn">
+        <a href="{{ url_for('main.add_feedback') }}" class="btn btn-sm fw-bold add-feedback-btn">
             <i class="fa-solid fa-plus me-1"></i> Feedback
         </a>
         <div class="d-flex align-items-center gap-3">
             <!-- Segmented Toggle -->
             <div class="btn-group" role="group">
-                <a href="{{ url_for('feedbacks') }}" class="btn btn-sm btn-outline-secondary">Pending</a>
-                <a href="{{ url_for('feedbacks_archive') }}" class="btn btn-sm btn-primary active">Resolved</a>
+                <a href="{{ url_for('main.feedbacks') }}" class="btn btn-sm btn-outline-secondary">Pending</a>
+                <a href="{{ url_for('main.feedbacks_archive') }}" class="btn btn-sm btn-primary active">Resolved</a>
             </div>
         </div>
         <div style="color: var(--text-muted);">
@@ -50,7 +50,7 @@
         <div class="feedback-content flex-grow-1">
             <!-- Added flex-wrap so badges don't overflow on small screens -->
             <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-                <a href="{{ url_for('feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
+                <a href="{{ url_for('main.feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
                     {{ f.title }}
                 </a>
                 <!-- Swapped p-2 to px-2 py-1 for sleeker pill badges -->
@@ -74,7 +74,7 @@
             {% if current_user.id == f.user_id and f.status != 'Resolved' %}                        
             <div class="d-flex gap-2 order-2 order-md-1">
                 <!-- Make sure to add the correct update_feedback URL here -->
-                <a href="{{ url_for('update_feedback', id=f.id)}}" class="btn btn-icon-action" title="Edit">
+                <a href="{{ url_for('main.update_feedback', id=f.id)}}" class="btn btn-icon-action" title="Edit">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
                 <!-- FIXED: Changed data-type from 'deadline' to 'feedback' -->
@@ -85,7 +85,7 @@
             {% endif %}
 
             <div class="d-flex gap-2 flex-wrap">
-                <a href="{{ url_for('feedback', id=f.id) }}" class="btn btn-sm btn-outline-secondary align-self-center align-self-md-auto">View Feedback</a>
+                <a href="{{ url_for('main.feedback', id=f.id) }}" class="btn btn-sm btn-outline-secondary align-self-center align-self-md-auto">View Feedback</a>
                 {% if current_user.role != 'Officer' %}
                     {% if f.status == 'Pending' %}
                         <!-- RESOLVE BUTTON: Added mt-md-auto -->

@@ -17,7 +17,7 @@
 
 {% block page_title %}Update Class Summary{% endblock %}
 {% block page_title_txt %}What's the haps today? Everybody needs to know !{% endblock %}
-{% block url_back %}{{ url_for('summaries')}}{% endblock %}
+{% block url_back %}{{ url_for('main.summaries')}}{% endblock %}
 
 {% block content %}
     <div class="row mt-4">
@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
                     {{ form.submit(value="Post Summary", class="btn btn-modal-save px-4") }}
                 </div>
             </form>

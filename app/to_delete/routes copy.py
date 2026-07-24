@@ -20,9 +20,9 @@ import uuid
 from werkzeug.utils import secure_filename
 
 from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion
-from app.webforms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm, FeedbackForm, ProfileForm, CreateTagForm
-from app.filter import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter, time_ago_filter
-from app.utility import send_web_push, send_verification_email
+from app.forms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, SignupForm, FeedbackForm, ProfileForm, CreateTagForm
+from app.filters import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter, time_ago_filter
+from app.utils import send_web_push, send_verification_email
 
 @login_manager.user_loader
 def load_user(user_id):
