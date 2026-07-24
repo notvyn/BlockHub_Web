@@ -66,7 +66,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="md-code-content">
-                                        <span class="md-code">{{ d.course.code }} | {{ d.course.title }}</span>
+                                        <span class="md-code">{{ d.course.code }} | {{ d.course.title | truncate(50, 'True', '...') }}</span>
                                         <span class="md-code">{{ d.category }}</span>
                                         
                                         {% if days_left <= 2 %}
@@ -190,7 +190,7 @@
 
                         {% for course_header, summaries in daily_summaries.items() %}
                             <div class="md-quote">
-                                <div class="md-quote-title">{{ course_header }}</div>
+                                <div class="md-quote-title">{{ course_header | truncate(55, 'True', '...') }}</div>
                                 {% for summary in summaries %}
                                     <p style="font-size: 0.85rem; margin-bottom: 0.3rem;">{{ summary.content | markdown | striptags | truncate(80, True, '...') }}</p>
 

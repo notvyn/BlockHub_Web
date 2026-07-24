@@ -136,7 +136,15 @@ A centralized class management system for CS 2103.
 - Refined Tags by making it each category collapsible, has tag limitation, and sliced user tags for visual clarity
 - Restyled lightbox modal and files uploaded in easymde content
 - Updated file uploaded icons
+- Fixed mobile sidebar footer issue
+- Added two slider (zoom and card position) on Wallpapers
+- Fixed hover effect of dropdown delete button
 
+**July 24, 2026 **
+- Truncated super lengthy course title on Dashboard
+- Fixed phone download not going through (wallpaper page)
+- Fixed styling login email focus style issue 
+- Refined Announcement url entry validation
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -154,7 +162,7 @@ A centralized class management system for CS 2103.
 - [/] Add small red dot on sidebar for pages with new content
 - [/] Fix Recent Announcements Total Count and refine Query (Dashboard) 
 - [/] Have a live update on the total content count for each action on a page
-- [ ] Fix mobile sidebar screen UI issue 
+- [/] Fix mobile sidebar screen UI issue 
 - [/] Fix Total Units live update count
 - [/] Have conditional text for no entry pages (Summaries and Deadlines already done, added archives, links, announcements, courses)
 - [/] Add Room to the Master Schedule and Model
@@ -178,6 +186,10 @@ A centralized class management system for CS 2103.
 - [/] Fix duplicate entries for summaries
 - [/] Add constraint to summaries and deadlines if there's no courses found yet.
 - [ ] Fix master schedule no live update
+- [/] Fix super lengthy course title
+- [/] Fix other phone download not going through (wallpaper page)
+- [/] Fix login email focus style issue 
+- [/] Fix Announcement url entry validation
 
 FUTURE VISION
 - [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)

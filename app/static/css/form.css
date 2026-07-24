@@ -11,9 +11,6 @@ input:-webkit-autofill:active {
 
     -webkit-font-family: var(--ActorFont);
     
-    /* 3. Retain your existing borders */
-    border: 1px solid var(--text-muted); /* Adjust to your border variable */
-    
     /* 4. Optional: Delay any background color changes */
     transition: background-color 5000s ease-in-out 0s;
 }

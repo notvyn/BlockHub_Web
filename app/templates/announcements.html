@@ -94,7 +94,7 @@
                 {% if a.is_pinned %}
                 <i class="fa-solid {{ 'fa-map-pin' if a.is_pinned else '' }}" style="color: var(--accent-red) !important; font-size: 1.3rem; transform: rotate(30deg);"></i> 
                 {% endif %}
-                <a href="{{ url_for('announcement', id=a.id) }}" class="card-title announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
+                <a href="{{ url_for('announcement', id=a.id) }}" id="copy-title-{{ a.id }}" class="card-title announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
                 
                 {% if a.id not in read_ids %}
                     <!-- Added the id and the new-tag class here! -->
@@ -107,7 +107,7 @@
             {% set text_only = a.content | remove_images %}
 
             <!-- CONTENT: Truncated to prevent massive walls of text -->
-            <div class="card-content">
+            <div id="copy-content-{{ a.id }}" class="card-content">
                 <!-- striptags removes Markdown/HTML formatting so it truncates cleanly -->
                 {{ text_only | markdown | truncate(300, True, '...') }}
             </div>

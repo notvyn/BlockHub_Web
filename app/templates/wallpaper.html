@@ -137,7 +137,7 @@
             <div class="preview-wrapper border border-4 border-white">
                 
                 <!-- THE ACTUAL WALLPAPER EXPORT DIV (1080x1920) -->
-                <div id="wallpaper-export" class="template-modern theme-dark">
+                <div id="wallpaper-export" class="template-sunset theme-dark">
 
                     <div id="wallpaper-bg-layer"></div>
 
@@ -316,7 +316,7 @@
             }
         });
 
-        // --- 5. DOWNLOAD WALLPAPER ---
+        // --- 5. DOWNLOAD WALLPAPER (Direct Download Fix) ---
         async function downloadWallpaper() {
             const downloadBtn = document.getElementById('download-btn');
             const originalText = downloadBtn.innerHTML;
@@ -324,34 +324,58 @@
             downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating HD...';
             downloadBtn.disabled = true;
 
+            // Give fonts and layout a fraction of a second to stabilize
             await new Promise(r => setTimeout(r, 100));
             await document.fonts.ready;
 
-            html2canvas(wallpaper, {
-                scale: 2, 
-                useCORS: true, 
-                allowTaint: true,
-                backgroundColor: null,
-                onclone: function (clonedDocument) {
-                    const clonedWallpaper = clonedDocument.getElementById('wallpaper-export');
-                    clonedWallpaper.style.transform = 'none';
-                    clonedWallpaper.style.position = 'relative'; 
-                }
-            }).then(canvas => {
-                const image = canvas.toDataURL("image/jpeg", 0.95);
-                const link = document.createElement('a');
-                link.download = 'BlockHub_Schedule.jpg';
-                link.href = image;
-                link.click();
+            try {
+                // 1. Generate the canvas
+                const canvas = await html2canvas(wallpaper, {
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: true,
+                    backgroundColor: null,
+                    onclone: function (clonedDocument) {
+                        const clonedWallpaper = clonedDocument.getElementById('wallpaper-export');
+                        clonedWallpaper.style.transform = 'none';
+                        clonedWallpaper.style.position = 'relative'; 
+                    }
+                });
 
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.disabled = false;
-            }).catch(err => {
+                // 2. Convert canvas directly to a physical Blob file in memory
+                // Using .toBlob() is highly optimized for mobile browsers
+                canvas.toBlob(function(blob) {
+                    
+                    // 3. Create a temporary, secure URL for the file
+                    const url = URL.createObjectURL(blob);
+                    
+                    // 4. Create an invisible download link
+                    const link = document.createElement('a');
+                    link.download = 'Class_Schedule.jpg';
+                    link.href = url;
+                    
+                    // 5. Append to body (required for some mobile browsers to register the click)
+                    document.body.appendChild(link);
+                    
+                    // 6. Force the download
+                    link.click();
+                    
+                    // 7. Clean up the memory and remove the invisible link
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 150);
+
+                }, "image/jpeg", 0.95);
+
+            } catch (err) {
                 console.error("Error generating wallpaper:", err);
-                alert("There was an issue generating your wallpaper. Please try again.");
+                alert("There was an issue saving the image. If you are inside an app like Messenger, try opening this link directly in Safari or Chrome!");
+            } finally {
+                // Restore the button
                 downloadBtn.innerHTML = originalText;
                 downloadBtn.disabled = false;
-            });
+            }
         }
     </script>
 {% endblock %}

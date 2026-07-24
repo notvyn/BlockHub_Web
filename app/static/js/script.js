@@ -38,8 +38,10 @@ window.initEntryValidation = function(formId, fieldsConfig) {
                         isValid = false; // It's empty, and NOT optional
                         dynamicMessage = field.messageEmpty || field.message;
                     } else {
-                        // It has text, so it MUST match the URL pattern
-                        const urlPattern = /^(https?:\/\/)/i;
+                        // THE MULTI-URL FIX
+                        // This checks for a valid link, followed by optional commas or spaces, 
+                        // and allows it to repeat infinitely until the end of the text.
+                        const urlPattern = /^(?:(?:https?:\/\/[^\s,]+|\[[^\]]+\]\(https?:\/\/[^\s)]+\))[\s,]*)+$/i;
                         isValid = urlPattern.test(val);
                         dynamicMessage = field.messageFormat || field.message;
                     }
