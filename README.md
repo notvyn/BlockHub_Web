@@ -1,211 +1,140 @@
-# KomSy3 (formerly BlockHub_Web) - UNDER DEVELOPMENT
-A centralized class management system for CS 2103.
+# KomSy3 (formerly BlockHub)
 
-**Created By: John Calvin Samson**
+A centralized class management platform dedicated to bringing blockmates together. 
 
-## DOCUMENTATION
-**Jul 7, 2026**
-- Updated Dashboard Content to show newly added contents.
-- Modified `model.py` & `webforms.py` to include properties for Announcement, ClassSummary, Course, Deadline, Link, and User.
-- Drafted templates for adding entries (i.e Announcement, Course, Deadline, Link, Summary, Login, Signup)
-- Enabled Login, Signup and Logout feature
+KomSy3 is designed to streamline academic communication, track upcoming deadlines, and provide a unified dashboard for class announcements and resources. It ensures that students stay informed while giving class officers an efficient tool to manage information.
 
-**July 8, 2026**
-- Modified Dashboard navigation redirection to individual pages.
-- Enhanced UX through deadline task filters, responsive interaction tags (i.e. "new"), and
-- Fixed duplicated cards of the same course in the Latest Summary Section.
-- Updated sidebar navigation (i.e. made Site logo redirect to dashboard).
-- Limited the visible content for Announcement, and refined UX through clickable titles.
-- Created AnnouncementRead model for tagging unread announcements.
+## ❓ Why I built it
 
-<p align="center">
-    <img src="app/assets/july-08-2026-d1.png" alt="July 08, 2026 - Enhanced Dashboard UI & UX" width="45%">
-    <img src="app/assets/july-08-2026-d2.png" alt="July 08, 2026 - Hover Effect & Mark Task" width="45%">
-</p>
+This project was deeply inspired by my experience as a Class Representative. It all started with a simple question: 'What happens to the students who aren't present during a lecture? How can they catch up on what they missed?' That's when it clicked. We had been using a basic spreadsheet tracker during our first year, but I took the initiative to build a dedicated web app for my block. KomSy3 was built to preserve resources, keep everyone informed, and make navigating the semester much easier for every student.
 
-**July 9, 2026**
-- Enabled routing for viewing individual announcement.
-- Enabled Dark Mode for Dashboard Content.
-- Fixed checkbox logic to properly remove task once clicked.
-- Created Dropdown for creating entries
-- Drafted Announcement Posting Page (has visual bugs)
+## ✨ Key Features
 
-**July 10, 2026**
-- Fixed Announcement Posting Page visual bug.
-- Changed mobile navbar design to put search, theme, and add button at the top.
-- Organized css files for better styling accessibility.
-- Created Summary, Deadline, and Course Form Page
-- Drafted dedicated pages of each content
+* **Centralized Announcements:** A live dashboard for important class updates and news.
+* **Interactive Deadlines:** Track upcoming quizzes, activities, and requirements by course.
+* **Core Courses & Master Schedule:** Centralized tracking for academic subjects, schedules, and instructor details.
+* **Accessible Class Summaries**: Review record of lectures and takeaways on a specific day. 
+* **Role-Based Access:** Distinct privileges for regular students and class officers/representatives to manage content securely.
+* **Secure Feedback System:** Allows students to communicate concerns efficiently.
+* **Custom Tools:** Includes a built-in lock-screen generator and customizable user profiles.
 
-**July 11, 2026**
-- Added overdue tag for deadline task 
-- Added image upload feature using cloudinary, reaction button, and seen by count
-- Fixed Announcements page and Enabled editing and deleting of post.
-- Created URL pattern validator and constructed element validator for potential cross site scripting (XSS) attacks
-- Enable image and file uploading
-- Made it so the back button redirects back to previous page (based on site history)
-- Separated modals into a single html file
+## 🛠️ Tech Stack
 
-**July 12, 2026** 
-- Styled Deadlines Page
-- Enabled Edit and Delete feature on Deadline Page
+**Frontend:**
+* HTML5
+* CSS3 & Bootstrap
+* Vanilla JavaScript
+* Jinja2 Templating
 
-**July 13, 2026**
-- Refined positioning of Deadline Page Cards
-- Fixed deadline task checkbox interaction
-- Added undo button for marking task as done
-- Created deadlines-archive page and refined task status update logic 
+**Backend:**
+* Python
+* Flask (Web Framework)
+* SQLite (Database)
+* SQLAlchemy (ORM)
 
-**July 14, 2026**
-- Aligned Course Page styling
-- Added delete logic for orphans of relational database model
-- Enabled edit and delete feature of both course and schedule
-- Added a master schedule accordion above course card, and a total units
-- Added instructor email and mailto href value
-- Added room to CourseSchedule model
-- Fixed updating of total units
+## 📂 Project Structure
 
-**July 15, 2026**
-- Fixed ClassSummary page query
-- Fixed Add Summary Forms
-- Enabled Read more feature on ClassSummary Page
-- Added Pagination for ClassSummary Page
-- Added Links page
-- Enabled Edit and Delete Feature of Links Page
-- Refined logic of LinkForm Modal
+```text
+KomSy3/
+├── app/
+│   ├── main/           # Core application routes (Dashboard, Deadlines, etc.)
+│   ├── api/            # Silent json interaction routes (Live Search, Delete, etc.)
+│   ├── auth/           # User Authentication (Login, Signup, Logout) 
+│   ├── static/         # CSS, JavaScript, and Image files
+│   ├── templates/      # HTML Jinja templates
+│   ├── __init__.py     # App factory and configuration
+│   └── models.py       # SQLAlchemy database schemas
+├── .env                # Environment variables (Secret Key, DB URI) - Not tracked by git
+├── requirements.txt    # Python dependencies
+└── run.py              # Main entry point to launch the server
+```
 
-**July 16, 2026**
-- Enabled Search Feature for mobile and desktop
-- Created Service workers for site notification
+## 🚀 How to Clone and Run Locally
+Follow these steps to set up a local development environment.
 
-**July 17, 2026**
-- Created Notification page for viewing recently added
-- Created Feedback page
-- Drafted Profile and Account Settings
-- Drafted Blockmates page
-- Added Email change validation and Password hashing
+### 1. Clone the repository
 
-**July 18, 2026**
-- Styled Login and Signup Page
-- Added validation form (i.e. Password and Email Matching)
-- Refined query logic for Deadlines 
-- Fixed Cascading attribute of relational models
-- Changed logout sidebar icon
-- Added password toggle on authentication pages
-- Refine resolve feature on Feedback page
+```Bash
+git clone [https://github.com/notvyn/BlockHub_Web.git](https://github.com/notvyn/BlockHub_Web.git)
 
-**July 19, 2026**
-- Drafted Wallpaper Generator page
-- Added tools for sidebar (needs refinement)
-- Added description key for Earned badges
-- Refined styling of profile page
+cd BlockHub_Web
+```
 
-**July 20, 2026**
-- Added Form validation for Profile Security Forms
-- Added Form validation to Add Entry pages and Update Entry pages (i.e. Announcement, Summary, Course, Feedback, Schedule)
-- Added role badge and admin badge to profile, blockmates, and blockmate page 
-- Added conditional display of having no content for pages
-- Created feedbacks archive template for resolved items
-- Created error page handlers
-- Fixed light blinking dark mode 
-- Fixed Wallpaper Page and Template 1, added card and background opacity bar
+### 2. Create and activate a virtual environment
 
-**July 21, 2026**
-- Created two more templates for Wallpaper Generator
-- Refined styling of wallpaper generator
-- Fixed tools navbar
-- Fixed Feedbacks' action buttons positioning
-- Refined update profile styling and tag creation logic
+```Bash
+# On Windows
+python -m venv venv
+venv\Scripts\activate
 
-**July 22, 2026**
-- Created Feedback page and added view post on Feedbacks
-- Fixed edit mode of tag creation modal
-- Updated back button url 
-- Added pin feature for announcements and changed action button UI to dropdown
-- Fixed update_deadline date route issue
-- Fixed sidebar two layer tool navigation and badge/dot display
-- Fixed announcement page mark as read issue
-- Refined Dashboard Announcement Section query (Unread vs Recently added) limited to only 3
-- Changed read by to users' profile image 
+# On macOS/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
 
-**July 23, 2026**
-- Created new badges
-- Added unique constraint to ClassSummary models and added error catching
-- Added pin feature on links
-- Added individual read entry on dashboard announcement and summary section
-- Refined Tags by making it each category collapsible, has tag limitation, and sliced user tags for visual clarity
-- Restyled lightbox modal and files uploaded in easymde content
-- Updated file uploaded icons
-- Fixed mobile sidebar footer issue
-- Added two slider (zoom and card position) on Wallpapers
-- Fixed hover effect of dropdown delete button
+### 3. Install dependencies
 
-**July 24, 2026 **
-- Truncated super lengthy course title on Dashboard
-- Fixed phone download not going through (wallpaper page)
-- Fixed styling login email focus style issue 
-- Refined Announcement url entry validation
-- Refactored/Restructured Routing to three classification (api, auth, main)
-- Refined validation of Feedback pending/resolve page
-- Partially organized and restructured javascript folder
+```Bash
+pip install -r requirements.txt
+```
 
-**July 25, 2026**
-- Finished organizing javascript folder
-- Added conditional text on dashboard filters
-- Changed This Week filter to Next 7 Days
-- Fixed sidebar profile picture issue
-- Cleaned the css folder
+### 4. Set up environment variables
+Create a `.env` file in the root directory and add your required keys:
 
-## TO-DO LIST
-- [/] Avoid duplicates for Class Summary Sections.
-- [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
-- [/] Limit content for Announcement.
-- [/] Enable Dark Mode.
-- [/] Enable dropdown for adding entry.
-- [/] Build Search Feature.
-- [/] Construct Templates for entries.
-- [/] Create route for individual viewing of announcement
-- [/] Fix total deadline visual number
-- [/] Fix style and structure dedicated pages for each content (i.e. Announcement ✔️, Courses✔️, Deadlines✔️, Summaries✔️)
-- [/] Create new model for Courses' schedule
-- [/] Include total number of content and other labels on each dedicated pages
-- [/] Add small red dot on sidebar for pages with new content
-- [/] Fix Recent Announcements Total Count and refine Query (Dashboard) 
-- [/] Have a live update on the total content count for each action on a page
-- [/] Fix mobile sidebar screen UI issue 
-- [/] Fix Total Units live update count
-- [/] Have conditional text for no entry pages (Summaries and Deadlines already done, added archives, links, announcements, courses)
-- [/] Add Room to the Master Schedule and Model
-- [/] Fix total count badge of deadline on dashboard
-- [/] Refine logic of Announcement query on dashboard
-- [ ] Refine styling of dashboard
-- [/] Refine Styling of Notification, Feedback, Profile, Login, Signup, and Blockmates (Login and Signup done)
-- [/] Create list of badges for profiles
-- [/] Create new model for each user completion of Task
-- [/] Add is_pinned on Announcements and Links
-- [/] Fix styling of Wallpaper Generator
-- [/] Create two more templates for Wallpaper generator
-- [/] Fix Tools sidebar navigation and interaction
-- [/] Fix Feedback action buttons positioning
-- [/] Fix edit mode of CreateTagModal
-- [/] Create a dedicated individual page for feedback entries
-- [/] Make each course unique in models
-- [/] Fix tag seed initialization.
-- [/] Fix date value for editing deadlines
-- [/] Fix announcements page mark as read issue
-- [/] Fix duplicate entries for summaries
-- [/] Add constraint to summaries and deadlines if there's no courses found yet.
-- [ ] Fix master schedule no live update
-- [/] Fix super lengthy course title
-- [/] Fix other phone download not going through (wallpaper page)
-- [/] Fix login email focus style issue 
-- [/] Fix Announcement url entry validation
-- [ ] Create a conditional text for no admin reply in Feedbacks
-- [/] Create a conditional text for no urgent task right now or within this week 
-- [/] Fix size of sidebar profile pic
-- [/] Create a conditional text for no current pending feedback 
-- [ ] Fix sidebar visual issue when new tag is created 
+```env
+SECRET_KEY=your_secret_key_here
 
-FUTURE VISION
-- [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)
-- [ ] Maybe add a grading computation for Course (possibly creation of a dedicated page for each course)
+# Cloudinary Setup for Image Uploads
+CLOUDINARY_CLOUD_NAME=your_cloud_name_here
+CLOUDINARY_API_KEY=your_api_key_here
+CLOUDINARY_API_SECRET=your_api_secret_here
+
+# VAPID Keys for Push Notifications
+VAPID_PUBLIC_KEY=your_vapid_public_key_here
+VAPID_PRIVATE_KEY=your_vapid_private_key_here
+VAPID_CLAIM_EMAIL=mailto:your_email@example.com
+
+# Email Configuration
+EMAIL_USER=your_email@example.com
+EMAIL_PASS=your_email_app_password_here
+```
+*Note: To run this project fully, you will need to create a free Cloudinary Account for the image API, generate VAPID keys using an online VAPID generator, and generate an App Password from your email provider.*
+
+
+### 5. Initialize the database
+
+```Bash
+python
+>>> from run import app
+>>> from app import db
+>>> with app.app_context():
+...     db.create_all()
+>>> exit()
+```
+
+### 6. Run the application
+
+```Bash
+flask run
+```
+
+The site will be available at `http://127.0.0.1:5000`
+
+## 🧠 What I Have Learned
+Building KomSy3 has been a deep dive into full-stack development and project management. Here are a few key takeaways from this journey:
+
+- Architecting a Full-Stack Application: Learned how to seamlessly connect a Vanilla JS/Bootstrap frontend with a Python-Flask backend using Jinja templates.
+
+- Database Management: Gained hands-on experience designing relational data models with SQLite and SQLAlchemy to handle users, announcements, and courses.
+
+- Deployment & Server Setup: Successfully navigated the challenges of deploying a live web application, managing virtual environments on a cloud Linux server (PythonAnywhere), and securely handling environment variables.
+
+- Program Debugging & Logic Testing: Trained Problem Solving skills through code debugging and logic creation of both frontend and backend elements interaction.  
+
+- Scoping & Agile Principles: Discovered the importance of building a Minimum Viable Product (MVP) and managing "feature creep" to ensure a timely and functional launch.
+
+- Structure & Code Optimization: Realized the significance of writing modular code using DRY Principle (Do Not Repeat Yourself) and maintaining simplicity and directory accessibility.
+
+<hr>
+
+A passion project brought to life by **John Calvin Samson**. Built by a student, for students.

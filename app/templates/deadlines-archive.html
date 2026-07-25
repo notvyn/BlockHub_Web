@@ -72,7 +72,7 @@
 
                     <!-- 4. RIGHT COLUMN: Actions & Status -->
                     <div class="dl-actions flex-shrink-0 d-flex flex-column align-items-end justify-content-end ms-2">
-                        {% if current_user.is_authenticated %}                        
+                        {% if current_user.role == 'Officer' or current_user.is_admin %}                  
                         <div class="d-flex gap-2 mb-1">
                             <a href="{{ url_for('main.update_deadline', id=d.id)}}" class="btn btn-icon-action" title="Edit">
                                 <i class="fa-solid fa-pencil"></i>

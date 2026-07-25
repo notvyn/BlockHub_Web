@@ -56,15 +56,17 @@
                 </div>
 
                 <div class="m-nav-btns d-flex align-items-center justify-content-evenly">
+                    {% if not is_auth %}
                     <button id="m-search-trigger">
                         <i class="bi bi-search"></i>
                     </button>
+                    {% endif %}
                     
                     <button class="theme-toggle-btn">
                         <i class="fa-solid fa-moon"></i>
                     </button>
 
-                    {% if is_entry != true and current_user.role == 'Officer' %}
+                    {% if is_entry != true and (current_user.role == 'Officer' or current_user.is_admin) %}
                         <div class="dropdown d-flex align-items-center">
                             <button class="entry-toggle" type="button" id="mobileAddEntryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa-solid fa-plus"></i>
@@ -137,7 +139,7 @@
                         
                         <button class="theme-toggle-btn" id="theme-toggle-desktop"><i class="fa-solid fa-moon"></i></button>
 
-                        {% if not is_auth and is_entry != true and current_user.role == 'Officer' %}
+                        {% if is_entry != true and (current_user.role == 'Officer' or current_user.is_admin) %}
                         <div class="dropdown">
                             <button class="entry-toggle" type="button" id="desktopAddEntryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa-solid fa-plus"></i>
