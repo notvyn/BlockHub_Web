@@ -18,7 +18,7 @@
             <div class="d-flex align-items-center gap-3">
                 <!-- Segmented Toggle -->
                 <div class="btn-group" role="group">
-                    <a href="{{ url_for('main.feedbacks') }}" class="btn btn-sm btn-primary active">Pending</a>
+                    <a href="{{ url_for('main.feedbacks') }}" class="btn btn-sm active" style="background-color: var(--accent-purple); color: var(--main-bg); border: 1px solid var(--hue-shade);">Pending</a>
                     <a href="{{ url_for('main.feedbacks_archive') }}" class="btn btn-sm btn-outline-secondary">Resolved</a>
                 </div>
             </div>
@@ -51,7 +51,7 @@
         <!-- LEFT SIDE: Content (Title, Badges, and Message) -->
         <div class="feedback-content flex-grow-1">
             <!-- Added flex-wrap so badges don't overflow on small screens -->
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                 <a href="{{ url_for('main.feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
                     {{ f.title }}
                 </a>
@@ -63,6 +63,7 @@
                     {{ f.status }}
                 </div>
             </div>
+            <div class="mb-2 small text-muted">Submitted by: {{ f.user.name }}</div>
             <div class="mb-2" style="color: var(--text-muted);">{{ f.message | markdown | truncate(200, true, '...') | safe }}</div>
             {% if f.admin_reply %}
                 <div class="mb-1 fw-medium">ADMIN REPLY:</div>
@@ -109,22 +110,50 @@
 
 {% block content %}
     <div class="card-container">
-        
         {% if current_user.role == 'Officer' or current_user.is_admin %}
-            {% for f in feedback %}
-                {{ feedback_content(f) }}
-            {% endfor %}
-        {% elif user_feedback_count > 0 %}
-            {% for f in feedback %}
-                {% if current_user.id == f.user_id %}
+            
+            <!-- ==========================================
+                OFFICER / ADMIN VIEW
+                ========================================== -->
+            {% if total_pending > 0 %}
+                {% for f in feedback %}
                     {{ feedback_content(f) }}
-                {% endif %}
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <!-- Officer Empty State -->
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-broom mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                    <h5>No pending feedbacks right now. Great job!</h5>
+                </div>
+            {% endif %}
+
         {% else %}
-            <div class="text-center py-5">
-                <i class="fa-regular fa-folder-open mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
-                <h5>Seen a bug? Have a question or suggestion? Relay it to the Officers ! ;)</h5>
-            </div>
+            
+            <!-- ==========================================
+                STUDENT VIEW
+                ========================================== -->
+            {% if user_total_pending > 0 %}
+                {% for f in feedback %}
+                    {% if current_user.id == f.user_id %}
+                        {{ feedback_content(f) }}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <!-- Student Empty State -->
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-broom mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                    
+                    {% if user_feedback_count > 0 %}
+                        <!-- Scenario A: They have no pending, but they DO have resolved tickets -->
+                        <h5>All your feedbacks have been resolved! Have another suggestion? Relay it to the Officers! ;)</h5>
+                    {% else %}
+                        <!-- Scenario B: They have absolutely zero tickets in the system -->
+                        <h5>Seen a bug? Have a question or suggestion? Relay it to the Officers! ;)</h5>
+                    {% endif %}
+                    
+                </div>
+            {% endif %}
+            
         {% endif %}
     </div>
 
@@ -153,7 +182,7 @@
                 
                 <div class="modal-footer border-top-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary fw-bold" id="submitReplyBtn">Resolve Feedback</button>
+                    <button type="button" class="btn fw-bold" id="submitReplyBtn" style="background-color: var(--accent-purple); color: var(--main-bg)">Resolve Feedback</button>
                 </div>
                 
             </div>

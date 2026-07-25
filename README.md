@@ -151,7 +151,10 @@ A centralized class management system for CS 2103.
 
 **July 25, 2026**
 - Finished organizing javascript folder
-
+- Added conditional text on dashboard filters
+- Changed This Week filter to Next 7 Days
+- Fixed sidebar profile picture issue
+- Cleaned the css folder
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -199,8 +202,8 @@ A centralized class management system for CS 2103.
 - [/] Fix Announcement url entry validation
 - [ ] Create a conditional text for no admin reply in Feedbacks
 - [/] Create a conditional text for no urgent task right now or within this week 
-- [ ] Fix size of sidebar profile pic
-- [ ] Create a conditional text for no current pending feedback 
+- [/] Fix size of sidebar profile pic
+- [/] Create a conditional text for no current pending feedback 
 - [ ] Fix sidebar visual issue when new tag is created 
 
 FUTURE VISION

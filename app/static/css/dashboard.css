@@ -200,7 +200,6 @@
     border: 1px solid var(--accent-purple);
 }
 
-
 /* Markdown Bullet Lists */
 .md-list {
     list-style: none;
@@ -249,10 +248,11 @@
     line-height: 1.6;
     
     /* The Line-Clamp Magic */
-    /* display: -webkit-box;
-    -webkit-line-clamp: 3; Limits the preview to exactly 3 lines
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-line-clamp: 3; /* Limits the preview to exactly 3 lines */
     -webkit-box-orient: vertical;
-    overflow: hidden; */
+    overflow: hidden;
 }
 
 .md-quote-content p {
@@ -275,8 +275,6 @@
     max-height: 280px;
     max-width: 100%;
     border-radius: 8px;
-    
-    /* NEW: Interaction styles */
     cursor: pointer;
     transition: transform 0.2s ease, opacity 0.2s ease;
 }

@@ -2,12 +2,13 @@ import {getReadHistory, initAnnouncementForm, readAnnouncement, setFileIcon, tog
 import {eyeToggle, validateSignUpInput} from './auth.js';
 import {toggleDarkMode, toggleDeleteEntry, toggleLiveSearch, toggleMobileSearchBar, toggleSearchHighlight, toggleSidebarExpand} from './core.js';
 import {initCourseForm} from './courses.js';
+import {initOnboardingTour} from './dashboard.js';
 import {completeDeadline, filterDeadline, initDeadlineForm} from './deadlines.js';
 import {initFeedbackForm, resolveFeedback, toggleFeedbackReplyModal} from './feedbacks.js';
 import {cleanInputLinkModal, toggleLinkModal, toggleLinkPin, validateLinkForm} from './links.js';
 import {initScheduleForm} from './schedules.js';
 import {getCourseRadios, initSummaryForm} from './summaries.js';
-import {initUpdateProfileSettings, toggleCreateTag, toggleNotificationSubscription, toggleUserProfileUpdate} from './profile.js';
+import {initTourReset, initUpdateProfileSettings, toggleCreateTag, toggleNotificationSubscription, toggleUserProfileUpdate} from './profile.js';
 import {setAnchorToAnnouncement} from './utils.js';
 import {initWallpaperGenerator} from './wallpaper.js';
 
@@ -37,6 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Course Features
     initCourseForm();
 
+    // Dashboard Features
+    initOnboardingTour();
+
     // Deadline Features
     completeDeadline();
     filterDeadline();
@@ -61,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSummaryForm();
 
     // Profile Features
+    initTourReset();
     initUpdateProfileSettings();
     toggleCreateTag();
     toggleNotificationSubscription();

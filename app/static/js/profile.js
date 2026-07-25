@@ -1,3 +1,17 @@
+export function initTourReset() {
+    const replayBtn = document.getElementById('replay-tour-btn');
+    
+    if (replayBtn) {
+        replayBtn.addEventListener('click', function() {
+            // 1. Erase the memory
+            localStorage.removeItem('blockhub_onboarding_complete');
+            
+            // 2. Redirect back to the dashboard (where the modal will pop up again!)
+            window.location.href = '/dashboard';
+        });
+    }
+}
+
 export function initUpdateProfileSettings() {
     // ==========================================
     // 1. INSTANT AVATAR PREVIEW

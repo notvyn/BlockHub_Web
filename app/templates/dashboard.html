@@ -212,5 +212,107 @@
         </div>
     </div>
 
+    <!-- ==========================================
+     THE MULTI-STEP ONBOARDING MODAL
+     ========================================== -->
+    <div class="modal fade" id="welcomeTourModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg card-wrapper">
+                <div class="modal-body p-4 p-md-5">
+                    
+                    <!-- The Bootstrap Carousel -->
+                    <div id="onboardingCarousel" class="carousel slide" data-bs-ride="false" data-bs-wrap="false">
+                        
+                        <!-- Carousel Indicators (Exactly 5 dots for 5 slides) -->
+                        <div class="carousel-indicators" style="bottom: -2rem;">
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="0" class="active bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="1" class="bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="2" class="bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="3" class="bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="4" class="bg-secondary"></button>
+                        </div>
+
+                        <div class="carousel-inner text-center pb-4">
+                            
+                            <!-- SLIDE 1: Welcome / Dashboard -->
+                            <div class="carousel-item active">
+                                <i class="fa-solid fa-rocket mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Welcome to the Hub</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        This is your central command center. From here, you have the tools to manage class communication, organize schedules, and keep the block on track.
+                                    {% else %}
+                                        This is your central command center. Stay on top of your requirements, track exactly how many days are left for assignments, and never miss an update.
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- SLIDE 2: Announcements -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-bullhorn mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Announcements</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Broadcast updates using the Markdown editor. Pin critical posts to the top of the feed, track heart reactions, and trigger push notifications to classmates.
+                                    {% else %}
+                                        Read the latest updates from your officers. Opt-in to push notifications and check your dashboard badges so you always know when important information drops!
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- SLIDE 3: Deadlines -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-calendar-check mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Deadlines</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Schedule upcoming tasks and exams. Assign them to specific courses and categories to help your classmates visualize their academic workload.
+                                    {% else %}
+                                        Use the dynamic filters on your dashboard to instantly spot what is due in the next 7 days, or quickly identify urgent tasks due within 48 hours.
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            <!-- SLIDE 4: Academics & Tools -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-toolbox mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Academics & Tools</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Upload concise lecture summaries, maintain the shared drive links, and manage course information so everyone has access to the right study materials.
+                                    {% else %}
+                                        Catch up quickly with lecture summaries, access important meeting links, and even use the custom Lock Screen Generator to export your aesthetic class schedule!
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- SLIDE 5: Community & Feedback -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-user-group mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Community & Feedback</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Review bug reports and suggestions. Reply to tickets, resolve them to keep the queue clean, and manage student profiles and custom role tags.
+                                    {% else %}
+                                        Personalize your profile with custom tags! Found a bug or have a suggestion? Submit a feedback ticket and get direct replies from your officers.
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Custom Navigation Controls -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <!-- Skip Button saves memory and dismisses -->
+                        <button type="button" class="btn text-muted fw-bold p-0 tour-dismiss-btn" data-bs-dismiss="modal">Skip Tour</button>
+                        <!-- Next Button -->
+                        <button type="button" class="btn btn-submit fw-bold px-4" id="tourNextBtn">Next <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
     
 {% endblock %}

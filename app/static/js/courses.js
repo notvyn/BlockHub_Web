@@ -1,17 +1,3 @@
-export function updateCourseUnits() {
-    function updateUnits(newUnits) {
-        const pageUnits = document.getElementById('course-page-total-units')
-
-        if (pageUnits) {
-            pageUnits.style.opacity = '0';
-            setTimeout(() => {
-                pageUnits.textContent = newUnits;
-                pageUnits.style.opacity = '1';
-            }, 150);
-        }
-    }
-}
-
 export function initCourseForm() {
     if (typeof window.initEntryValidation === 'function') {
         window.initEntryValidation('courseForm', [

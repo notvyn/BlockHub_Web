@@ -528,18 +528,21 @@ def feedback(id):
 def feedbacks():
     feedback = Feedback.query.filter(Feedback.status == 'Pending').order_by(Feedback.date_added.desc()).all()
 
-    user_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id, Feedback.status == 'Pending').count()
+    user_total_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id).count()
+    user_total_pending = Feedback.query.filter(current_user.id == Feedback.user_id, Feedback.status == 'Pending').count()
+    total_pending = Feedback.query.filter(Feedback.status == 'Pending').count()
 
-    return render_template('feedbacks.html', feedback=feedback, user_feedback_count=user_feedback_count)
+    return render_template('feedbacks.html', feedback=feedback, user_feedback_count=user_total_feedback_count, user_total_pending=user_total_pending, total_pending=total_pending)
 
 @main.route('/feedback-archive', methods=['GET', 'POST'])
 @login_required
 def feedbacks_archive():
     feedback = Feedback.query.filter(Feedback.status == 'Resolved').order_by(Feedback.date_added.desc()).all()
 
-    user_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id, Feedback.status == 'Resolved').count()
+    user_total_feedback_count = Feedback.query.filter(current_user.id == Feedback.user_id).count()
+    user_total_pending = Feedback.query.filter(current_user.id == Feedback.user_id, Feedback.status == 'Pending').count()
 
-    return render_template('feedbacks-archive.html', feedback=feedback, user_feedback_count=user_feedback_count)
+    return render_template('feedbacks-archive.html', feedback=feedback, user_feedback_count=user_total_feedback_count, user_total_pending=user_total_pending)
 
 @main.route('/links')
 @login_required

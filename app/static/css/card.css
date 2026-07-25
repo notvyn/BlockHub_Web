@@ -11,7 +11,7 @@
     padding: 1.5rem;
     margin-bottom: 1.5rem;
 
-    /* ADD THESE TWO LINES: Locks the entire app frame to the exact screen size */
+    /* Locks the entire app frame to the exact screen size */
     overflow: hidden;
 
     /* Adds a subtle hover float effect for a premium feel */
@@ -123,8 +123,6 @@
     max-height: 280px;
     max-width: 100%;
     border-radius: 8px;
-    
-    /* NEW: Interaction styles */
     cursor: pointer;
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
