@@ -1,18 +1,4 @@
 /* --- CLASS SUMMARY CARDS --- */
-/* .summary-card {
-    background-color: var(--card-bg);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-} */
-
-/* .summary-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
-} */
-
 .summary-date {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }

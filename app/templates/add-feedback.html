@@ -36,7 +36,7 @@
 
                 <div class="mb-4">
                     <label class="form-label md-code border-0 bg-transparent mb-1">MESSAGE</label>
-                    {{ form.message(id="feedback-message", class="form-control" + ("is-invalid" if form.message.errors else ""), placeholder="Found bug at... Block activity...") }}
+                    {{ form.message(id="feedback-message", class="form-control" + ("is-invalid" if form.message.errors else ""), placeholder="Found bug at... Block activity...", data_has_error="true" if form.message.errors else "false")}}
                     <div class="invalid-feedback fw-bold" id="error-message">
                         {% if form.message.errors %}{{ form.message.errors[0] }}{% endif %}
                     </div>
@@ -53,57 +53,6 @@
 
 {% block script %}
     <script>
-        const easyMDE = new EasyMDE({
-            element: document.getElementById('feedback-message'),
-            theme: "modern",
-            minHeight: "100px", // <--- ADD THIS LINE (Adjust the pixel value to your liking)
-            maxHeight: "200px",
-            spellChecker: false,
-            // Turn on the image upload feature
-            uploadImage: true,
-            toolbar: [
-                "bold", "italic", "strikethrough", "|", 
-                "heading-1", "heading-2", "heading-3", "|", 
-                "code", "quote", "|", 
-                "unordered-list", "ordered-list", "|", 
-                "link", "image", "horizontal-rule", "|", 
-                "preview", "side-by-side", "fullscreen", "|", 
-                "guide"
-            ],
-            // Define the custom upload function
-            imageUploadFunction: function(file, onSuccess, onError) {
-                const formData = new FormData();
-                formData.append('image', file);
-
-                fetch('/upload-image', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.data && data.data.filePath) {
-                        // If successful, tell EasyMDE the URL to insert!
-                        onSuccess(data.data.filePath);
-                    } else {
-                        onError("Upload failed");
-                    }
-                })
-                .catch(err => {
-                    onError(err.toString());
-                });
-            }
-        });
-
-        {% if form.message.errors %}
-            if (easyMDE.element.nextSibling) {
-                easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
-            }
-        {% endif %}
-
-        window.initEntryValidation('feedbackForm', [
-            { type: 'text', id: 'title', errorId: 'error-title', message: 'Feedback Title is required.' },
-            { type: 'radio', name: 'category', containerId: 'categoryContainer', errorId: 'error-category', message: 'Please select a category.' },
-            { type: 'easymde', instance: easyMDE, errorId: 'error-message', message: 'Feedback content cannot be empty' }
-        ]);
+        
     </script>
 {% endblock %}

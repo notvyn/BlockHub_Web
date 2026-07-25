@@ -145,6 +145,16 @@ A centralized class management system for CS 2103.
 - Fixed phone download not going through (wallpaper page)
 - Fixed styling login email focus style issue 
 - Refined Announcement url entry validation
+- Refactored/Restructured Routing to three classification (api, auth, main)
+- Refined validation of Feedback pending/resolve page
+- Partially organized and restructured javascript folder
+
+**July 25, 2026**
+- Finished organizing javascript folder
+- Added conditional text on dashboard filters
+- Changed This Week filter to Next 7 Days
+- Fixed sidebar profile picture issue
+- Cleaned the css folder
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -190,6 +200,11 @@ A centralized class management system for CS 2103.
 - [/] Fix other phone download not going through (wallpaper page)
 - [/] Fix login email focus style issue 
 - [/] Fix Announcement url entry validation
+- [ ] Create a conditional text for no admin reply in Feedbacks
+- [/] Create a conditional text for no urgent task right now or within this week 
+- [/] Fix size of sidebar profile pic
+- [/] Create a conditional text for no current pending feedback 
+- [ ] Fix sidebar visual issue when new tag is created 
 
 FUTURE VISION
 - [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)

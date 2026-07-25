@@ -7,7 +7,7 @@
 
 {% block page_title %}Class Summaries{% endblock %}
 {% block page_title_txt %}The past is worth looking into :P{% endblock %}
-{% block url_back %}{{ url_for('summaries')}}{% endblock %}
+{% block url_back %}{{ url_for('main.summaries')}}{% endblock %}
 
 {% block content %}
     <div class="col-12">
@@ -43,8 +43,8 @@
 
             <!-- 2. MAIN CONTENT SECTION -->
             <!-- Removed striptags and truncate. Added 'safe' to render your EasyMDE formatting -->
-            <div class="summary-content mb-3" style="font-size: 1.05rem; line-height: 1.8;">
-                {{ summary.content | markdown | safe }}
+            <div class="card-content summary-content mb-3" style="font-size: 1.05rem; line-height: 1.8;">
+                {{ summary.content | markdown }}
             </div>
 
             <!-- 3. EXTRA NOTE SECTION -->
@@ -57,10 +57,10 @@
 
             <!-- 4. ACTION BUTTONS -->
             <div class="d-flex justify-content-end gap-3 mt-auto pt-4">
-                <a href="{{ url_for('update_summary', id=summary.id) }}" class="btn btn btn-icon-action" title="Edit">
+                <a href="{{ url_for('main.update_summary', id=summary.id) }}" class="btn btn btn-icon-action" title="Edit">
                     <i class="fa-solid fa-pencil"></i> Edit
                 </a>
-                <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ summary.id }}" data-redirect="{{ url_for('summaries') }}" data-type="class-summary" title="Delete">
+                <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ summary.id }}" data-redirect="{{ url_for('main.summaries') }}" data-type="class-summary" title="Delete">
                     <i class="fa-solid fa-trash"></i> Delete
                 </button>
             </div>

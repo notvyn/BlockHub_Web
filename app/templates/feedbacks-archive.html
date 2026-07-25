@@ -11,14 +11,14 @@
     <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3 ">
         <!-- Fixed Floating Action Button at Bottom-Right -->
          <!-- Compact Primary Action -->
-        <a href="{{ url_for('add_feedback') }}" class="btn btn-sm fw-bold add-feedback-btn">
+        <a href="{{ url_for('main.add_feedback') }}" class="btn btn-sm fw-bold add-feedback-btn">
             <i class="fa-solid fa-plus me-1"></i> Feedback
         </a>
         <div class="d-flex align-items-center gap-3">
             <!-- Segmented Toggle -->
             <div class="btn-group" role="group">
-                <a href="{{ url_for('feedbacks') }}" class="btn btn-sm btn-outline-secondary">Pending</a>
-                <a href="{{ url_for('feedbacks_archive') }}" class="btn btn-sm btn-primary active">Resolved</a>
+                <a href="{{ url_for('main.feedbacks') }}" class="btn btn-sm btn-outline-secondary">Pending</a>
+                <a href="{{ url_for('main.feedbacks_archive') }}" class="btn btn-sm active" style="background-color: var(--accent-purple); color: var(--main-bg); border: 1px solid var(--hue-shade);">Resolved</a>
             </div>
         </div>
         <div style="color: var(--text-muted);">
@@ -49,8 +49,8 @@
         <!-- LEFT SIDE: Content (Title, Badges, and Message) -->
         <div class="feedback-content flex-grow-1">
             <!-- Added flex-wrap so badges don't overflow on small screens -->
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-                <a href="{{ url_for('feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <a href="{{ url_for('main.feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
                     {{ f.title }}
                 </a>
                 <!-- Swapped p-2 to px-2 py-1 for sleeker pill badges -->
@@ -61,6 +61,7 @@
                     {{ f.status }}
                 </div>
             </div>
+            <div class="mb-2 small text-muted">Submitted by: {{ f.user.name }}</div>
             <div class="mb-2" style="color: var(--text-muted);">{{ f.message | markdown | truncate(200, true, '...') | safe }}</div>
             {% if f.admin_reply %}
                 <div class="mb-1 fw-medium">ADMIN REPLY:</div>
@@ -71,10 +72,10 @@
         <!-- RIGHT SIDE: Actions (Edit, Delete, Complete) -->
         <!-- Used flex-md-column to stack buttons neatly on the right -->
         <div class="feedback-actions d-flex flex-row flex-md-column justify-content-between align-items-md-end pt-3 pt-md-0 ps-md-4 mt-2 mt-md-0" style="min-width: 140px;">
-            {% if current_user.id == f.user_id and f.status != 'Resolved' %}                        
+            {% if (current_user.id == f.user_id and f.status != 'Resolved') %}                        
             <div class="d-flex gap-2 order-2 order-md-1">
                 <!-- Make sure to add the correct update_feedback URL here -->
-                <a href="{{ url_for('update_feedback', id=f.id)}}" class="btn btn-icon-action" title="Edit">
+                <a href="{{ url_for('main.update_feedback', id=f.id)}}" class="btn btn-icon-action" title="Edit">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
                 <!-- FIXED: Changed data-type from 'deadline' to 'feedback' -->
@@ -85,7 +86,7 @@
             {% endif %}
 
             <div class="d-flex gap-2 flex-wrap">
-                <a href="{{ url_for('feedback', id=f.id) }}" class="btn btn-sm btn-outline-secondary align-self-center align-self-md-auto">View Feedback</a>
+                <a href="{{ url_for('main.feedback', id=f.id) }}" class="btn btn-sm btn-outline-secondary align-self-center align-self-md-auto">View Feedback</a>
                 {% if current_user.role != 'Officer' %}
                     {% if f.status == 'Pending' %}
                         <!-- RESOLVE BUTTON: Added mt-md-auto -->
@@ -95,9 +96,6 @@
                                 data-id="{{ f.id }}">
                             <i class="fa-solid fa-check me-1"></i> Resolve
                         </button>
-                    {% else %}
-                        <!-- BADGE: Added mt-md-auto -->
-                        <span class="badge bg-success order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto">Resolved</span>
                     {% endif %}
                 {% endif %}
             </div>
@@ -107,23 +105,50 @@
 
 {% block content %}
     <div class="card-container">
-        
-        {% if user_feedback_count > 0 %}
-            {% for f in feedback %}
-
-                {% if current_user.role == 'Officer' or current_user.is_admin %}
+        {% if current_user.role == 'Officer' or current_user.is_admin %}
+            
+            <!-- ==========================================
+                OFFICER / ADMIN VIEW (RESOLVED)
+                ========================================== -->
+            {% if feedback %}
+                {% for f in feedback %}
                     {{ feedback_content(f) }}
-                {% else %}
-                    {% if current_user.id == f.user_id %}
-                        {{ feedback_content(f) }}
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <!-- Officer Empty State -->
+                <div class="text-center py-5">
+                    <i class="fa-regular fa-folder-open mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                    <h5>No feedbacks have been resolved yet.</h5>
+                </div>
+            {% endif %}
+
         {% else %}
-            <div class="text-center py-5">
-                <i class="fa-regular fa-folder-open mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
-                <h5>Feedback hasn't been resolved yet.</h5>
-            </div>
+            
+            <!-- ==========================================
+                STUDENT VIEW (RESOLVED)
+                ========================================== -->
+            <!-- Magically filter the list to only include this student's resolved feedbacks -->
+            {% set user_resolved = feedback | selectattr('user_id', 'equalto', current_user.id) | list %}
+            
+            {% if user_resolved %}
+                {% for f in user_resolved %}
+                    {{ feedback_content(f) }}
+                {% endfor %}
+            {% else %}
+                <!-- Student Empty State -->
+                <div class="text-center py-5">
+                    <i class="fa-regular fa-folder-open mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                    
+                    {% if user_feedback_count > 0 %}
+                        <!-- Scenario A: They have tickets, but they are all still 'Pending' -->
+                        <h5>Your feedbacks are currently being reviewed. None have been resolved yet.</h5>
+                    {% else %}
+                        <!-- Scenario B: They have zero tickets in the system entirely -->
+                        <h5>You haven't submitted any feedback yet.</h5>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
         {% endif %}
     </div>
 {% endblock %}

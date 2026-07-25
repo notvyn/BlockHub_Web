@@ -26,7 +26,7 @@
                 <!-- Obsidian Style Deadlines -->
                 <div class="md-section">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="{{ url_for('deadlines') }}" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('main.deadlines') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Pending Deadlines</div>
                             {% set badge_display = 'inline-block' if deadlines else 'none' %}
                             <span id="deadline-badge" class="badge bg-danger rounded-pill" style="display: {{ badge_display }};">{{ deadlines|length }}</span>
@@ -37,7 +37,7 @@
                                 <span>Urgent</span>
                             </a>
                             <a href="#" class="filter-btn" data-filter="week">
-                                <span>This week</span>
+                                <span>Next 7 days</span>
                             </a>
                             <a href="#" class="filter-btn fw-bold" data-filter="all">
                                 <span>Upcoming</span>
@@ -45,21 +45,18 @@
                         </div>
                     </div>
                     
+                    <div class="deadline-filtered-null" style="display: none;"></div>
                     {% if deadlines %}
                         {% for d in deadlines %}
                             {% set days_left = (d.due_datetime - today).days %}
-                            {% set is_this_week = "true" if d.due_datetime <= end_of_week else "false" %}
 
-                            <div class="md-task deadline-item" data-days="{{ days_left }}" data-this-week="{{ is_this_week }}">
-                                <!-- <i class="bi bi-square"></i> -->
-                                <!-- ADDED: checked condition -->
+                            <div class="md-task deadline-item" data-days="{{ days_left }}">
                                 <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.id in completed_ids %}checked{% endif %}>
                                 <label class="btn btn-obsidian" for="btn-check-{{ d.id }}">
                                     <i class="fa-solid fa-check"></i>
                                 </label>
                                 <div id="task-text-{{ d.id }}">
                                     <div class="md-code-title">
-                                        <!-- ADDED: inline style for strikethrough -->
                                         <a href="#" class="md-task-title" data-id="{{ d.id }}" {% if d.id in completed_ids %}style="text-decoration: line-through;"{% endif %}>{{ d.description }}</a>
                                         {% if d.due_datetime < today %}
                                             <span class="md-code fw-bold text-white bg-danger border-0 ms-2 new-tag" id="tag-{{ d.id}}">OVERDUE</span>
@@ -90,7 +87,7 @@
                 <!-- Obsidian Style Announcements -->
                 <div class="md-section">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="{{ url_for('announcements') }}" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('main.announcements') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Recent Announcements</div>
                             <span id="announcement-badge" class="badge bg-danger rounded-pill" style="display: none;">0</span>
                             <i class="fa-solid fa-chevron-right text-muted"></i>
@@ -101,7 +98,7 @@
                     {% for a in announcements %}
                     <div class="md-quote">
                         <div class="md-quote-title">
-                            <a href="{{ url_for('announcement', id=a.id)}}" class="announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
+                            <a href="{{ url_for('main.announcement', id=a.id)}}" class="announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
                             
                             {% if a.id not in read_ids %}
                                 <span class="md-code text-white bg-danger border-0 ms-2 new-tag" id="tag-{{ a.id }}">NEW</span>
@@ -135,7 +132,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end mt-2">
-                            <a href="{{ url_for('announcement', id=a.id) }}" class="btn btn-sm announcement-link announcement-link-btn" data-id="{{ a.id }}">
+                            <a href="{{ url_for('main.announcement', id=a.id) }}" class="btn btn-sm announcement-link announcement-link-btn" data-id="{{ a.id }}">
                                 Read Post <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -154,7 +151,7 @@
                 <!-- Quick Links -->
                 <div class="md-section" id="quick-links">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="{{ url_for('links') }}" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('main.links') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Quick Links</div>
                             <i class="fa-solid fa-chevron-right text-muted"></i>
                         </a>
@@ -175,7 +172,7 @@
                 <!-- Class Summary -->
                 <div class="md-section" id="latest-summary">
                     <div class="md-h2-container d-flex justify-content-between">
-                        <a href="{{ url_for('summaries') }}" class="md-title d-flex align-items-center gap-2">
+                        <a href="{{ url_for('main.summaries') }}" class="md-title d-flex align-items-center gap-2">
                             <div class="md-h2 mb-0">Latest Summary</div>
                                 <!-- <span class="badge bg-danger rounded-pill">{{ total_deadline }}</span> -->
                                 <i class="fa-solid fa-chevron-right text-muted"></i>
@@ -199,7 +196,7 @@
                                     {% endif %}
 
                                     <!-- FIX: The link is now tied directly to the individual summary loop -->
-                                    <a href="{{ url_for('summary', id=summary.id) }}" class="read-summary">
+                                    <a href="{{ url_for('main.summary', id=summary.id) }}" class="read-summary">
                                         Read Full Summary <i class="fa-solid fa-arrow-right ms-1"></i>
                                     </a>
 
@@ -215,5 +212,107 @@
         </div>
     </div>
 
+    <!-- ==========================================
+     THE MULTI-STEP ONBOARDING MODAL
+     ========================================== -->
+    <div class="modal fade" id="welcomeTourModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg card-wrapper">
+                <div class="modal-body p-4 p-md-5">
+                    
+                    <!-- The Bootstrap Carousel -->
+                    <div id="onboardingCarousel" class="carousel slide" data-bs-ride="false" data-bs-wrap="false">
+                        
+                        <!-- Carousel Indicators (Exactly 5 dots for 5 slides) -->
+                        <div class="carousel-indicators" style="bottom: -2rem;">
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="0" class="active bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="1" class="bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="2" class="bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="3" class="bg-secondary"></button>
+                            <button type="button" data-bs-target="#onboardingCarousel" data-bs-slide-to="4" class="bg-secondary"></button>
+                        </div>
+
+                        <div class="carousel-inner text-center pb-4">
+                            
+                            <!-- SLIDE 1: Welcome / Dashboard -->
+                            <div class="carousel-item active">
+                                <i class="fa-solid fa-rocket mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Welcome to the Hub</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        This is your central command center. From here, you have the tools to manage class communication, organize schedules, and keep the block on track.
+                                    {% else %}
+                                        This is your central command center. Stay on top of your requirements, track exactly how many days are left for assignments, and never miss an update.
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- SLIDE 2: Announcements -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-bullhorn mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Announcements</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Broadcast updates using the Markdown editor. Pin critical posts to the top of the feed, track heart reactions, and trigger push notifications to classmates.
+                                    {% else %}
+                                        Read the latest updates from your officers. Opt-in to push notifications and check your dashboard badges so you always know when important information drops!
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- SLIDE 3: Deadlines -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-calendar-check mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Deadlines</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Schedule upcoming tasks and exams. Assign them to specific courses and categories to help your classmates visualize their academic workload.
+                                    {% else %}
+                                        Use the dynamic filters on your dashboard to instantly spot what is due in the next 7 days, or quickly identify urgent tasks due within 48 hours.
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            <!-- SLIDE 4: Academics & Tools -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-toolbox mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Academics & Tools</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Upload concise lecture summaries, maintain the shared drive links, and manage course information so everyone has access to the right study materials.
+                                    {% else %}
+                                        Catch up quickly with lecture summaries, access important meeting links, and even use the custom Lock Screen Generator to export your aesthetic class schedule!
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- SLIDE 5: Community & Feedback -->
+                            <div class="carousel-item">
+                                <i class="fa-solid fa-user-group mb-4" style="font-size: 3.5rem; color: var(--accent-purple);"></i>
+                                <h3 class="fw-bold mb-3" style="color: var(--text-dark);">Community & Feedback</h3>
+                                <p class="text-muted">
+                                    {% if current_user.role == 'Officer' or current_user.is_admin %}
+                                        Review bug reports and suggestions. Reply to tickets, resolve them to keep the queue clean, and manage student profiles and custom role tags.
+                                    {% else %}
+                                        Personalize your profile with custom tags! Found a bug or have a suggestion? Submit a feedback ticket and get direct replies from your officers.
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Custom Navigation Controls -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <!-- Skip Button saves memory and dismisses -->
+                        <button type="button" class="btn text-muted fw-bold p-0 tour-dismiss-btn" data-bs-dismiss="modal">Skip Tour</button>
+                        <!-- Next Button -->
+                        <button type="button" class="btn btn-submit fw-bold px-4" id="tourNextBtn">Next <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
     
 {% endblock %}

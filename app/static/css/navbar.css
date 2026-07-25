@@ -1,42 +1,3 @@
-/* 
-.wrapper {
-    width: 100%;
-    flex-grow: 1;
-
-    display: flex;
-}
-
-main {
-    min-height: 100vh;
-    width: 100%;
-    overflow: hidden;
-    transition: all 0.35s ease-in-out;
-    flex-grow: 1;
-    padding: 2rem;
-    max-height: 100vh;
-    max-width: 100vw;
-    overflow-y: auto;
-} */
-
-/* .wrapper {
-    display: flex;
-    width: 100%;
-    height: 100%; Forces it to fill the exact height and width of the body
-} */
-
-/* .main {
-    flex: 1; Tells it to take up all remaining space next to the sidebar
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    
-    THE MAGIC FIX: This prevents wide content (like EasyMDE) from blowing out the flexbox
-    min-width: 0; 
-    
-    overflow: hidden;
-    transition: all 0.35s ease-in-out;
-} */
-
 #sidebar {
     width: 70px;
     min-width: 70px;
@@ -46,7 +7,7 @@ main {
     flex-direction: column;
     background-color: var(--sidebar-bg);
     height: 100dvh;
-    /* 1. Kill the horizontal scrollbar entirely */
+    /* 1. Remove the horizontal scrollbar entirely */
     overflow-x: hidden; 
     
     /* 2. Allow vertical scrolling ONLY if content overflows (for mobile) */
@@ -117,6 +78,10 @@ a.sidebar-link {
     gap: 1rem;
 }
 
+#sidebar:not(.expand) a.sidebar-link {
+    justify-content: center;
+}
+
 /* Ensure the icon stays perfectly sized and aligned */
 .sidebar-link i {
     font-size: 1.1rem;
@@ -125,13 +90,20 @@ a.sidebar-link {
     text-align: center;
 }
 
+.sidebar-link img {
+    width: 20px;          /* Match the min-width of the standard icons */
+    height: 20px;         /* Keep it a perfect circle */
+    object-fit: cover;    /* Prevents the image from stretching or distorting */
+    flex-shrink: 0;
+}
+
 /* 2. BADGE VISIBILITY LOGIC */
 /* The Number Pill is visible by default, but hidden when collapsed */
 #sidebar:not(.expand) .sidebar-badge-num {
     display: none !important;
 }
 
-/* 🛑 THE FIX: Make the red dot hidden by default! */
+/* Make the red dot hidden by default! */
 .sidebar-badge-dot {
     display: none !important;
     position: absolute;
@@ -155,7 +127,6 @@ a.sidebar-link {
     animation: preventFlash 0.15s forwards;
 }
 
-/* 3. FIX THE COLLAPSED 2-LAYER NAVBAR */
 /* Shows the dropdown menu to the right when hovered in collapsed mode */
 #sidebar:not(.expand) .sidebar-item:focus .sidebar-dropdown {
     display: block;
@@ -168,42 +139,10 @@ a.sidebar-link {
     display: none;
 }
 
-/* a.sidebar-link {
-    padding: .625rem 1.625rem;
-    color: #FFF;
-    display: block;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    border-left: 3px solid transparent;
-}
-
-.sidebar-link {
-    font-size: 1.1rem;
-    margin-right: .75rem;
-}
-*/
 a.sidebar-link:hover {
     background-color: rgba(255,255,255,.075);
     border-left:3px solid var(--accent-purple);
 } 
-
-/*
-.sidebar-footer .sidebar-item a.sidebar-link:hover {
-    background-color: rgba(86, 86, 91, 0.075);
-    border-left: 3px solid var(--sidebar-bg);
-}
-
-.sidebar-item {
-    position: relative;
-}
-
-.sidebar-auth {
-    margin: 0.5rem 0 0 0;
-}
-
-/* .m-nav {
-    background-color: var(--sidebar-bg);
-} */
 
 
 
@@ -211,16 +150,6 @@ a.sidebar-link:hover {
     padding-left: 2.5rem;
     font-size: 0.95rem;
 }
-
-/* #sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
-    position: absolute;
-    top: 0;
-    left: 70px;
-    background-color: #0e2238;
-    padding: 0;
-    min-width: 15rem;
-    display: none;
-} */
 
 #sidebar.expand .sidebar-link[data-bs-toggle="collapse"]::after {
     border: solid;
@@ -238,8 +167,4 @@ a.sidebar-link:hover {
 #sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
     transform: rotate(45deg);
     transition: all .2s ease-out;
-}
-
-.sidebar-footer {
-    
 }

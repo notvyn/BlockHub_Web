@@ -61,7 +61,7 @@
 
                 <div class="mb-4">
                     <label class="form-label fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">TAKEAWAY (MAIN CONTENT)</label>
-                    {{ form.content(class="form-control", id="summary-content", placeholder="e.g. Discussion of...") }}
+                    {{ form.content(class="form-control", id="summary-content", placeholder="e.g. Discussion of...", data_has_error="true" if form.content.errors else "false") }}
                     <div class="invalid-feedback fw-bold mt-2" id="error-content" style="{% if form.content.errors %}display: block;{% endif %}">
                         {% if form.content.errors %}{{ form.content.errors[0] }}{% endif %}
                     </div>
@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="form-btn d-flex justify-content-end gap-3 mt-5">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-modal-cancel text-decoration-none d-flex align-items-center">Cancel</a>
                     {{ form.submit(value="Post Summary", class="btn btn-modal-save px-4") }}
                 </div>
             </form>
@@ -83,40 +83,6 @@
 
 {% block script %}
     <script>
-        const easyMDE = new EasyMDE({
-            element: document.getElementById('summary-content'),
-            theme: "modern",
-            minHeight: "100px", // <--- ADD THIS LINE (Adjust the pixel value to your liking)
-            maxHeight: "250px",
-            spellChecker: false,
-            toolbar: [
-                "bold", "italic", "strikethrough", "|", 
-                "heading-1", "heading-2", "heading-3", "|", 
-                "code", "quote", "|", 
-                "unordered-list", "ordered-list", "|", 
-                "link", "image", "horizontal-rule", "|", 
-                "preview", "side-by-side", "fullscreen", "|", 
-                "guide"
-            ]
-        });
-
-        const fpInstance = flatpickr(".custom-date-input", {
-            altInput: true,
-            altFormat: "D - M d, Y", // This outputs: Mon - Jul 07, 2026
-            dateFormat: "Y-m-d",     // This keeps the backend data clean
-            allowInput: true
-        });
-
-        {% if form.content.errors %}
-            if (easyMDE.element.nextSibling) {
-                easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
-            }
-        {% endif %}
-
-        window.initEntryValidation('summarySchedule', [
-            { type: 'radio', name: 'course', containerId: 'courseContainer', errorId: 'error-course', message: 'Please select a course.'},
-            { type: 'radio', name: 'schedule', containerId: 'scheduleContainer', errorId: 'error-schedule', message: 'Please select a schedule.'},
-            { type: 'easymde', instance: easyMDE, errorId: 'error-content', message: 'Class Summary content cannot be empty.'}
-        ]);
+        
     </script>
 {% endblock %}
