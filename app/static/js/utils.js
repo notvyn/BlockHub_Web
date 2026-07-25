@@ -118,7 +118,6 @@ window.initEntryValidation = function(formId, fieldsConfig) {
     });
 };
 
-// Kind of Optional (I think)
 export function setAnchorToAnnouncement() {
     // 1. Target every single link specifically inside the announcement content
     const contentLinks = document.querySelectorAll('.card-content a');

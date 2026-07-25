@@ -1,5 +1,3 @@
-// js/config.js
-
 export const APP_CONFIG = {
     // Regex Rules
     emailRegex: /^\d{2}-\d{5}@g\.batstate-u\.edu\.ph$/,

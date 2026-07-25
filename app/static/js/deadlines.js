@@ -60,49 +60,69 @@ export function completeDeadline() {
 }
 
 export function filterDeadline() {
-    // Grab all our new filter buttons
+    // 1. Grab all required elements
     const filterButtons = document.querySelectorAll('.filter-btn');
-    // Grab all the task containers
     const deadlines = document.querySelectorAll('.deadline-item');
+    const deadlineIsNull = document.querySelector('.deadline-filtered-null'); 
 
-    if (filterButtons) {
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault(); // Stops the page from jumping to the top when clicking an '#' link
+    // Null Safety: Only run if the elements actually exist on this page
+    if (filterButtons.length === 0 || !deadlineIsNull) return;
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); 
+
+            const filterType = this.getAttribute('data-filter');
+
+            // 2. Visual Update: Make only the clicked button bold
+            filterButtons.forEach(b => b.classList.remove('fw-bold'));
+            this.classList.add('fw-bold');
+
+            // 3. Define variables for this specific click
+            let visibleCount = 0;
+            let emptyMessage = '';
+
+            // Determine the fallback text exactly once based on the clicked filter
+            if (filterType === 'all') {
+                emptyMessage = 'No upcoming deadlines.';
+            } else if (filterType === 'urgent') {
+                emptyMessage = 'No urgent deadlines pending right now.';
+            } else if (filterType === 'week') {
+                emptyMessage = 'No pending deadlines for the next 7 days';
+            }
+
+            // 4. Loop through every task on the screen
+            deadlines.forEach(item => {
+                const days = parseInt(item.getAttribute('data-days'));
+                let shouldShow = false;
+
+                // Evaluate the rules
+                if (filterType === 'all') {
+                    shouldShow = true;
+                } else if (filterType === 'urgent' && days <= 2) { 
+                    shouldShow = true;
+                } else if (filterType === 'week' && days <= 7) {
+                    shouldShow = true;
+                }
+
+                // Instantly hide or show the task
+                item.style.display = shouldShow ? 'flex' : 'none'; 
                 
-                // What filter did they click? (urgent, week, or all)
-                const filterType = this.getAttribute('data-filter');
-
-                // Visual Update: Make only the clicked button bold
-                filterButtons.forEach(b => b.classList.remove('fw-bold'));
-                this.classList.add('fw-bold');
-
-                // Loop through every task on the screen
-                deadlines.forEach(item => {
-                    // Grab the invisible days_left number we injected
-                    const days = parseInt(item.getAttribute('data-days'));
-                    const thisWeek = item.getAttribute('data-this-week'); // Grab our new boolean string
-                    let shouldShow = false;
-
-                    // The Logic Rules
-                    if (filterType === 'all') {
-                        shouldShow = true;
-                    } else if (filterType === 'urgent' && days <= 2) { // Matches your md-code-hot threshold
-                        shouldShow = true;
-                    } else if (filterType === 'week' && thisWeek === 'true') {
-                        shouldShow = true;
-                    }
-
-                    // Instantly hide or show the task
-                    // (Using 'flex' because your .md-task class uses display: flex)
-                    item.style.display = shouldShow ? 'flex' : 'none'; 
-                });
-                
-                // Optional: You could add logic here to make the clicked link bold or change color!
-                item.style.backgroundColor = 'purple';
+                // If it's visible, increase our tally
+                if (shouldShow) {
+                    visibleCount++;
+                }
             });
+            
+            // 5. Update the Fallback Message (Strictly OUTSIDE the loop)
+            if (visibleCount === 0) {
+                deadlineIsNull.textContent = emptyMessage; 
+                deadlineIsNull.style.display = 'block';
+            } else {
+                deadlineIsNull.style.display = 'none';
+            }
         });
-    }
+    });
 }
 
 
@@ -136,5 +156,37 @@ function updateBadges(newTotal, archiveTotal) {
             deadlineArchivePageTotal.textContent = archiveTotal;
             deadlineArchivePageTotal.style.opacity = '1';
         }, 150);
+    }
+}
+
+export function initDeadlineForm() {
+    // 1. Safety Check: Only run if the deadline form is on the screen
+    const form = document.getElementById('deadlineForm');
+    if (!form) return;
+
+    // 2. Initialize Flatpickr instances
+    const fpDateGiven = flatpickr("#date_given", {
+        altInput: true,
+        altFormat: "D - M d, Y", 
+        dateFormat: "Y-m-d",     
+        allowInput: true
+    });
+
+    const fpDueDate = flatpickr("#due_date", {
+        altInput: true,
+        altFormat: "D - M d, Y", 
+        dateFormat: "Y-m-d",     
+        allowInput: true
+    });
+
+    if (typeof window.initEntryValidation === 'function') {
+        window.initEntryValidation('deadlineForm', [
+            { type: 'text', id: 'description', errorId: 'error-description', message: 'A title is required.' },
+            { type: 'radio', name: 'course', containerId: 'courseContainer', errorId: 'error-course', message: 'Please select a course.' },
+            { type: 'radio', name: 'category', containerId: 'categoryContainer', errorId: 'error-category', message: 'Please select a category.' },
+            { type: 'radio', name: 'status', containerId: 'statusContainer', errorId: 'error-status', message: 'Please select a status.' },
+            { type: 'flatpickr', instance: fpDateGiven, errorId: 'error-date_given', message: 'Please select a start date.' },
+            { type: 'flatpickr', instance: fpDueDate, errorId: 'error-due_date', message: 'Please select a due date.' }
+        ]);
     }
 }

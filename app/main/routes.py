@@ -8,7 +8,7 @@ from datetime import date, datetime, timedelta, timezone, time
 from app import db
 from app.main import main
 
-import cloudinary, cloudinary.uploader
+import cloudinary, cloudinary.uploader, os
 
 from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion
 from app.forms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, FeedbackForm, ProfileForm, CreateTagForm
@@ -199,10 +199,10 @@ def dashboard():
     cutoff_time = ph_time - timedelta(days=1)
 
     # 1. Math: Sunday is 6. If today is Wed (2), 6 - 2 = 4 days until Sunday.
-    days_until_sunday = 6 - ph_time.weekday()
+    # days_until_sunday = 6 - ph_time.weekday()
     
     # 2. Add those days to today's date to find the exact date of this Sunday
-    end_of_week = ph_time + timedelta(days=days_until_sunday)
+    # end_of_week = ph_time + timedelta(days=days_until_sunday)
 
     # 1. Grab the absolute newest record, regardless of time.
     target_record = ClassSummary.query.order_by(ClassSummary.date_held.desc()).first()
@@ -251,7 +251,6 @@ def dashboard():
         links=links,
         user=user,
         today=ph_time,
-        end_of_week=end_of_week,
         completed_ids=completed_ids
     )
 
@@ -634,10 +633,14 @@ def notifications():
 def profile():
     form = LoginForm()
 
+    # 1. Grab the key from your .env file
+    # (Assuming you are using python-dotenv)
+    push_public_key = os.environ.get("VAPID_PUBLIC_KEY")
+
     # Create a dynamic list to pass to the HTML
     earned_badges = check_earned_badges(current_user.id)
     
-    return render_template('profile.html', earned_badges=earned_badges, form=form)
+    return render_template('profile.html', earned_badges=earned_badges, form=form, vapid_public_key=push_public_key)
 
 @main.route('/class-summaries/<int:id>', methods=['GET', 'POST'])
 @login_required

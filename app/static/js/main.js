@@ -1,11 +1,15 @@
-import {getReadHistory, readAnnouncement, setFileIcon, toggleAnnouncementPin, toggleHeartReact, updateAnnouncementBadge} from './announcements.js';
+import {getReadHistory, initAnnouncementForm, readAnnouncement, setFileIcon, toggleAnnouncementPin, toggleHeartReact, updateAnnouncementBadge} from './announcements.js';
 import {eyeToggle, validateSignUpInput} from './auth.js';
-import {toggleDarkMode, toggleMobileSearchBar, toggleSidebarExpand} from './core.js';
-import {completeDeadline, filterDeadline} from './deadlines.js';
-import {toggleFeedbackReplyModal} from './feedbacks.js';
-import {cleanInputLinkModal, toggleLinkModal, validateLinkForm} from './links.js';
-import {getCourseRadios} from './summaries.js';
+import {toggleDarkMode, toggleDeleteEntry, toggleLiveSearch, toggleMobileSearchBar, toggleSearchHighlight, toggleSidebarExpand} from './core.js';
+import {initCourseForm} from './courses.js';
+import {completeDeadline, filterDeadline, initDeadlineForm} from './deadlines.js';
+import {initFeedbackForm, resolveFeedback, toggleFeedbackReplyModal} from './feedbacks.js';
+import {cleanInputLinkModal, toggleLinkModal, toggleLinkPin, validateLinkForm} from './links.js';
+import {initScheduleForm} from './schedules.js';
+import {getCourseRadios, initSummaryForm} from './summaries.js';
+import {initUpdateProfileSettings, toggleCreateTag, toggleNotificationSubscription, toggleUserProfileUpdate} from './profile.js';
 import {setAnchorToAnnouncement} from './utils.js';
+import {initWallpaperGenerator} from './wallpaper.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Authentication Features (logged out)
@@ -14,32 +18,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Global Features 
     toggleDarkMode();
+    toggleLiveSearch();
     toggleMobileSearchBar();
+    toggleSearchHighlight();
     toggleSidebarExpand();
+
+    toggleDeleteEntry();
     
     // Announcement Features
-    // getReadHistory(); // Has Errors in it, I think
+    getReadHistory(); // Has Errors in it, I think
+    initAnnouncementForm();
     readAnnouncement();
     setFileIcon();
     toggleAnnouncementPin();
     toggleHeartReact();
     updateAnnouncementBadge();
 
+    // Course Features
+    initCourseForm();
+
     // Deadline Features
     completeDeadline();
     filterDeadline();
+    initDeadlineForm();
 
     // Feedback Features
+    initFeedbackForm();
+    resolveFeedback();
     toggleFeedbackReplyModal();
 
     // Link Features
     cleanInputLinkModal();
     toggleLinkModal();
+    toggleLinkPin();
     validateLinkForm();
+
+    // Schedules Features
+    initScheduleForm();
 
     // Summary Features
     getCourseRadios();
+    initSummaryForm();
+
+    // Profile Features
+    initUpdateProfileSettings();
+    toggleCreateTag();
+    toggleNotificationSubscription();
+    toggleUserProfileUpdate();
 
     // Utilities 
     setAnchorToAnnouncement();
+
+    // Wallpaper Features
+    initWallpaperGenerator();
 });

@@ -3,29 +3,33 @@
 export function getReadHistory() {
     // 1. Setup: Grab authentication status from the container
     const container = document.getElementById('dashboard-container');
+    
+    // If the container isn't on this page, stop the function immediately
+    if (!container) return; 
+    
     const isLoggedIn = container.getAttribute('data-logged-in') === 'true';
     
     if (!isLoggedIn) {
-        // ... (Your existing Guest Memory Check code stays exactly the same) ...
+        // Guest Memory Check 
         let guestReadIds = JSON.parse(localStorage.getItem('guestReadAnnouncements')) || [];
         document.querySelectorAll('.new-tag').forEach(tag => {
             let tagId = tag.id.split('-')[1]; 
             if (guestReadIds.includes(tagId)) { tag.style.display = 'none'; }
         });
     } else {
-        // NEW LOGIC: The user is logged in! Let's check for guest data to sync.
+        // User is logged in. Check for guest data to sync.
         let guestReadIds = JSON.parse(localStorage.getItem('guestReadAnnouncements'));
         
         // If there is data to sync...
         if (guestReadIds && guestReadIds.length > 0) {
             
-            // 1. Instantly hide the tags on the screen for a smooth UX
+            // 1. Instantly hide the tags on the screen
             guestReadIds.forEach(id => {
                 const tag = document.getElementById(`tag-${id}`);
                 if (tag) tag.style.display = 'none';
             });
             
-            // 2. Send the data to our new Python route
+            // 2. Send the data to the Python route
             fetch('/sync-guest-reads', {
                 method: 'POST',
                 headers: {
@@ -36,7 +40,7 @@ export function getReadHistory() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // 3. The server saved them safely. Delete the local browser memory!
+                    // 3. Delete the local browser memory
                     localStorage.removeItem('guestReadAnnouncements');
                 }
             })
@@ -45,11 +49,71 @@ export function getReadHistory() {
     }
 }
 
+export function initAnnouncementForm() {
+    // 1. Safety Check: Only run if we are actually on the Add Announcement page
+    const textArea = document.getElementById('announcement-content');
+    if (!textArea) return; 
+
+    // 2. Initialize EasyMDE with all your custom settings
+    const easyMDE = new EasyMDE({
+        element: textArea,
+        theme: "modern",
+        minHeight: "100px", 
+        maxHeight: "250px",
+        spellChecker: false,
+        uploadImage: true,
+        toolbar: [
+            "bold", "italic", "strikethrough", "|", 
+            "heading-1", "heading-2", "heading-3", "|", 
+            "code", "quote", "|", 
+            "unordered-list", "ordered-list", "|", 
+            "link", "image", "horizontal-rule", "|", 
+            "preview", "side-by-side", "fullscreen", "|", 
+            "guide"
+        ],
+        imageUploadFunction: function(file, onSuccess, onError) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('/upload-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.filePath) {
+                    onSuccess(data.data.filePath);
+                } else {
+                    onError("Upload failed");
+                }
+            })
+            .catch(err => {
+                onError(err.toString());
+            });
+        }
+    });
+
+    // 3. Read the "Jinja Bridge" to check for Python server errors
+    const hasError = textArea.getAttribute('data-has-error') === 'true';
+    if (hasError && easyMDE.element.nextSibling) {
+        easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
+    }
+
+    // 4. Initialize Live Frontend Validation
+    if (typeof APP_CONFIG.initEntryValidation === 'function') {
+        APP_CONFIG.initEntryValidation('announcementForm', [
+            { type: 'text', id: 'title', errorId: 'error-title', message: 'A title is required.' },
+            { type: 'easymde', instance: easyMDE, errorId: 'error-content', message: 'Announcement content cannot be empty.' },
+            { type: 'url', id: 'url', optional: true, errorId: 'error-url', messageFormat: 'URL must start with http:// or https://' }
+        ]);
+    }
+}
+
 export function readAnnouncement() {
     // 3. The Click Event (With Navigation Pause)
     document.querySelectorAll('.announcement-link').forEach(link => {
         link.addEventListener('click', function(e) {
-            // 🛑 STOP the browser from navigating instantly
+            // STOP the browser from navigating instantly
             e.preventDefault(); 
             
             const targetUrl = this.getAttribute('href'); 
@@ -75,7 +139,7 @@ export function readAnnouncement() {
                     method: 'POST'
                 })
                 .finally(() => {
-                    // 🟢 NAVIGATE to the post ONLY after the server gets the message
+                    // NAVIGATE to the post ONLY after the server gets the message
                     window.location.href = targetUrl;
                 });
             } else {

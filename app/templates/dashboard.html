@@ -37,7 +37,7 @@
                                 <span>Urgent</span>
                             </a>
                             <a href="#" class="filter-btn" data-filter="week">
-                                <span>This week</span>
+                                <span>Next 7 days</span>
                             </a>
                             <a href="#" class="filter-btn fw-bold" data-filter="all">
                                 <span>Upcoming</span>
@@ -45,21 +45,18 @@
                         </div>
                     </div>
                     
+                    <div class="deadline-filtered-null" style="display: none;"></div>
                     {% if deadlines %}
                         {% for d in deadlines %}
                             {% set days_left = (d.due_datetime - today).days %}
-                            {% set is_this_week = "true" if d.due_datetime <= end_of_week else "false" %}
 
-                            <div class="md-task deadline-item" data-days="{{ days_left }}" data-this-week="{{ is_this_week }}">
-                                <!-- <i class="bi bi-square"></i> -->
-                                <!-- ADDED: checked condition -->
+                            <div class="md-task deadline-item" data-days="{{ days_left }}">
                                 <input type="checkbox" class="btn-check task-checkbox" id="btn-check-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.id in completed_ids %}checked{% endif %}>
                                 <label class="btn btn-obsidian" for="btn-check-{{ d.id }}">
                                     <i class="fa-solid fa-check"></i>
                                 </label>
                                 <div id="task-text-{{ d.id }}">
                                     <div class="md-code-title">
-                                        <!-- ADDED: inline style for strikethrough -->
                                         <a href="#" class="md-task-title" data-id="{{ d.id }}" {% if d.id in completed_ids %}style="text-decoration: line-through;"{% endif %}>{{ d.description }}</a>
                                         {% if d.due_datetime < today %}
                                             <span class="md-code fw-bold text-white bg-danger border-0 ms-2 new-tag" id="tag-{{ d.id}}">OVERDUE</span>

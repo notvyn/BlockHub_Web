@@ -60,7 +60,7 @@ export function validateSignUpInput() {
     // --- CONFIRM PASSWORD VALIDATION ---
     if (confirmInput) {
         confirmInput.addEventListener('input', function() {
-            // Fix: It must match exactly AND the main password must actually be strong!
+            // It must match exactly AND the main password must actually be strong!
             const isMatch = this.value === passwordInput.value && this.value !== '';
             const isMainValid = APP_CONFIG.passRegex.test(passwordInput.value);
             

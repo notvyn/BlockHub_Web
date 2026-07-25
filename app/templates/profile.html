@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block head %}
+    <meta name="vapid-public-key" content="{{ vapid_public_key }}">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/card.css')}}">
 {% endblock %}

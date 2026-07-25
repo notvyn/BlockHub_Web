@@ -22,7 +22,7 @@ export function cleanInputLinkModal() {
         });
     }
 
-    // Tell Bootstrap to run our scrub function every time the modal closes
+    // Tell Bootstrap to run the scrub function every time the modal closes
     if (addLinkModal) {
         addLinkModal.addEventListener('hidden.bs.modal', function () {
             scrubLinkForm();
@@ -175,4 +175,30 @@ export function validateLinkForm() {
             }
         });
     }
+}
+
+export function toggleLinkPin() {
+    /* =========================================
+       LINK PINNING LOGIC
+       ========================================= */
+    document.querySelectorAll('.btn-link-pin').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const linkId = this.getAttribute('data-id');
+            
+            fetch(`/api/toggle-link-pin/${linkId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // The cleanest way to re-sort a dynamic grid is a quick page reload
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error toggling pin:', error));
+        });
+    });
 }

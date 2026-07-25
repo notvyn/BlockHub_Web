@@ -92,3 +92,66 @@ export function getCourseRadios() {
     }
 }
 
+export function initSummaryForm() {
+    const textArea = document.getElementById('summary-content');
+    if (!textArea) return;
+
+    const easyMDE = new EasyMDE({
+        element: textArea,
+        theme: "modern",
+        minHeight: "100px",
+        maxHeight: "250px",
+        spellChecker: false,
+        uploadImage: true,
+        toolbar: [
+            "bold", "italic", "strikethrough", "|", 
+            "heading-1", "heading-2", "heading-3", "|", 
+            "code", "quote", "|", 
+            "unordered-list", "ordered-list", "|", 
+            "link", "image", "horizontal-rule", "|", 
+            "preview", "side-by-side", "fullscreen", "|", 
+            "guide"
+        ],
+        imageUploadFunction: function(file, onSuccess, onError) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('/upload-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.filePath) {
+                    onSuccess(data.data.filePath);
+                } else {
+                    onError("Upload failed");
+                }
+            })
+            .catch(err => {
+                onError(err.toString());
+            });
+        }
+    });
+
+    const fpInstance = flatpickr(".custom-date-input", {
+        altInput: true,
+        altFormat: "D - M d, Y", // This outputs: Mon - Jul 07, 2026
+        dateFormat: "Y-m-d",     // This keeps the backend data clean
+        allowInput: true
+    });
+
+    // 3. Read the "Jinja Bridge" to check for Python server errors
+    const hasError = textArea.getAttribute('data-has-error') === 'true';
+    if (hasError && easyMDE.element.nextSibling) {
+        easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
+    }
+
+    if (typeof window.initEntryValidation === 'function' ) {
+        window.initEntryValidation('summarySchedule', [
+            { type: 'radio', name: 'course', containerId: 'courseContainer', errorId: 'error-course', message: 'Please select a course.'},
+            { type: 'radio', name: 'schedule', containerId: 'scheduleContainer', errorId: 'error-schedule', message: 'Please select a schedule.'},
+            { type: 'easymde', instance: easyMDE, errorId: 'error-content', message: 'Class Summary content cannot be empty.'}
+        ]);
+    }
+}

@@ -149,6 +149,10 @@ A centralized class management system for CS 2103.
 - Refined validation of Feedback pending/resolve page
 - Partially organized and restructured javascript folder
 
+**July 25, 2026**
+- Finished organizing javascript folder
+
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
@@ -194,8 +198,10 @@ A centralized class management system for CS 2103.
 - [/] Fix login email focus style issue 
 - [/] Fix Announcement url entry validation
 - [ ] Create a conditional text for no admin reply in Feedbacks
-- [ ] Create a conditional text for no urgent task right now or within this week 
+- [/] Create a conditional text for no urgent task right now or within this week 
 - [ ] Fix size of sidebar profile pic
+- [ ] Create a conditional text for no current pending feedback 
+- [ ] Fix sidebar visual issue when new tag is created 
 
 FUTURE VISION
 - [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)

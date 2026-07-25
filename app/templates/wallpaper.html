@@ -32,13 +32,13 @@
             <div class="mb-4">
                 <label class="form-label fw-bold small text-uppercase">2. Choose Template</label>
                 <div class="d-flex gap-3">
-                    <button onclick="setTemplate('template-sunset')" id="btn-template-sunset" class="btn btn-template flex-grow-1 btn-dark">
+                    <button data-template="template-sunset" id="btn-template-sunset" class="btn btn-template flex-grow-1 btn-dark">
                         <i class="fa-solid fa-sun"></i> Sunset
                     </button>
-                    <button onclick="setTemplate('template-vintage')" id="btn-template-vintage" class="btn btn-template flex-grow-1 btn-outline-dark">
+                    <button data-template="template-vintage" id="btn-template-vintage" class="btn btn-template flex-grow-1 btn-outline-dark">
                         <i class="fa-solid fa-leaf "></i> Vintage
                     </button>
-                    <button onclick="setTemplate('template-modern')" id="btn-template-modern" class="btn btn-template flex-grow-1 btn-outline-dark">
+                    <button data-template="template-modern" id="btn-template-modern" class="btn btn-template flex-grow-1 btn-outline-dark">
                         <i class="fa-solid fa-shapes"></i> Modern
                     </button>
                 </div>
@@ -48,8 +48,8 @@
             <div class="mb-4">
                 <label class="form-label fw-bold small text-uppercase">3. Choose Theme</label>
                 <div class="d-flex gap-2">
-                    <button id="btn-theme-dark" class="btn btn-dark flex-grow-1 theme-btn" onclick="changeCardTheme('theme-dark')">Dark Glass</button>
-                    <button id="btn-theme-light" class="btn btn-outline-dark flex-grow-1 theme-btn" onclick="changeCardTheme('theme-light')">Light Glass</button>
+                    <button data-theme="theme-dark" id="btn-theme-dark" class="btn btn-dark flex-grow-1 theme-btn">Dark Glass</button>
+                    <button data-theme="theme-light" id="btn-theme-light" class="btn btn-outline-dark flex-grow-1 theme-btn">Light Glass</button>
                 </div>
             </div>
 
@@ -125,7 +125,7 @@
             </div>
 
             <!-- Download Button -->
-            <button id="download-btn" class="btn w-100 py-3 fw-bold text-white mt-3" style="background-color: var(--accent-purple);" onclick="downloadWallpaper()">
+            <button id="download-btn" class="btn w-100 py-3 fw-bold text-white mt-3" style="background-color: var(--accent-purple);">
                 <i class="fa-solid fa-download me-2"></i> Download Wallpaper
             </button>
         </div>
