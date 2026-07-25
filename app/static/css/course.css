@@ -88,7 +88,7 @@
     box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
-/* --- ACCORDION FOCUS RING FIX --- */
+/* --- ACCORDION FOCUS RING --- */
 
 /* Overrides the default Bootstrap blue glow with your accent purple */
 .accordion-button:focus {
@@ -123,7 +123,7 @@
     background-color: rgba(255, 255, 255, 0.08);
 }
 
-/* --- TABLE BORDER FIX --- */
+/* --- TABLE BORDER --- */
 
 /* Light mode: Faint dark gray line */
 .table > :not(caption) > * > * {

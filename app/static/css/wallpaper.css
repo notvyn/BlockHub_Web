@@ -19,7 +19,7 @@
 
 /* The container that holds the scaled-down preview safely */
 .preview-wrapper {
-    /* 🟢 THE FIX: Calculate width and height dynamically based on the scale factor */
+    /* Calculate width and height dynamically based on the scale factor */
     width: calc(1080px * var(--scale-factor));  
     height: calc(1920px * var(--scale-factor)); 
     
@@ -36,7 +36,7 @@
     width: 1080px;
     height: 1920px;
     
-    /* 🟢 THE FIX: Apply the dynamic scale variable */
+    /* Apply the dynamic scale variable */
     transform: scale(var(--scale-factor));
     transform-origin: top left;
     
@@ -88,14 +88,11 @@
     .wallpaper-title-1 {
         font-family: var(--WindSongFont);
         font-size: 22px;
-        /* font-weight: 800; */
-        /* letter-spacing: -2px; */
     }
 
     .wallpaper-title-2 {
         font-family: var(--UncialAntiquaFont);
         font-size: 40px;
-        /* font-weight: 500; */
     }
 
     .schedule-glass-card {
@@ -224,9 +221,7 @@
 /* --- THE NEW GLASS CARD LAYOUT --- */
 .schedule-glass-card {
     width: 70%;
-    /* max-width: 950px; */
     padding: 40px 60px;
-    /* transition: all 0.3s ease; */
     margin-bottom: 9rem;
 }
 

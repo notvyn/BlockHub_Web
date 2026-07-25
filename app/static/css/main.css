@@ -76,18 +76,6 @@ h1 {
     font-size: 1.5rem;
 }
 
-/* body {
-    font-family: var(--ABeeZeeFont);
-    font-family: 'Inter', sans-serif;
-    background-color: var(--main-bg);
-    color: var(--text-dark);
-    margin: 0;
-    display: flex;
-    min-height: 100vh;
-    min-width: 100vw;
-    
-} */
-
 /* 1. Lock down the HTML tag entirely */
 html {
     height: 100%;

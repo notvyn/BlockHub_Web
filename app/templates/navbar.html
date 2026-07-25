@@ -4,25 +4,25 @@
             <i class="bi bi-grid-fill"></i>
         </button>
         <div class="sidebar-logo">
-            <a href="{{ url_for('dashboard') }}">KomSy3</a>
+            <a href="{{ url_for('main.dashboard') }}">KomSy3</a>
         </div>
     </div>
     <ul class="sidebar-nav">
         <li class="sidebar-item">
-            <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <a href="{{ url_for('main.dashboard') }}" class="sidebar-link">
                 <i class="fa-solid fa-house"></i>
                 <span>Dashboard</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="{{ url_for('blockmates') }}" class="sidebar-link">
+            <a href="{{ url_for('main.blockmates') }}" class="sidebar-link">
                 <i class="fa-solid fa-user-group"></i>
                 <span>Blockmates</span>
             </a>
         </li>
         <!-- ANNOUNCEMENTS SIDEBAR ITEM -->
         <li class="sidebar-item">
-            <a href="{{ url_for('announcements') }}" class="sidebar-link">
+            <a href="{{ url_for('main.announcements') }}" class="sidebar-link">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Announcements</span>
 
@@ -39,7 +39,7 @@
         
         <!-- DEADLINES SIDEBAR ITEM -->
         <li class="sidebar-item">
-            <a href="{{ url_for('deadlines') }}" class="sidebar-link">
+            <a href="{{ url_for('main.deadlines') }}" class="sidebar-link">
                 <i class="fa-solid fa-alarm-clock"></i>
                 <span>Deadlines</span>
                 
@@ -54,13 +54,13 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="{{ url_for('courses') }}" class="sidebar-link">
+            <a href="{{ url_for('main.courses') }}" class="sidebar-link">
                 <i class="fa-solid fa-book"></i>
                 <span>Courses</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="{{ url_for('summaries') }}" class="sidebar-link">
+            <a href="{{ url_for('main.summaries') }}" class="sidebar-link">
                 <i class="fa-solid fa-chalkboard-user"></i>
                 <span>Class Summaries</span>
                 
@@ -73,7 +73,7 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="{{ url_for('links') }}" class="sidebar-link">
+            <a href="{{ url_for('main.links') }}" class="sidebar-link">
                 <i class="fa-solid fa-link"></i>
                 <span>Links</span>
                 
@@ -94,7 +94,7 @@
             <ul id="auth" class="sidebar-dropdown list-unstyled collapse">
                 <li class="sidebar-item">
                     <!-- Removed standard 'sidebar-link' class from child to prevent layout breaking, added custom padding -->
-                    <a href="{{ url_for('wallpaper_generator') }}" class="sidebar-link" style="font-size: 0.9rem;">
+                    <a href="{{ url_for('main.wallpaper_generator') }}" class="sidebar-link" style="font-size: 0.9rem;">
                         <i class="fa-regular fa-file-image"></i>            
                         <span>Wallpaper Generator</span>
                     </a>
@@ -105,23 +105,21 @@
     </ul>
     <div class="sidebar-footer">
         <li class="sidebar-item">
-            <a href="{{ url_for('notifications') }}" class="sidebar-link">
+            <a href="{{ url_for('main.notifications') }}" class="sidebar-link">
                 <i class="fa-solid fa-bell"></i>
                 <span>Notification</span>
             </a>
         </li>
         {% if current_user.is_authenticated %}
         <li class="sidebar-item">
-            <a href="{{ url_for('feedbacks')}}" class="sidebar-link">
+            <a href="{{ url_for('main.feedbacks')}}" class="sidebar-link">
                 <i class="fa-solid fa-square-poll-horizontal"></i>
                 <span>Feedback</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="{{ url_for('profile')}}" class="sidebar-link">
-                <!-- <i class="fa-solid fa-user-gear"></i>
-                <span>Setting</span> -->
-                <img src="{{ current_user.profile_image }}" class="sidebar-avatar rounded-circle" style="height: 20px; width: 20px;">
+            <a href="{{ url_for('main.profile')}}" class="sidebar-link">
+                <img src="{{ current_user.profile_image }}" class="sidebar-avatar rounded-circle">
                 <span class="sidebar-name">{{ current_user.name }}</span>
             </a>
         </li>
@@ -130,7 +128,7 @@
         <div class="sidebar-auth">
             {% if current_user.is_authenticated %}
                 <li class="sidebar-item">
-                    <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                    <a href="{{ url_for('auth.logout') }}" class="sidebar-link text-danger">
                         <!-- Swapped to a standard power/exit icon -->
                         <i class="fa-solid fa-power-off"></i>                   
                         <span>Logout</span>
@@ -138,14 +136,14 @@
                 </li>
             {% else %}
                 <li class="sidebar-item">
-                    <a href="{{ url_for('login') }}" class="sidebar-link">
+                    <a href="{{ url_for('auth.login') }}" class="sidebar-link">
                         <!-- Swapped to an 'entering the door' icon -->
                         <i class="fa-solid fa-right-to-bracket"></i>                   
                         <span>Login</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="{{ url_for('signup') }}" class="sidebar-link">
+                    <a href="{{ url_for('auth.signup') }}" class="sidebar-link">
                         <i class="fa-solid fa-person-circle-plus"></i>             
                         <span>Signup</span>
                     </a>

@@ -328,7 +328,7 @@ input:-webkit-autofill:active {
     color: #dc3545; /* Standard danger red */
 }
 
-/* --- THE MAGIC CHECKED (SELECTED) STATE --- */
+/* --- BUTTON PILL (SELECTED STATE) --- */
 /* Changes the entire pill background when the hidden checkbox is true */
 .custom-tag-pill:has(.btn-check:checked) {
     background-color: var(--text-muted);

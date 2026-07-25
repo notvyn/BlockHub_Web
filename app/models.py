@@ -32,12 +32,8 @@ class AnnouncementRead(db.Model):
 
 class AnnouncementHeart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    # The user who clicked the heart
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    # The announcement they hearted
     announcement_id = db.Column(db.Integer, db.ForeignKey('announcement.id'), nullable=False)
-    
-    # Optional: Track when they liked it
     date_hearted = db.Column(db.DateTime, default=datetime.utcnow)
 
 class ClassSummary(db.Model):
@@ -80,7 +76,6 @@ class CourseSchedule(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
     day = db.Column(db.String(50), nullable=False)
     
-    # CHANGED: These must be db.Time to accept WTForms TimeField data
     start_time = db.Column(db.Time, nullable=False) 
     end_time = db.Column(db.Time, nullable=False)
 
@@ -115,12 +110,33 @@ class DeadlineCompletion(db.Model):
     # Ensures a user can't complete the exact same deadline twice
     __table_args__ = (db.UniqueConstraint('user_id', 'deadline_id', name='unique_user_deadline'),)
 
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(80), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(80), nullable=False, default='Pending')
+    admin_reply = db.Column(db.Text, nullable=True)
+    date_added = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
 class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     url = db.Column(db.Text, nullable=False)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
     is_pinned = db.Column(db.Boolean, default=False, nullable=True)
+
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) 
+    
+    # Store the entire JSON object as a text string
+    subscription_data = db.Column(db.Text, nullable=False)
+
+    def get_subscription_dict(self):
+        # Helper function to convert the text back to a dictionary when sending pushes
+        return json.loads(self.subscription_data)
 
 # Place this helper table right above your User model
 user_tags = db.Table('user_tags',
@@ -131,7 +147,7 @@ user_tags = db.Table('user_tags',
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
-    category = db.Column(db.String(50)) # e.g., "Technical", "Interest", "Role"
+    category = db.Column(db.String(50))
 
 cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
 
@@ -145,7 +161,7 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
     profile_image = db.Column(db.String(255), nullable=True)
     
-    # We still store it as a string, but it will hold the long scrambled hash
+    # Store it as a string, but it will hold the long scrambled hash
     password_hash = db.Column(db.String(256), nullable=False)
 
     announcements = db.relationship('Announcement', backref='author', lazy=True, cascade="all, delete-orphan")
@@ -157,12 +173,12 @@ class User(db.Model, UserMixin):
     deadline_completions = db.relationship('DeadlineCompletion', backref='user', lazy=True, cascade="all, delete-orphan")
     push_subscriptions = db.relationship('PushSubscription', backref='user', lazy=True, cascade="all, delete-orphan")
 
-    # NEW: Watermark timestamps for page-level tracking
+    # Watermark timestamps for page-level tracking
     last_viewed_summaries = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     last_viewed_links = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     last_viewed_courses = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    # --- NEW HELPER METHODS --- 
+    # --- HELPER METHODS --- 
     def set_password(self, password):
         """Scrambles the plain text password and saves the hash."""
         self.password_hash = generate_password_hash(password)
@@ -185,25 +201,3 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.name}')"
-
-class PushSubscription(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    # Change 'user.id' if your user table is named differently!
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) 
-    
-    # We will store the entire JSON object as a text string
-    subscription_data = db.Column(db.Text, nullable=False)
-
-    def get_subscription_dict(self):
-        # Helper function to convert the text back to a dictionary when sending pushes
-        return json.loads(self.subscription_data)
-    
-class Feedback(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    title = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(80), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(80), nullable=False, default='Pending')
-    admin_reply = db.Column(db.Text, nullable=True)
-    date_added = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

@@ -4,6 +4,8 @@
     <link href="{{ url_for('static', filename='css/form.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 {% endblock %}
 
 {% block page_title %}New Deadline{% endblock %}
@@ -97,33 +99,4 @@
             </form>
         </div>
     </div>
-{% endblock %}
-
-{% block script %}
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        const fpDateGiven = flatpickr("#date_given", {
-            altInput: true,
-            altFormat: "D - M d, Y", 
-            dateFormat: "Y-m-d",     
-            allowInput: true
-        });
-
-        const fpDueDate = flatpickr("#due_date", {
-            altInput: true,
-            altFormat: "D - M d, Y", 
-            dateFormat: "Y-m-d",     
-            allowInput: true
-        });
-
-        // THE MISSING COMMA IS FIXED!
-        window.initEntryValidation('deadlineForm', [
-            { type: 'text', id: 'description', errorId: 'error-description', message: 'A title is required.' },
-            { type: 'radio', name: 'course', containerId: 'courseContainer', errorId: 'error-course', message: 'Please select a course.' },
-            { type: 'radio', name: 'category', containerId: 'categoryContainer', errorId: 'error-category', message: 'Please select a category.' },
-            { type: 'radio', name: 'status', containerId: 'statusContainer', errorId: 'error-status', message: 'Please select a status.' },
-            { type: 'flatpickr', instance: fpDateGiven, errorId: 'error-date_given', message: 'Please select a start date.' },
-            { type: 'flatpickr', instance: fpDueDate, errorId: 'error-due_date', message: 'Please select a due date.' }
-        ]);
-    </script>
 {% endblock %}

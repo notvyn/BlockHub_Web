@@ -11,7 +11,7 @@
 {% block extra_header %}
 <div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3">
     {% if total_deadlines > 0 %}
-    <a href="{{ url_for('deadlines_archive')}}" class="btn fw-medium" style="background-color: var(--text-muted) !important; color: var(--main-bg);">View Archive</a>
+    <a href="{{ url_for('main.deadlines_archive')}}" class="btn fw-medium" style="background-color: var(--text-muted) !important; color: var(--main-bg);">View Archive</a>
     {% endif %}
     <div style="color: var(--text-muted);">
         Pending Deadlines: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ deadlines|length }}</span>
@@ -98,7 +98,7 @@
                     <div class="dl-actions flex-shrink-0 d-flex flex-column align-items-end justify-content-end ms-2">
                         {% if current_user.is_authenticated %}                        
                         <div class="d-flex gap-2 mb-1">
-                            <a href="{{ url_for('update_deadline', id=d.id)}}" class="btn btn-icon-action" title="Edit">
+                            <a href="{{ url_for('main.update_deadline', id=d.id)}}" class="btn btn-icon-action" title="Edit">
                                 <i class="fa-solid fa-pencil"></i>
                             </a>
                             <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ d.id }}" data-type="deadline" title="Delete">
