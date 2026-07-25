@@ -1,12 +1,15 @@
 # KomSy3 (formerly BlockHub)
+> A passion project brought to life by **John Calvin Samson**. Built by a student, for students.
 
-A centralized class management platform dedicated to bringing blockmates together. 
+---
+
+KomSy3 is a centralized class management platform dedicated to bringing blockmates together. 
 
 KomSy3 is designed to streamline academic communication, track upcoming deadlines, and provide a unified dashboard for class announcements and resources. It ensures that students stay informed while giving class officers an efficient tool to manage information.
 
 ## ❓ Why I built it
 
-This project was deeply inspired by my experience as a Class Representative. It all started with a simple question: 'What happens to the students who aren't present during a lecture? How can they catch up on what they missed?' That's when it clicked. We had been using a basic spreadsheet tracker during our first year, but I took the initiative to build a dedicated web app for my block. KomSy3 was built to preserve resources, keep everyone informed, and make navigating the semester much easier for every student.
+This project was deeply inspired by my experience as a Class Representative. It all started with a simple question: 'What happens to the students who aren't present during a lecture? How can they catch up on what they missed?' That's when it clicked. We had been using a basic spreadsheet tracker during our first year, but I took the chance to build a dedicated web app for our block. KomSy3 was built to preserve resources, keep everyone informed, and make navigating the semester much easier for every student.
 
 ## ✨ Key Features
 
@@ -135,6 +138,8 @@ Building KomSy3 has been a deep dive into full-stack development and project man
 
 - Structure & Code Optimization: Realized the significance of writing modular code using DRY Principle (Do Not Repeat Yourself) and maintaining simplicity and directory accessibility.
 
-<hr>
+## 📬 Connect with Me
 
-A passion project brought to life by **John Calvin Samson**. Built by a student, for students.
+If you'd like to deploy a similar platform for your block, collaborate on a project, or just connect, feel free to reach out!
+
+* **GitHub:** [@notvyn](https://github.com/notvyn)
