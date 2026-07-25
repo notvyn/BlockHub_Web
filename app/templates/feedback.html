@@ -36,7 +36,7 @@
             <!-- LEFT SIDE: Content (Title, Badges, and Message) -->
             <div class="feedback-content flex-grow-1">
                 <!-- Added flex-wrap so badges don't overflow on small screens -->
-                <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                     <div class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
                         {{ feedback.title }}
                     </div>
@@ -48,6 +48,7 @@
                         {{ feedback.status }}
                     </div>
                 </div>
+                <div class="mb-2 small text-muted">Submitted by: {{ feedback.user.name }} @ {{ feedback.date_added.strftime('%b %d, %Y') }}</div>
                 <div class="mb-2" style="color: var(--text-muted);">{{ feedback.message | markdown }}</div>
                 {% if feedback.admin_reply %}
                     <div class="mb-1 fw-medium">ADMIN REPLY:</div>
