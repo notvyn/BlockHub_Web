@@ -45,7 +45,10 @@
                         </div>
                     </div>
                     
-                    <div class="deadline-filtered-null" style="display: none;"></div>
+                    <!-- Single Master Fallback Message -->
+                    <div id="deadline-empty-msg" class="md-code border-0 bg-transparent" {% if deadlines %}style="display: none;"{% endif %}>
+                        No deadlines found. Rest Well !
+                    </div>
                     {% if deadlines %}
                         {% for d in deadlines %}
                             {% set days_left = (d.due_datetime - today).days %}
@@ -79,8 +82,6 @@
                                 </div>
                             </div>
                         {% endfor %}
-                    {% else %}
-                        <div class="md-code border-0 bg-transparent">No deadlines found. Rest Well !</div>
                     {% endif %}
                 </div> 
 

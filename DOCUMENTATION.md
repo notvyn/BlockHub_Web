@@ -157,6 +157,9 @@ A centralized class management system for CS 2103.
 - Cleaned the css folder
 - Added role validation on edit and delete buttons (course & deadline)
 
+**August 2, 2025**
+- Fixed dashboard deadline empty message
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
@@ -206,6 +209,10 @@ A centralized class management system for CS 2103.
 - [/] Fix size of sidebar profile pic
 - [/] Create a conditional text for no current pending feedback 
 - [ ] Fix sidebar visual issue when new tag is created 
+
+Known Bugs 
+- [ ] Task update element display not in real-time 
+- [ ] Deadline Archive Task unchecked marked as missed even if due date is not overdue 
 
 FUTURE VISION
 - [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)

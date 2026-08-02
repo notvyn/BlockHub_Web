@@ -60,13 +60,11 @@ export function completeDeadline() {
 }
 
 export function filterDeadline() {
-    // 1. Grab all required elements
     const filterButtons = document.querySelectorAll('.filter-btn');
     const deadlines = document.querySelectorAll('.deadline-item');
-    const deadlineIsNull = document.querySelector('.deadline-filtered-null'); 
+    const emptyMsgDiv = document.querySelector('#deadline-empty-msg'); // Grab the single master div
 
-    // Null Safety: Only run if the elements actually exist on this page
-    if (filterButtons.length === 0 || !deadlineIsNull) return;
+    if (filterButtons.length === 0) return;
 
     filterButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -74,52 +72,39 @@ export function filterDeadline() {
 
             const filterType = this.getAttribute('data-filter');
 
-            // 2. Visual Update: Make only the clicked button bold
+            // Visual Update
             filterButtons.forEach(b => b.classList.remove('fw-bold'));
             this.classList.add('fw-bold');
 
-            // 3. Define variables for this specific click
             let visibleCount = 0;
-            let emptyMessage = '';
 
-            // Determine the fallback text exactly once based on the clicked filter
-            if (filterType === 'all') {
-                emptyMessage = 'No upcoming deadlines.';
-            } else if (filterType === 'urgent') {
-                emptyMessage = 'No urgent deadlines pending right now.';
-            } else if (filterType === 'week') {
-                emptyMessage = 'No pending deadlines for the next 7 days';
-            }
-
-            // 4. Loop through every task on the screen
+            // Loop through tasks and toggle visibility
             deadlines.forEach(item => {
                 const days = parseInt(item.getAttribute('data-days'));
-                let shouldShow = false;
+                
+                // Cleaner boolean logic
+                let shouldShow = (filterType === 'all') || 
+                                 (filterType === 'urgent' && days <= 2) || 
+                                 (filterType === 'week' && days <= 7);
 
-                // Evaluate the rules
-                if (filterType === 'all') {
-                    shouldShow = true;
-                } else if (filterType === 'urgent' && days <= 2) { 
-                    shouldShow = true;
-                } else if (filterType === 'week' && days <= 7) {
-                    shouldShow = true;
-                }
-
-                // Instantly hide or show the task
                 item.style.display = shouldShow ? 'flex' : 'none'; 
                 
-                // If it's visible, increase our tally
-                if (shouldShow) {
-                    visibleCount++;
-                }
+                if (shouldShow) visibleCount++;
             });
             
-            // 5. Update the Fallback Message (Strictly OUTSIDE the loop)
-            if (visibleCount === 0) {
-                deadlineIsNull.textContent = emptyMessage; 
-                deadlineIsNull.style.display = 'block';
-            } else {
-                deadlineIsNull.style.display = 'none';
+            // Update the single Fallback Message
+            if (emptyMsgDiv) {
+                if (visibleCount === 0) {
+                    // Inject the specific text based on the filter
+                    if (filterType === 'all') emptyMsgDiv.textContent = 'No upcoming deadlines.';
+                    else if (filterType === 'urgent') emptyMsgDiv.textContent = 'No urgent deadlines pending right now.';
+                    else if (filterType === 'week') emptyMsgDiv.textContent = 'No pending deadlines for the next 7 days.';
+                    
+                    emptyMsgDiv.style.display = 'block';
+                } else {
+                    // Hide it if we found tasks
+                    emptyMsgDiv.style.display = 'none';
+                }
             }
         });
     });
