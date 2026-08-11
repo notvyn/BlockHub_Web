@@ -1,4 +1,4 @@
-import {getReadHistory, initAnnouncementForm, readAnnouncement, setFileIcon, toggleAnnouncementPin, toggleHeartReact, updateAnnouncementBadge} from './announcements.js';
+import {getReadHistory, initAnnouncementForm, readAnnouncement, setFileIcon, toggleAnnouncementPin, toggleHeartReact, toggleLightboxModal, updateAnnouncementBadge} from './announcements.js';
 import {eyeToggle, validateSignUpInput} from './auth.js';
 import {toggleDarkMode, toggleDeleteEntry, toggleLiveSearch, toggleMobileSearchBar, toggleSearchHighlight, toggleSidebarExpand} from './core.js';
 import {initCourseForm} from './courses.js';
@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setFileIcon();
     toggleAnnouncementPin();
     toggleHeartReact();
+    toggleLightboxModal();
     updateAnnouncementBadge();
 
     // Course Features

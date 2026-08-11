@@ -256,6 +256,34 @@ export function toggleHeartReact() {
     });
 }
 
+export function toggleLightboxModal() {
+    const lightboxModal = document.getElementById('imageLightboxModal');
+    
+    if (lightboxModal) {
+        lightboxModal.addEventListener('show.bs.modal', function (event) {
+            // 1. Get the element that the user just clicked
+            const triggerElement = event.relatedTarget;
+            
+            // 2. Extract the URL from the custom data attribute we added in Step 1
+            const imageUrl = triggerElement.getAttribute('data-img-url');
+            
+            // 3. Inject the URL into the modal's <img> tag
+            const modalImage = document.getElementById('lightboxImage');
+            modalImage.src = imageUrl;
+            
+            // 4. Inject the URL into the Download button's data-url attribute
+            const downloadBtn = document.getElementById('lightboxDownloadBtn');
+            downloadBtn.setAttribute('data-url', imageUrl);
+        });
+
+        // Optional but recommended: Clear the image when the modal closes 
+        // to prevent a brief flash of the old image the next time it opens.
+        lightboxModal.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('lightboxImage').src = "";
+        });
+    }
+}
+
 /* =========================================
     DYNAMIC BADGE COUNTER
 ========================================= */
