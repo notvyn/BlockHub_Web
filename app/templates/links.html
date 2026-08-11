@@ -49,7 +49,7 @@
                                 
                                 {{ link.title }}
                             </div>
-                            <div class="text-truncate" style="color: var(--text-muted); font-size: 0.8rem;">
+                            <div id="copy-content-{{ link.id }}" class="text-truncate" style="color: var(--text-muted); font-size: 0.8rem;">
                                 {{ link.url }}
                             </div>
                         </a>
@@ -71,6 +71,13 @@
                                 <button type="button" class="dropdown-item md-dropdown-item py-2 btn-link-pin" data-id="{{ link.id }}">
                                     <i class="fa-solid {{ 'fa-thumbtack-slash' if link.is_pinned else 'fa-thumbtack' }}" style="width: 16px;"></i> 
                                     {{ 'Unpin' if link.is_pinned else 'Pin' }}
+                                </button>
+                            </li>
+
+                            <!-- Copy Action -->
+                            <li>
+                                <button type="button" class="dropdown-item md-dropdown-item py-2" onclick="copyLink('{{ link.id }}')">
+                                    <i class="fa-regular fa-copy" style="width: 16px;"></i> Copy
                                 </button>
                             </li>
 
@@ -97,3 +104,21 @@
         {% endfor %}
     </div>
 {% endblock %}
+
+{% block script %}
+    <script>
+        async function copyLink(id) {
+            const contentEl = document.getElementById(`copy-content-${id}`);
+
+            const linkContent = contentEl.innerText.trim();
+
+            try {
+                await navigator.clipboard.write(linkContent);
+                alert("Link copied to clipboard!"); 
+            } catch (err) {
+                console.error("Failed to copy:", err);
+                alert("Failed to copy text. Your browser might not support this feature.");
+            }
+        }
+    </script>
+{% endblock%}
