@@ -96,7 +96,7 @@ export function filterDeadline() {
             if (emptyMsgDiv) {
                 if (visibleCount === 0) {
                     // Inject the specific text based on the filter
-                    if (filterType === 'all') emptyMsgDiv.textContent = 'No upcoming deadlines.';
+                    if (filterType === 'all') emptyMsgDiv.textContent = 'No upcoming deadlines. Enjoy the free time!';
                     else if (filterType === 'urgent') emptyMsgDiv.textContent = 'No urgent deadlines pending right now.';
                     else if (filterType === 'week') emptyMsgDiv.textContent = 'No pending deadlines for the next 7 days.';
                     
