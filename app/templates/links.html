@@ -107,13 +107,14 @@
 
 {% block script %}
     <script>
+        // Working on secured sites (HTTPS), not working on LocalHost
         async function copyLink(id) {
             const contentEl = document.getElementById(`copy-content-${id}`);
 
             const linkContent = contentEl.innerText.trim();
 
             try {
-                await navigator.clipboard.write(linkContent);
+                await navigator.clipboard.writeText(linkContent);
                 alert("Link copied to clipboard!"); 
             } catch (err) {
                 console.error("Failed to copy:", err);
