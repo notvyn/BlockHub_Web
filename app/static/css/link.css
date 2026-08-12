@@ -1,3 +1,13 @@
+.link-card {
+    position: relative;
+    z-index: 1;
+}
+
+.link-card:hover,
+.link-card:focus-within {
+    z-index: 1050 !important; 
+}
+
 .link-card:hover {
     /* transform: translateY(-3px); */
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08) !important;
