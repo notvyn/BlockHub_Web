@@ -182,14 +182,14 @@ def dashboard():
         
     active_deadlines = active_query.order_by(Deadline.due_date.asc()).all()
 
-    # --- NEW: Give the date a clock (11:59 PM) so Jinja can do exact hour math ---
+    # --- Give the date a clock (11:59 PM) so Jinja can do exact hour math ---
     for d in active_deadlines:
         if type(d.due_date) is date:
             d.due_datetime = datetime.combine(d.due_date, time(23, 59, 59))
         else:
             d.due_datetime = d.due_date
 
-    links = Link.query.order_by(Link.is_pinned.desc(), Link.date_added.desc()).all()
+    links = Link.query.order_by(Link.is_pinned.desc(), Link.date_added.desc()).limit(4).all()
 
     # 1. Grab the exact UTC time, remove timezone info, and add 8 hours for PHT
     now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
