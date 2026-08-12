@@ -85,7 +85,10 @@ export function getCourseRadios() {
                     targetDate.setDate(today.getDate() - daysToSubtract);
                     
                     // 8. Command Flatpickr to jump to this new date instantly!
-                    fpInstance.setDate(targetDate);
+                    const dateInput = document.querySelector(".custom-date-input");
+                    if (dateInput && dateInput._flatpickr) {
+                        dateInput._flatpickr.setDate(targetDate);
+                    }
                 }
             }
         });
