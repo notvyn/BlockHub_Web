@@ -157,8 +157,16 @@ A centralized class management system for CS 2103.
 - Cleaned the css folder
 - Added role validation on edit and delete buttons (course & deadline)
 
-**August 2, 2025**
+**August 2, 2026**
 - Fixed dashboard deadline empty message
+
+**August 11, 2026**
+- Fixed cloudinary issue on hosting site by adding an internal port
+
+**August 12, 2026**
+- Fixed schedule snapping to nearest date when adding summaries 
+- Fixed visual issue of links three dot - other link's dots are showing
+- Refined documentation and renamed it to milestone
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
