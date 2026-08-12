@@ -7,6 +7,9 @@ KomSy3 is a centralized class management platform dedicated to bringing blockmat
 
 KomSy3 is designed to streamline academic communication, track upcoming deadlines, and provide a unified dashboard for class announcements and resources. It ensures that students stay informed while giving class officers an efficient tool to manage information.
 
+<img src="documentation/dashboard-light.png" width="230" alt="Light Dashboard">
+<img src="documentation/dashboard-dark.png" width="230" alt="Light Dashboard">
+
 ## ❓ Why I built it
 
 This project was deeply inspired by my experience as a Class Representative. It all started with a simple question: 'What happens to the students who aren't present during a lecture? How can they catch up on what they missed?' That's when it clicked. We had been using a basic spreadsheet tracker during our first year, but I took the chance to build a dedicated web app for our block. KomSy3 was built to preserve resources, keep everyone informed, and make navigating the semester much easier for every student.
