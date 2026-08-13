@@ -5,7 +5,7 @@ export function initCourseForm() {
             { type: 'text', id: 'code', errorId: 'error-code', message: 'Course code is required.'},
             { type: 'float', id: 'units', errorId: 'error-units', message: 'Please enter a valid course units.'},
             { type: 'text', id: 'instructor', errorId: 'error-instructor', message: 'Course instructor is required.'},
-            { type: 'url', id: 'instructor_email', optional: true, errorId: 'error-instructor_email', messageFormat: 'URL must start with http:// or https://' }
+            { type: 'email', id: 'instructor_email', optional:true, errorId: 'error-instructor_email', message: 'Email should end by g.batstate-u.edu.ph'}
         ]);
     }
 }

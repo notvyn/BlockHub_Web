@@ -44,6 +44,14 @@ window.initEntryValidation = function(formId, fieldsConfig) {
                     }
                 }
             }
+            else if (field.type === 'email') {
+                targetElement = document.getElementById(field.id);
+                if (targetElement) {
+                    const email = /.+@g\.batstate-u\.edu\.ph$/i;
+
+                    isValid = email.test(targetElement.value);
+                }
+            }
             else if (field.type === 'radio') {
                 const radios = document.querySelectorAll(`input[name="${field.name}"]`);
                 isValid = Array.from(radios).some(radio => radio.checked);
