@@ -64,7 +64,7 @@ export function initWallpaperGenerator() {
         });
     });
 
-    // 5. ADVANCED SLIDERS & CUSTOM BACKGROUND
+    // ADVANCED SLIDERS & CUSTOM BACKGROUND
     if (opacitySlider && glassCard) {
         const opacityValDisplay = document.getElementById('opacity-val');
         opacitySlider.addEventListener('input', function() {
