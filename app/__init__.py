@@ -7,7 +7,7 @@ import cloudinary
 import os
 from dotenv import load_dotenv
 
-# 1. Initialize extensions globally (BUT DO NOT attach the app yet)
+# Initialize extensions globally (BUT DO NOT attach the app yet)
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
