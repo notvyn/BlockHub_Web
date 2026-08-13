@@ -32,7 +32,7 @@ def add_link_api():
             # Use the helper method we made in models.py to turn the text back into a dictionary
             sub_dict = sub.get_subscription_dict()
             
-            # Fire the message!
+            # Fire the message
             status = send_web_push(
                 subscription_dict=sub_dict, 
                 notification_title="New Class Link!", 
@@ -40,7 +40,7 @@ def add_link_api():
                 target_url=f"/links#link-{new_link.id}"
             )
 
-            # NEW: Automatically clean the database if the address is dead!
+            # Automatically clean the database if the address is dead!
             if status == "expired":
                 db.session.delete(sub)
 
@@ -63,7 +63,7 @@ def add_link_api():
 def api_delete_account():
     user = User.query.get(current_user.id)
     
-    # Optional: Log them out before deleting the record
+    # Log them out before deleting the record
     logout_user()
     
     db.session.delete(user)
@@ -116,10 +116,10 @@ def complete_deadline(id):
     data = request.get_json()
     is_completed = data.get('completed', False)
 
-    # 1. Check if a completion record already exists for THIS user and THIS deadline
+    # Check if a completion record already exists for THIS user and THIS deadline
     completion = DeadlineCompletion.query.filter_by(user_id=current_user.id, deadline_id=id).first()
 
-    # 2. Add or Remove the record based on the checkbox state
+    # Add or Remove the record based on the checkbox state
     if is_completed and not completion:
         # Checkbox was checked (true), and no record exists -> CREATE IT
         new_completion = DeadlineCompletion(user_id=current_user.id, deadline_id=id)
@@ -132,7 +132,7 @@ def complete_deadline(id):
     # Save the changes to the database
     db.session.commit()
 
-    # 3. Calculate the new badge totals dynamically for the JS to update the UI
+    # Calculate the new badge totals dynamically for the JS to update the UI
     # Total deadlines completed by this specific user
     archive_total = DeadlineCompletion.query.filter_by(user_id=current_user.id).count()
     
@@ -211,15 +211,15 @@ def delete_announcement(id):
         return jsonify({'success': False, 'error': 'Unauthorized'}), 403
 
     try:
-        # 1. Delete all attached Read Receipts first
+        # Delete all attached Read Receipts first
         AnnouncementRead.query.filter_by(announcement_id=id).delete()
         
-        # 2. Delete all attached Hearts first
+        # Delete all attached Hearts first
         AnnouncementHeart.query.filter_by(announcement_id=id).delete()
 
         remaining_announcement = Announcement.query.count()
         
-        # 3. NOW it is safe to delete the actual announcement
+        # NOW it is safe to delete the actual announcement
         db.session.delete(announcement_to_delete)
         db.session.commit()
 
@@ -368,13 +368,12 @@ def edit_tag(tag_id):
         tag.name = tag_form.tag_name.data
         tag.category = tag_form.tag_category.data
         db.session.commit()
-        # FIX: Return a JSON success instead of a redirect
+        # Return a JSON success instead of a redirect
         return jsonify({'success': True})
         
-    # FIX: Return JSON errors if validation fails
+    # Return JSON errors if validation fails
     return jsonify({'success': False, 'errors': tag_form.errors})
 
-# --- NEW API ROUTE ---
 # JavaScript will fetch data from here when a course is clicked
 @api.route('/api/get-schedules/<int:course_id>')
 @login_required
@@ -392,7 +391,7 @@ def get_schedules(course_id):
     return jsonify({'schedules': schedule_data})
 
 @api.route('/api/search')
-# @login_required # Keeps search data private to logged-in users
+@login_required # Keeps search data private to logged-in users
 def global_search():
     query = request.args.get('q', '').strip()
     
@@ -402,24 +401,24 @@ def global_search():
     search_term = f"%{query}%"
     results = []
 
-    # 1. Search Links
+    # Search Links
     links = Link.query.filter(Link.title.ilike(search_term)).limit(3).all()
     for link in links:
         results.append({'type': 'Link', 'title': link.title, 'url': f"{url_for('main.links')}#link-{link.id}", 'icon': 'fa-link'})
 
-    # 2. Search Announcements
+    # Search Announcements
     announcements = Announcement.query.filter(
         or_(Announcement.title.ilike(search_term), Announcement.content.ilike(search_term))
     ).limit(3).all()
     for a in announcements:
         results.append({'type': 'Announcement', 'title': a.title, 'url': url_for('main.announcement', id=a.id), 'icon': 'fa-bullhorn'})
 
-    # 3. Search Deadlines
+    # Search Deadlines
     deadlines = Deadline.query.filter(Deadline.description.ilike(search_term)).limit(3).all()
     for d in deadlines:
         results.append({'type': 'Deadline', 'title': d.description, 'url': f"{url_for('main.deadlines')}#deadline-{d.id}", 'icon': 'fa-clock'})
 
-    # 4. Search Class Summaries
+    # Search Class Summaries
     summaries = ClassSummary.query.filter(ClassSummary.content.ilike(search_term)).limit(3).all()
     for s in summaries:
         results.append({'type': 'Summary', 'title': f"{s.course.code} Summary", 'url': url_for('main.summary', id=s.id), 'icon': 'fa-book-open'})
@@ -495,13 +494,13 @@ def save_subscription():
 @api.route('/sync-guest-reads', methods=['POST'])
 @login_required
 def sync_guest_reads():
-    # 1. Catch the JSON data sent by JavaScript
+    # Catch the JSON data sent by JavaScript
     data = request.get_json()
     
-    # 2. Extract the list of IDs (or default to an empty list)
+    # Extract the list of IDs (or default to an empty list)
     announcement_ids = data.get('ids', [])
     
-    # 3. Loop through the IDs and save them to the database
+    # Loop through the IDs and save them to the database
     for a_id in announcement_ids:
         # Check if the receipt already exists so we don't cause a database error
         existing = AnnouncementRead.query.filter_by(
@@ -513,7 +512,7 @@ def sync_guest_reads():
             receipt = AnnouncementRead(user_id=current_user.id, announcement_id=a_id)
             db.session.add(receipt)
             
-    # 4. Commit all the new receipts at once
+    # Commit all the new receipts at once
     db.session.commit()
     
     return jsonify({"status": "success"})
@@ -579,14 +578,14 @@ def upload_image():
     file = request.files['image']
     
     try:
-        # 1. Safely extract the original name and extension (e.g., "Test", ".docx")
+        # Safely extract the original name and extension (e.g., "Test", ".docx")
         original_filename = secure_filename(file.filename) or "uploaded_file"
         name, ext = os.path.splitext(original_filename)
         
-        # 2. Generate a random 8-character string so users don't overwrite each other's files
+        # Generate a random 8-character string so users don't overwrite each other's files
         random_id = uuid.uuid4().hex[:8]
         
-        # 3. Smart ID Generation
+        # Smart ID Generation
         # List of common media formats that Cloudinary handles automatically
         media_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4', '.mov']
         
@@ -594,7 +593,7 @@ def upload_image():
             # For Images/Videos: Cloudinary adds the extension to the URL itself
             custom_public_id = f"{name}_{random_id}"
         else:
-            # 🟢 THE FIX: For Raw files (.docx, .pdf, .zip): We MUST force the extension into the ID
+            # THE For Raw files (.docx, .pdf, .zip): We MUST force the extension into the ID
             custom_public_id = f"{name}_{random_id}{ext}"
             
         upload_result = cloudinary.uploader.upload(
@@ -615,14 +614,14 @@ def update_link(id):
     form = LinkForm() # Or whatever your form is named
     
     if form.validate_on_submit():
-        # 1. Fetch the EXISTING link
+        # Fetch the EXISTING link
         link_to_update = Link.query.get_or_404(id)
         
-        # 2. Overwrite its data
+        # Overwrite its data
         link_to_update.title = form.title.data
         link_to_update.url = form.url.data
         
-        # 3. Commit (DO NOT use db.session.add() here)
+        # Commit (DO NOT use db.session.add() here)
         db.session.commit()
         
         return jsonify({'success': True})

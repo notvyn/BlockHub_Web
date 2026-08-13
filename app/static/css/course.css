@@ -90,31 +90,31 @@
 
 /* --- ACCORDION FOCUS RING --- */
 
-/* Overrides the default Bootstrap blue glow with your accent purple */
+/* Overrides the default Bootstrap blue glow with the accent purple */
 .accordion-button:focus {
     border-color: var(--accent-purple, #8e44ad) !important;
     /* The 0.25rem creates the thickness, the rgba sets the purple color with 25% opacity */
     box-shadow: 0 0 0 0.25rem rgba(142, 68, 173, 0.2) !important;
 }
 
-/* Optional: Dark mode adaptation for the focus ring */
+/* Dark mode adaptation for the focus ring */
 [data-theme="dark"] .accordion-button:focus {
     box-shadow: 0 0 0 0.25rem rgba(142, 68, 173, 0.2) !important;
 }
 
-/* 1. Strip Bootstrap's default cell backgrounds so the row color shines through */
+/* Strip Bootstrap's default cell backgrounds so the row color shines through */
 .table .schedule-row > th,
 .table .schedule-row > td {
     background-color: transparent !important;
 }
 
-/* 2. Apply the background directly to the row (Reverting your red test color back to white!) */
+/* Apply the background directly to the row */
 .schedule-row {
     background-color: var(--card-bg);
     transition: background-color 0.3s ease;
 }
 
-/* 4. Hover effect for the inner rows */
+/* Hover effect for the inner rows */
 .schedule-row.data-row:hover {
     background-color: rgba(255, 255, 255, 0.08); /* Faint purple hover */
 }
@@ -189,23 +189,23 @@
 
 /* --- ACCORDION ARROW FIX --- */
 
-/* 1. Target the default (collapsed) accordion arrow */
+/* Target the default (collapsed) accordion arrow */
 .accordion-button::after {
-    /* Notice the fill='%238e44ad' -- %23 is the # symbol for hex codes */
+    /* The fill='%238e44ad' -- %23 is the # symbol for hex codes */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238e44ad'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
 }
 
-/* 2. Target the open (active) accordion arrow */
+/* Target the open (active) accordion arrow */
 .accordion-button:not(.collapsed)::after {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238e44ad'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
 }
 
 [data-theme="dark"] .accordion-button::after {
-    /* Notice the fill='%238e44ad' -- %23 is the # symbol for hex codes */
+    /* The fill='%238e44ad' -- %23 is the # symbol for hex codes */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239a91b5'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
 }
 
-/* 2. Target the open (active) accordion arrow */
+/* Target the open (active) accordion arrow */
 [data-theme="dark"] .accordion-button:not(.collapsed)::after {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239a91b5'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
 }

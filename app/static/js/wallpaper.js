@@ -1,7 +1,7 @@
 // js/tools.js
 
 export function initWallpaperGenerator() {
-    // 1. SAFETY CHECK: Only run if the wallpaper export div exists on the page
+    // SAFETY CHECK: Only run if the wallpaper export div exists on the page
     const wallpaper = document.getElementById('wallpaper-export');
     if (!wallpaper) return;
 
@@ -12,9 +12,7 @@ export function initWallpaperGenerator() {
     const wallpaperHeader = document.querySelector('.wallpaper-header');
     const glassCard = wallpaper.querySelector('.schedule-glass-card');
 
-    // ==========================================
-    // 2. LIVE TYPING (Title Input)
-    // ==========================================
+    // LIVE TYPING (Title Input)
     if (wallpaperTitle && blockInput) {
         blockInput.addEventListener('input', function() {
             if (blockInput.value.trim() !== "") {
@@ -25,9 +23,7 @@ export function initWallpaperGenerator() {
         });
     }
 
-    // ==========================================
-    // 3. TEMPLATE SWITCHING
-    // ==========================================
+    // TEMPLATE SWITCHING
     const templateBtns = document.querySelectorAll('.btn-template');
     templateBtns.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -43,9 +39,7 @@ export function initWallpaperGenerator() {
         });
     });
 
-    // ==========================================
-    // 4. THEME SWITCHING
-    // ==========================================
+    // THEME SWITCHING
     const themeBtns = document.querySelectorAll('.theme-btn');
     const opacitySlider = document.getElementById('opacity-slider');
     
@@ -70,9 +64,7 @@ export function initWallpaperGenerator() {
         });
     });
 
-    // ==========================================
     // 5. ADVANCED SLIDERS & CUSTOM BACKGROUND
-    // ==========================================
     if (opacitySlider && glassCard) {
         const opacityValDisplay = document.getElementById('opacity-val');
         opacitySlider.addEventListener('input', function() {
@@ -127,9 +119,7 @@ export function initWallpaperGenerator() {
         });
     }
 
-    // ==========================================
-    // 6. DOWNLOAD WALLPAPER (html2canvas)
-    // ==========================================
+    // DOWNLOAD WALLPAPER (html2canvas)
     const downloadBtn = document.getElementById('download-btn');
     if (downloadBtn) {
         downloadBtn.addEventListener('click', async function() {

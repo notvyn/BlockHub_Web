@@ -361,7 +361,6 @@ input[type="range"].form-range {
 
 
 /* --- THE THUMB (The draggable circle) --- */
-
 /* Chrome, Safari, Edge, Opera */
 input[type="range"].form-range::-webkit-slider-thumb {
     -webkit-appearance: none;

@@ -30,7 +30,7 @@ def load_user(user_id):
     from app.models import User
     return User.query.get(int(user_id))
 
-# 2. The Application Factory
+# The Application Factory
 def create_app():
     # Create the App
     app = Flask(__name__)
@@ -44,16 +44,16 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
     app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
 
-    # 3. Initialize the extensions WITH the app
+    # Initialize the extensions WITH the app
     db.init_app(app)
     migrate.init_app(app, db)
     
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login' # Notice this changes to point to the auth blueprint!
+    login_manager.login_view = 'auth.login' # point to the auth blueprint
     
     mail.init_app(app)
 
-    # 4. Register your Blueprints here
+    # Register the Blueprints here (main, auth, api)
     from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
@@ -63,5 +63,5 @@ def create_app():
     from app.api import api as api_blueprint
     app.register_blueprint(api_blueprint)
 
-    # 5. Return the fully built app
+    # Return the fully built app
     return app

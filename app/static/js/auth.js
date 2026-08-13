@@ -22,7 +22,7 @@ export function eyeToggle() {
 }
 
 export function validateSignUpInput() {
-    // 1. Grab the inputs
+    // Grab the inputs
     const nameInput = document.getElementById('name')
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');

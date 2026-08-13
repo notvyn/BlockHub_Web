@@ -3,19 +3,17 @@ export function initTourReset() {
     
     if (replayBtn) {
         replayBtn.addEventListener('click', function() {
-            // 1. Erase the memory
+            // Erase the memory
             localStorage.removeItem('blockhub_onboarding_complete');
             
-            // 2. Redirect back to the dashboard (where the modal will pop up again!)
+            // Redirect back to the dashboard (where the modal will pop up again!)
             window.location.href = '/dashboard';
         });
     }
 }
 
 export function initUpdateProfileSettings() {
-    // ==========================================
-    // 1. INSTANT AVATAR PREVIEW
-    // ==========================================
+    // INSTANT AVATAR PREVIEW
     const imageInput = document.getElementById('profile_pic'); 
     const imagePreview = document.getElementById('avatarPreview');
 
@@ -28,9 +26,7 @@ export function initUpdateProfileSettings() {
         });
     }
 
-    // ==========================================
-    // 2. TAG SELECTION LIMITER
-    // ==========================================
+    // TAG SELECTION LIMITER
     const MAX_TAGS = 5;
     const tagCheckboxes = document.querySelectorAll('#tagsAccordion .user-selectable-tag'); 
     const tagCounter = document.getElementById('tagCounter');
@@ -55,9 +51,7 @@ export function initUpdateProfileSettings() {
         updateTagCount(); // Run once on load
     }
 
-    // ==========================================
-    // 3. INSTANT DELETE TAG (Event Delegation)
-    // ==========================================
+    // INSTANT DELETE TAG (Event Delegation)
     const tagsContainer = document.getElementById('tags-container');
     if (tagsContainer) {
         tagsContainer.addEventListener('click', function(e) {
@@ -83,9 +77,7 @@ export function initUpdateProfileSettings() {
         });
     }
 
-    // ==========================================
-    // 4. CREATE / EDIT TAG MODAL LOGIC
-    // ==========================================
+    // CREATE / EDIT TAG MODAL LOGIC
     const tagModal = document.getElementById('createTagModal');
     const form = document.getElementById('exclusiveTagForm');
     const submitBtn = document.getElementById('exclusiveSubmitBtn');
@@ -154,7 +146,6 @@ export function initUpdateProfileSettings() {
                     if (isEdit) {
                         window.location.reload(); 
                     } else {
-                        // Notice the button here now uses data-id instead of onclick!
                         const newPill = document.createElement('div');
                         newPill.className = 'custom-tag-pill d-flex align-items-center';
                         newPill.innerHTML = `
@@ -227,18 +218,18 @@ export function toggleCreateTag() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // 1. Hide the Bootstrap modal
+                    // Hide the Bootstrap modal
                     const modalElement = document.getElementById('createTagModal');
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     modalInstance.hide();
                     
-                    // 2. Clear the inputs so it's empty next time they open it
+                    // Clear the inputs so it's empty next time they open it
                     tagForm.reset();
                     
-                    /// 3. Find the container using the new ID we added above
+                    ///Find the container using the new ID we added above
                     const checkboxesContainer = document.getElementById('tags-container');
 
-                    // 4. Create the HTML matching the exact Jinja pill structure!
+                    // Create the HTML matching the exact Jinja pill structure!
                     const newCheckboxHTML = `
                         <input class="btn-check" id="tags-${data.tag.id}" name="tags" type="checkbox" value="${data.tag.id}" checked>
                         <label class="btn btn-outline-primary rounded-pill btn-sm px-3" for="tags-${data.tag.id}">
@@ -246,7 +237,7 @@ export function toggleCreateTag() {
                         </label>
                     `;
 
-                    // 5. Inject the new checkbox into the page!
+                    // Inject the new checkbox into the page!
                     checkboxesContainer.insertAdjacentHTML('beforeend', newCheckboxHTML);
                     
                 } else {
@@ -262,17 +253,15 @@ export function toggleCreateTag() {
 }
 
 export function toggleNotificationSubscription() {
-    /* =========================================
-    WEB PUSH NOTIFICATION SETUP
-    ========================================= */
+    /* WEB PUSH NOTIFICATION SETUP*/
 
-    // 1. Find the meta tag in the HTML
+    // Find the meta tag in the HTML
     const publicKeyMeta = document.querySelector('meta[name="vapid-public-key"]');
 
-    // 2. Extract the string from the 'content' attribute
+    // Extract the string from the 'content' attribute
     const PUBLIC_KEY = publicKeyMeta ? publicKeyMeta.getAttribute('content') : null;
 
-    // A mandatory helper function that converts your public key into the security format the browser demands
+    // A mandatory helper function that converts the public key into the security format the browser demands
     function urlBase64ToUint8Array(base64String) {
         const padding = '='.repeat((4 - base64String.length % 4) % 4);
         const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -301,7 +290,7 @@ export function toggleNotificationSubscription() {
                     
                     console.log("SUCCESS! Sending this to the server:", subscription);
                     
-                    // NEW CODE: Send the subscription to your Flask backend
+                    // Send the subscription to the Flask backend
                     const response = await fetch('/api/save-subscription', {
                         method: 'POST',
                         headers: {
@@ -324,22 +313,19 @@ export function toggleNotificationSubscription() {
         }
     };
 
-    /* =========================================
-       ACCOUNT SETTINGS TAB LOGIC
-       ========================================= */
-
+    /* ACCOUNT SETTINGS TAB LOGIC */
     // Push Notification Toggle
     const pushToggle = document.getElementById('settingsPushNotifications');
 
     if (pushToggle) {
-        // 1. Check current status on load
+        // Check current status on load
         if (Notification.permission === 'granted') {
             pushToggle.checked = true;
         } else {
             pushToggle.checked = false;
         }
 
-        // 2. Trigger on change
+        // Trigger on change
         pushToggle.addEventListener('change', function(e) {
             if (this.checked) {
                 // Attempt to subscribe
@@ -361,9 +347,7 @@ export function toggleNotificationSubscription() {
 }
 
 export function toggleUserProfileUpdate() {
-    /* =========================================
-       ACCOUNT SETTINGS: LIVE VALIDATION & SUBMIT
-       ========================================= */
+    /* ACCOUNT SETTINGS: LIVE VALIDATION & SUBMIT */
 
     const profileEmailInput = document.getElementById('newEmailInput');
     const currentPasswordInput = document.getElementById('currentPassword');
@@ -463,7 +447,7 @@ export function toggleUserProfileUpdate() {
         });
     }
 
-    // 5. Delete Account Logic
+    // Delete Account Logic
     const deleteAccountBtn = document.getElementById('deleteAccountBtn');
     if (deleteAccountBtn) {
         deleteAccountBtn.addEventListener('click', function() {

@@ -6,7 +6,7 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-/* 1. The Inputs */
+/* The Inputs */
 .modal-content .form-control {
     background-color: rgba(0,0,0,0.02) !important;
     color: var(--text-dark) !important; 
@@ -32,7 +32,7 @@
     color: var(--text-dark);
 }
 
-/* 2. The Cancel Button */
+/* The Cancel Button */
 .btn-modal-cancel {
     background-color: transparent;
     color: var(--text-muted);
@@ -46,7 +46,7 @@
     transform: translateY(-1px);
 }
 
-/* 3. The Save Button */
+/* The Save Button */
 .btn-modal-save {
     background-color: var(--accent-purple);
     color: var(--text-dark);
@@ -62,9 +62,9 @@
 }
 
 /* --- LINK FORM --- */
-/* 1. The Success State (Green Checkmark & Glow) */
+/*  The Success State (Green Checkmark & Glow) */
 .modal-content .form-control.is-valid {
-    border-color: #10b981 !important; /* A smooth, modern emerald green */
+    border-color: #10b981 !important;
     padding-right: calc(1.5em + 0.75rem);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
 }
@@ -73,7 +73,7 @@
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25) !important;
 }
 
-/* 2. The Error State (Red Warning & Glow) */
+/* The Error State (Red Warning & Glow) */
 .modal-content .form-control.is-invalid {
     border-color: var(--accent-red) !important; 
     padding-right: calc(1.5em + 0.75rem);
@@ -84,7 +84,6 @@
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25) !important;
 }
 
-/* --- DARK MODE MODAL FIXES --- */
 /* Invert the 'X' button so it's visible in dark mode */
 [data-theme="dark"] .btn-close {
     filter: invert(1); 

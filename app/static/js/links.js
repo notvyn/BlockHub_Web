@@ -1,7 +1,5 @@
 export function cleanInputLinkModal() {
-    /* =========================================
-       MODAL CLEANUP ROUTINE
-       ========================================= */
+    /* MODAL CLEANUP ROUTINE */
     const addLinkModal = document.getElementById('addLinkModal');
     
     // Create a reusable function to scrub everything clean
@@ -9,13 +7,13 @@ export function cleanInputLinkModal() {
         const form = document.getElementById('addLinkForm');
         if (form) form.reset(); // 1. Clear the text
         
-        // 2. Hide the error messages
+        // Hide the error messages
         const tError = document.getElementById('title-error');
         const uError = document.getElementById('url-error');
         if (tError) tError.style.display = 'none';
         if (uError) uError.style.display = 'none';
         
-        // 3. Strip away all the green/red validation glows
+        // Strip away all the green/red validation glows
         const inputs = form.querySelectorAll('.form-control');
         inputs.forEach(input => {
             input.classList.remove('is-valid', 'is-invalid');
@@ -31,14 +29,12 @@ export function cleanInputLinkModal() {
 }
 
 export function toggleLinkModal() {
-/* =========================================
-    UNIFIED MODAL AJAX SUBMISSION (ADD & UPDATE)
-    ========================================= */
+/* UNIFIED MODAL AJAX SUBMISSION (ADD & UPDATE) */
     const linkModal = document.getElementById('addLinkModal');
     const linkForm = document.getElementById('addLinkForm');
 
     if (linkModal) {
-        // 1. SHAPESHIFT THE MODAL WHEN IT OPENS
+        // SHAPESHIFT THE MODAL WHEN IT OPENS
         linkModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
             
@@ -75,7 +71,7 @@ export function toggleLinkModal() {
     }
 
     if (linkForm) {
-        // 2. HANDLE THE FORM SUBMISSION
+        // HANDLE THE FORM SUBMISSION
         linkForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Stop page reload
             
@@ -121,9 +117,7 @@ export function toggleLinkModal() {
 }
 
 export function validateLinkForm() {
-    /* =========================================
-       9. LIVE FORM VALIDATION (QUICK LINKS)
-       ========================================= */
+    /* LIVE FORM VALIDATION (QUICK LINKS) */
     const titleInput = document.getElementById('title');
     const urlInput = document.getElementById('url');
     const titleError = document.getElementById('title-error');
@@ -168,7 +162,7 @@ export function validateLinkForm() {
                 this.classList.remove('is-valid');
                 this.classList.add('is-invalid');
             } else {
-                // Success State!
+                // Success State
                 urlError.style.display = 'none';
                 this.classList.remove('is-invalid');
                 this.classList.add('is-valid');
@@ -178,9 +172,7 @@ export function validateLinkForm() {
 }
 
 export function toggleLinkPin() {
-    /* =========================================
-       LINK PINNING LOGIC
-       ========================================= */
+    /* LINK PINNING LOGIC */
     document.querySelectorAll('.btn-link-pin').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -194,7 +186,7 @@ export function toggleLinkPin() {
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    // The cleanest way to re-sort a dynamic grid is a quick page reload
+                    // re-sort dynamic grid by a quick page reload
                     window.location.reload();
                 }
             })

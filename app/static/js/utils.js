@@ -10,7 +10,7 @@ window.initEntryValidation = function(formId, fieldsConfig) {
             let applyBoxBorder = false;
             let dynamicMessage = field.message; // Default message
 
-            // A. Logic Check
+            // Logic Check
             if (field.type === 'text') {
                 targetElement = document.getElementById(field.id);
                 if (targetElement) isValid = targetElement.value.trim() !== '';
@@ -36,7 +36,6 @@ window.initEntryValidation = function(formId, fieldsConfig) {
                         isValid = false; // It's empty, and NOT optional
                         dynamicMessage = field.messageEmpty || field.message;
                     } else {
-                        // THE MULTI-URL FIX
                         // This checks for a valid link, followed by optional commas or spaces, 
                         // and allows it to repeat infinitely until the end of the text.
                         const urlPattern = /^(?:(?:https?:\/\/[^\s,]+|\[[^\]]+\]\(https?:\/\/[^\s)]+\))[\s,]*)+$/i;
@@ -65,7 +64,7 @@ window.initEntryValidation = function(formId, fieldsConfig) {
                 targetElement = field.instance.altInput || field.instance.input;
             }
 
-            // B. Visual Updates
+            // Visual Updates
             const errorDiv = document.getElementById(field.errorId);
             
             if (isValid) {
@@ -90,11 +89,10 @@ window.initEntryValidation = function(formId, fieldsConfig) {
         };
     });
 
-    // 2. Attach Live Event Listeners
+    // Attach Live Event Listeners
     fieldsConfig.forEach((field, index) => {
         const validateFn = validators[index];
         
-        // Ensure 'url' is added to this listener group alongside text and float!
         if (field.type === 'text' || field.type === 'float' || field.type === 'url') {
             const input = document.getElementById(field.id);
             if (input) input.addEventListener('input', validateFn);
@@ -108,7 +106,7 @@ window.initEntryValidation = function(formId, fieldsConfig) {
         }
     });
 
-    // 3. Gatekeeper
+    // Gatekeeper
     form.addEventListener('submit', function(e) {
         let isFormValid = true;
         validators.forEach(validateFn => {
@@ -119,14 +117,14 @@ window.initEntryValidation = function(formId, fieldsConfig) {
 };
 
 export function setAnchorToAnnouncement() {
-    // 1. Target every single link specifically inside the announcement content
+    // Target every single link specifically inside the announcement content
     const contentLinks = document.querySelectorAll('.card-content a');
     
     contentLinks.forEach(link => {
-        // 2. Force the link to open in a new tab
+        // Force the link to open in a new tab
         link.setAttribute('target', '_blank');
         
-        // 3. Security best practice: Prevents the new tab from maliciously hijacking your dashboard page
+        // Security best practice: Prevents the new tab from maliciously hijacking the dashboard page
         link.setAttribute('rel', 'noopener noreferrer');
     });
 }

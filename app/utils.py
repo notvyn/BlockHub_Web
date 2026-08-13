@@ -9,7 +9,7 @@ import json
 import os
 import re
 
-# Grab your keys from your environment variables
+# Grab the keys from the environment variables
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY') 
 VAPID_CLAIM_EMAIL = os.environ.get('VAPID_CLAIM_EMAIL') # e.g., "mailto:your@email.com"
 
@@ -29,13 +29,13 @@ def send_web_push(subscription_dict, notification_title, notification_body, targ
             vapid_claims={"sub": VAPID_CLAIM_EMAIL}
         )
         print("Push sent successfully!")
-        return "success" # NEW: Explicitly return success!
+        return "success" # Explicitly return success
         
     except WebPushException as ex:
         error_message = str(ex)
         print("Push failed!", repr(ex))
         
-        # THE FIX: A bulletproof string-match looking for "410" or "unsubscribed"
+        # A string-match looking for "410" or "unsubscribed"
         if "410" in error_message or "unsubscribed" in error_message:
             print("Subscription expired or revoked. Telling route to delete!")
             return "expired" 
@@ -43,17 +43,17 @@ def send_web_push(subscription_dict, notification_title, notification_body, targ
         return "error"
 
 def send_verification_email(user, new_email):
-    # 1. Initialize the serializer with your app's secret key
+    # Initialize the serializer with your app's secret key
     serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     
-    # 2. Package the user's ID and the NEW email into a secure token
+    # Package the user's ID and the NEW email into a secure token
     # We salt it so it can only be used for email updates
     token = serializer.dumps({'user_id': user.id, 'new_email': new_email}, salt='email-update-salt')
     
-    # 3. Create the unique verification link
+    # Create the unique verification link
     verify_url = url_for('verify_email_update', token=token, _external=True)
     
-    # 4. Construct the email
+    # Construct the email
     msg = Message('Confirm Your BlockHub Email Update',
                   sender='noreply@blockhub.com',
                   recipients=[new_email]) # Send it to the NEW email to prove they own it
@@ -68,7 +68,7 @@ To confirm and apply this change, please visit the following link:
 If you did not make this request, please ignore this email and your account will remain secure.
 This link will expire in 30 minutes.
 '''
-    # 5. Send it!
+    # Send it!
     mail.send(msg)
 
 def validate_school_email(form, field):

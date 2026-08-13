@@ -3,15 +3,15 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-    /* 1. Cover the blue background with a massive inner shadow */
+    /* Cover the blue background with a massive inner shadow */
     -webkit-box-shadow: 0 0 0 1000px var(--card-bg) inset !important;
     
-    /* 2. Force the text color to match your theme */
+    /* Force the text color to match your theme */
     -webkit-text-fill-color: var(--text-dark) !important;
 
     -webkit-font-family: var(--ActorFont);
     
-    /* 4. Optional: Delay any background color changes */
+    /* Delay any background color changes */
     transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -76,7 +76,7 @@ input:-webkit-autofill:active {
     opacity: 0.7;
 }
 
-/* --- 1. Highlighted Title Input --- */
+/* --- Highlighted Title Input --- */
 .title-input {
     font-size: 2rem !important;
     font-weight: 700;
@@ -108,7 +108,7 @@ input:-webkit-autofill:active {
 [data-theme="dark"] .add-entry-form .title-input {
     background-color: transparent !important;
     color: var(--text-dark) !important;
-    box-shadow: none !important; /* Kills the blue bootstrap glow */
+    box-shadow: none !important; /* Removes the blue bootstrap glow */
 }
 
 .input-group-text {
@@ -129,7 +129,7 @@ input:-webkit-autofill:active {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* --- 2. Single-Click Pills (Bulletproof Radio Hack) --- */
+/* --- Single-Click Pills (Radio Fields) --- */
 .btn-pill {
     background-color: transparent;
     color: var(--text-muted);
@@ -178,7 +178,7 @@ input:-webkit-autofill:active {
     border: 1px solid var(--accent-purple) !important;
 }
 
-/* --- 3. Date Grid & Custom Inputs --- */
+/* --- Date Grid & Custom Inputs --- */
 .date-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -209,7 +209,7 @@ input:-webkit-autofill:active {
     box-shadow: none !important;
 }
 
-/* 2. When the input is invalid, apply the custom red glow to the whole input group */
+/* When the input is invalid, apply the custom red glow to the whole input group */
 .input-group:has(.form-control.is-invalid) {
     border: 1px solid #dc3545;
     border-radius: 0.375rem;
@@ -234,7 +234,7 @@ input:-webkit-autofill:active {
     outline: none !important;
 }
 
-/* 3. Ensure the icon and toggle button match the container's appearance */
+/* Ensure the icon and toggle button match the container's appearance */
 .input-group:has(.form-control.is-invalid) .input-group-text {
     border-color: transparent !important;
     background-color: transparent !important;
@@ -409,16 +409,16 @@ input:-webkit-autofill:active {
     color: var(--text-dark) !important;
 }
 
-/* 1. Target the actual text color when it is highlighted */
+/* Target the actual text color when it is highlighted */
 .CodeMirror-line::selection, 
 .CodeMirror-line *::selection {
-    color: #ffffff !important; /* Change this to whatever color you want the text to be */
-    background-color: rgba(163, 163, 163, 0.5) !important; /* A semi-transparent purple */
+    color: #ffffff !important;
+    background-color: rgba(163, 163, 163, 0.5) !important;
 }
 
-/* 2. Target CodeMirror's custom highlight box layer */
+/* Target CodeMirror's custom highlight box layer */
 .CodeMirror-selected {
-    background-color: rgba(163, 163, 163, 0.5) !important; /* Match the background color above */
+    background-color: rgba(163, 163, 163, 0.5) !important;
 }
 
 /* --- DARK MODE DYNAMIC OVERRIDES --- */
@@ -442,7 +442,7 @@ input:-webkit-autofill:active {
 }
 /* Change the EasyMDE blinking cursor color in Dark Mode */
 [data-theme="dark"] .CodeMirror-cursor {
-    border-left-color: var(--text-dark) !important; /* Pure white, or use your var(--text-dark) */
+    border-left-color: var(--text-dark) !important;
 }
 /* Change the blinking cursor for all standard inputs in Dark Mode */
 [data-theme="dark"] .add-entry-form .form-control {

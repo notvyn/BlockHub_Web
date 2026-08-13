@@ -34,26 +34,26 @@
 }
 
 [data-theme="dark"] {
-    /* Backgrounds: Moving into deep, rich violets instead of pure black */
-    --main-bg: #16141d;         /* Soft, dark gray-violet */
-    --theme-bg: #221a42;        /* Slightly lighter elevated color for cards/sections */
+    /* Backgrounds */
+    --main-bg: #16141d;
+    --theme-bg: #221a42;
     --card-bg: rgba(255, 255, 255, 0.03);
     
-    /* Sidebar: Keeping the hierarchy clear */
-    --sidebar-bg: #1e1b29;      /* Slightly lighter gray-violet */
-    --sidebar-footer: #0d0c12;  /* Very dark */
+    /* Sidebar */
+    --sidebar-bg: #1e1b29;
+    --sidebar-footer: #0d0c12;
     
-    /* Typography: Using your old cream background as the primary text color! */
-    --text-dark: #E7DFC6;       /* (Note: Even though it's called 'dark', it acts as your main light text now) */
-    --text-muted: #9a91b5;      /* A soft, readable lavender-gray instead of harsh gray */
+    /* Typography */
+    --text-dark: #E7DFC6;
+    --text-muted: #9a91b5;
     
     --hue-shade: rgba(255, 255, 255, 0.1);
 
-    /* Accents: Brightened up by about 10-15% so they pop against the dark backgrounds */
-    --accent-purple: #8b5cf6;   
-    --accent-red: #f87171;      
-    --accent-yellow: #fbbf24;   
-    --accent-blue: #38bdf8;     
+    /* Accents */
+    --accent-purple: #8b5cf6;
+    --accent-red: #f87171;
+    --accent-yellow: #fbbf24;
+    --accent-blue: #38bdf8;
 }
 
 ::after,
@@ -76,20 +76,20 @@ h1 {
     font-size: 1.5rem;
 }
 
-/* 1. Lock down the HTML tag entirely */
+
 html {
     height: 100%;
     overflow: hidden;
     width: 100%;
 }
-/* 2. Upgrade body to 100dvh */
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--main-bg);
     color: var(--text-dark);
     margin: 0;
     width: 100vw;
-    height: 100dvh; /* <-- Changed to dvh */
+    height: 100dvh;
     overflow: hidden;
     transition: all 0.2s ease-in-out;
 }
@@ -101,14 +101,13 @@ main {
     max-width: 100dvw;
     overflow-y: auto;
 
-    /* ADD THIS HERE: The bumper for the scrollable container! */
+    /* The bumper for the scrollable container! */
     scroll-padding-top: 100px; 
     scroll-behavior: smooth;
 }
 
-/* 3. Upgrade main-content to 100dvh */
 .main-content {
-    height: 100dvh; /* <-- Changed to dvh */
+    height: 100dvh;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -120,7 +119,6 @@ main {
     width: 100%;
     height: 100dvh;
     display: flex;
-    /* flex-grow: 1; */
 }
 
 .text-dark {
@@ -223,7 +221,7 @@ main {
 
 /* --- Omni-Add Dropdown Styling --- */
 
-/* 1. Style the main dropdown box */
+/* Style the main dropdown box */
 .dropdown-menu {
     background-color: var(--main-bg);
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -233,7 +231,7 @@ main {
     z-index: 1050; /* Ensures it stays on top of other elements */
 }
 
-/* 2. Style the individual items */
+/* Style the individual items */
 .md-dropdown-item {
     color: var(--text-dark);
     font-size: 0.85rem;
@@ -246,7 +244,7 @@ main {
     transition: all 0.2s ease;
 }
 
-/* Color the icons to match your theme */
+/* Color the icons to match the theme */
 .md-dropdown-item i {
     color: var(--accent-purple);
     font-size: 0.9rem;
@@ -254,7 +252,7 @@ main {
     text-align: center;
 }
 
-/* 3. The Hover State */
+/* The Hover State */
 .md-dropdown-item:hover, 
 .md-dropdown-item:focus {
     background-color: var(--theme-bg);
@@ -262,7 +260,7 @@ main {
     transform: translateX(2px); /* A subtle nudge */
 }
 
-/* 4. The Divider Line */
+/* The Divider Line */
 .dropdown-divider {
     border-top: 1px dashed rgba(0, 0, 0, 0.1);
     margin: 0.4rem 0;
@@ -304,7 +302,7 @@ main {
     width: 100%;
     min-width: 250px; /* Ensures desktop search doesn't get too skinny */
     max-height: 400px;
-    background-color: var(--card-bg); /* Use your existing blockhub theme variable */
+    background-color: var(--card-bg);
     border: 1px solid rgba(0, 0, 0, 0.1);
     overflow-y: auto;
     z-index: 1050; 
@@ -343,7 +341,7 @@ main {
 }
 
 [date-theme='dark'] .search-result-item:hover {
-    background-color: var(--text-muted); /* Soft accent purple tint */
+    background-color: var(--text-muted);
 }
 
 [data-theme='dark'] .search-result-item:focus {
@@ -364,7 +362,6 @@ main {
 }
 
 [data-theme='dark'] .highlight-glow {
-    /* Increased duration to 3s makes the transition feel more premium and visible */
     animation: dark-target-highlight 3s ease-out !important;
     border: 2px solid var(--accent-purple) !important;
 }
@@ -377,7 +374,7 @@ main {
     }
     15% { 
         box-shadow: 0 0 20px 8px rgba(142, 68, 173, 0.6); 
-        background-color: rgba(142, 68, 173, 0.1); /* Adds a soft purple background tint */
+        background-color: rgba(142, 68, 173, 0.1);
     }
     100% { 
         box-shadow: 0 0 0 0 rgba(142, 68, 173, 0); 
@@ -402,11 +399,8 @@ main {
 }
 
 
-/* =========================================
-   SMART MARKDOWN LINKS (File Attachments)
-   ========================================= */
-
-/* 1. Turn all standard links into sleek, auto-truncating "pill" buttons */
+/* SMART MARKDOWN LINKS (File Attachments) */
+/* Turn all standard links into sleek, auto-truncating "pill" buttons */
 .card-content a {
     display: inline-flex;
     align-items: center;
@@ -415,13 +409,12 @@ main {
     overflow: hidden;      
     text-overflow: ellipsis; 
     
-    background-color: rgba(255, 255, 255, 0.05); /* Subtle dark background */
+    background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--accent-purple); 
     padding: 0.4rem 0.8rem;
     border-radius: 8px;
-    
-    /* The key to separating them from text! Adds margin all around */
+
     margin: 0.5rem 0.5rem 0.5rem 0; 
     
     text-decoration: none;
@@ -436,35 +429,29 @@ main {
     color: var(--accent-purple);
 }
 
-/* =========================================
-   CUSTOM SCROLLBAR
-   ========================================= */
+/* CUSTOM SCROLLBAR */
 
-/* 1. Set the overall width of the scrollbar */
 ::-webkit-scrollbar {
     width: 4px;  /* Vertical scrollbars */
     height: 4px; /* Horizontal scrollbars */
 }
 
-/* 2. Style the track (the invisible lane the scrollbar sits in) */
+/* Style the track (the invisible lane the scrollbar sits in) */
 ::-webkit-scrollbar-track {
     background-color: transparent; 
 }
 
-/* 3. Style the thumb (the actual draggable handle) */
+/* Style the thumb (the actual draggable handle) */
 ::-webkit-scrollbar-thumb {
-    /* Uses your muted purple/gray color so it isn't too distracting */
     background-color: var(--text-muted); 
     border-radius: 20px;
     
-    /* Adds a "fake" border matching your background to make the thumb look slimmer */
     /* border: 3px solid var(--main-bg);  */
     transition: background-color 0.2s ease;
 }
 
-/* 4. Style the thumb when a user hovers over it */
+/* Style the thumb when a user hovers over it */
 ::-webkit-scrollbar-thumb:hover {
-    /* Pops to your bright purple when they interact with it */
     background-color: var(--accent-purple); 
 }
 

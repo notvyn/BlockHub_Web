@@ -1,11 +1,9 @@
 export function toggleDarkMode() {
-    /* =========================================
-       UNIFIED DARK MODE CONTROLLER
-       ========================================= */
+    /* UNIFIED DARK MODE CONTROLLER */
     const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn');
     const settingsDarkModeToggle = document.getElementById('settingsDarkMode');
 
-    // 1. The Master Function that changes everything at once
+    // The Master Function that changes everything at once
     function applyTheme(isDark) {
         // Change the actual CSS theme and save it
         if (isDark) {
@@ -27,12 +25,12 @@ export function toggleDarkMode() {
         }
     }
 
-    // 2. Initialize on Page Load (Read the saved memory)
+    // Initialize on Page Load (Read the saved memory)
     const savedTheme = localStorage.getItem('blockhub_theme');
     const isCurrentlyDark = (savedTheme === 'dark');
     applyTheme(isCurrentlyDark);
 
-    // 3. Click Event for the Header Button (Sun/Moon Icon)
+    // Click Event for the Header Button (Sun/Moon Icon)
     themeToggleBtns.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -42,7 +40,7 @@ export function toggleDarkMode() {
         });
     });
 
-    // 4. Click Event for the Settings Tab Switch
+    // Click Event for the Settings Tab Switch
     if (settingsDarkModeToggle) {
         settingsDarkModeToggle.addEventListener('change', function() {
             // Send the exact state of the switch (true/false) to the master function
@@ -95,7 +93,7 @@ export function toggleDeleteEntry() {
     let cardToRemove = null;
     let redirectUrl = null;
 
-    // 1. When ANY trash can button is clicked...
+    // When ANY trash can button is clicked...
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', function() {
             // Grab the ID and the new 'data-type' attribute
@@ -114,7 +112,7 @@ export function toggleDeleteEntry() {
         });
     });
 
-    // 2. When the "Yes, Delete" button inside ANY global modal is clicked...
+    // When the "Yes, Delete" button inside ANY global modal is clicked...
     const confirmDeleteBtns = document.querySelectorAll('.confirmDeleteBtn');
     
     if (confirmDeleteBtns.length > 0) {
@@ -209,7 +207,7 @@ export function toggleDeleteEntry() {
 
     function updateCount(newTotal) {
         if (newTotal !== undefined) {
-            // 1. Update the big number on the actual page
+            // Update the big number on the actual page
             const pageTotal = document.getElementById(`${itemToDeleteType}-page-total-count`);
             
             if (pageTotal) {
@@ -220,7 +218,7 @@ export function toggleDeleteEntry() {
                 }, 150);
             }
 
-            // 2. Update the little red notification badge in the sidebar (if it exists)
+            // Update the little red notification badge in the sidebar (if it exists)
             const badge = document.getElementById(`${itemToDeleteType}-badge`);
             
             if (badge) {
@@ -236,9 +234,7 @@ export function toggleDeleteEntry() {
 }
 
 export function toggleLiveSearch() {
-    /* =========================================
-    LIVE SEARCH FUNCTIONALITY
-    ========================================= */
+    /* LIVE SEARCH FUNCTIONALITY */
     const searchInputs = document.querySelectorAll('.live-search-input');
     let debounceTimer;
 
@@ -301,9 +297,7 @@ export function toggleLiveSearch() {
 }
 
 export function toggleSearchHighlight() {
-    /* =========================================
-    CUSTOM HASH SCROLLING & HIGHLIGHTING
-    ========================================= */
+    /* CUSTOM HASH SCROLLING & HIGHLIGHTING*/
 
     document.addEventListener('click', function(e) {
         const link = e.target.closest('.search-result-item');
@@ -359,19 +353,11 @@ export function toggleSearchHighlight() {
         }
     });
 
-    /* =========================================
-        DEBUGGING SEARCH HIGHLIGHT
-        ========================================= */
-
     function triggerHighlight(targetId) {
-        // Debug: Print the ID we are looking for
-        // console.log("Looking for element with selector:", targetId);
         
         const targetEl = document.querySelector(targetId);
         
-        // Debug: Tell us if we found it or not
         if (targetEl) {
-            // console.log("SUCCESS: Found element:", targetEl);
             targetEl.classList.remove('highlight-glow');
             void targetEl.offsetWidth; 
             targetEl.classList.add('highlight-glow');
@@ -379,7 +365,7 @@ export function toggleSearchHighlight() {
             setTimeout(() => targetEl.classList.remove('highlight-glow'), 5000);
         } else {
             console.error("ERROR: Could not find element with ID:", targetId);
-            // Hint: This usually means the ID in your HTML doesn't match the ID in the URL
+            // Error: This usually means the ID in the HTML doesn't match the ID in the URL
         }
     }
 }

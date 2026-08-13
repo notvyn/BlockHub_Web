@@ -2,14 +2,14 @@
 @media (max-width: 767.98px) {
 
     :root {
-        /* 1080 * 0.26 = 280px wide. Fits beautifully on all phones! */
+        /* 1080 * 0.26 = 280px wide. Fits accurately on all phones */
         --scale-factor: 0.26; 
     }
 
     /* Mobile Header Base Styling */
     .m-nav {
         background-color: var(--sidebar-bg);
-        height: 60px; /* Gives the header a sturdy, touch-friendly height */
+        height: 60px;
         padding: 0 0.5rem;
         z-index: 1020;
         flex-shrink: 0;
@@ -132,14 +132,13 @@
         font-size: 1.5rem;
     }
 
-    /* 1. Ensure the normal state has a smooth transition */
+    /* Ensure the normal state has a smooth transition */
     .wrapper > div,
     .wrapper > main {
         transition: filter 0.3s ease-in-out;
     }
 
-    /* 2. The Sibling Selector Trick! 
-       When #sidebar has .expand, apply these styles to the main content next to it */
+    /* When #sidebar has .expand, apply these styles to the main content next to it */
     #sidebar.expand ~ div,
     #sidebar.expand ~ main {
         filter: contrast(0.6) brightness(0.7); /* Soft Wash (Low Contrast) */
@@ -147,18 +146,14 @@
         user-select: none; /* Prevents accidental text highlighting */
     }
 
-    /* =========================================
-   MOBILE SIDEBAR FIX (Industry Standard)
-   ========================================= */
-
-    /* 1. Fix the body and wrapper to respect the true mobile screen */
+    /* Fix the body and wrapper to respect the true mobile screen */
     body, .wrapper {
         height: 100%;
         min-height: 100dvh; /* Modern dynamic viewport */
         min-height: -webkit-fill-available; /* iOS/Chrome mobile magic bullet */
     }
 
-    /* 2. Target the exact sidebar ID from your navbar.html */
+    /* Target the exact sidebar ID from the navbar.html */
     #sidebar {
         display: flex !important;
         flex-direction: column !important;
@@ -174,13 +169,13 @@
         overflow: hidden; /* Prevent the outer sidebar from scrolling */
     }
 
-    /* 3. Target the exact link list */
+    /* Target the exact link list */
     .sidebar-nav {
         flex-grow: 1 !important; /* Absorbs all empty space */
         flex-shrink: 1 !important; /* Allows it to shrink when the URL bar appears */
         overflow-y: auto !important; /* Allows scrolling only in this middle section */
         
-        /* Hide scrollbars for a native app feel */
+        /* Hide scrollbars */
         scrollbar-width: none; 
         -ms-overflow-style: none; 
     }
@@ -189,14 +184,13 @@
         display: none;
     }
 
-    /* 4. Target the exact footer */
+    /* Target the exact footer */
     .sidebar-footer {
-        flex-shrink: 0 !important; /* STRICT rule: Never let the footer get squished */
+        flex-shrink: 0 !important; /* Never let the footer get squished */
         
         /* Uses the OS safe area so it doesn't overlap with Android/iOS swipe bars */
         /* Calculates the OS safe area PLUS an extra 20 pixels of padding */
         padding-bottom: calc(env(safe-area-inset-bottom, 1rem) + 20px) !important;
-        margin-bottom: 0 !important; /* Remove your temporary fix! */
     }
 
 }

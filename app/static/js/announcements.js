@@ -1,7 +1,7 @@
 
 
 export function getReadHistory() {
-    // 1. Setup: Grab authentication status from the container
+    // Grab authentication status from the container
     const container = document.getElementById('dashboard-container');
     
     // If the container isn't on this page, stop the function immediately
@@ -23,13 +23,13 @@ export function getReadHistory() {
         // If there is data to sync...
         if (guestReadIds && guestReadIds.length > 0) {
             
-            // 1. Instantly hide the tags on the screen
+            // Instantly hide the tags on the screen
             guestReadIds.forEach(id => {
                 const tag = document.getElementById(`tag-${id}`);
                 if (tag) tag.style.display = 'none';
             });
             
-            // 2. Send the data to the Python route
+            // Send the data to the Python route
             fetch('/sync-guest-reads', {
                 method: 'POST',
                 headers: {
@@ -40,7 +40,7 @@ export function getReadHistory() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // 3. Delete the local browser memory
+                    // Delete the local browser memory
                     localStorage.removeItem('guestReadAnnouncements');
                 }
             })
@@ -50,11 +50,11 @@ export function getReadHistory() {
 }
 
 export function initAnnouncementForm() {
-    // 1. Safety Check: Only run if we are actually on the Add Announcement page
+    // Safety Check: Only run if we are actually on the Add Announcement page
     const textArea = document.getElementById('announcement-content');
     if (!textArea) return; 
 
-    // 2. Initialize EasyMDE with all your custom settings
+    // Initialize EasyMDE with all the custom settings
     const easyMDE = new EasyMDE({
         element: textArea,
         theme: "modern",
@@ -93,13 +93,13 @@ export function initAnnouncementForm() {
         }
     });
 
-    // 3. Read the "Jinja Bridge" to check for Python server errors
+    // Read the "Jinja Bridge" to check for Python server errors
     const hasError = textArea.getAttribute('data-has-error') === 'true';
     if (hasError && easyMDE.element.nextSibling) {
         easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');
     }
 
-    // 4. Initialize Live Frontend Validation
+    // Initialize Live Frontend Validation
     if (typeof APP_CONFIG.initEntryValidation === 'function') {
         APP_CONFIG.initEntryValidation('announcementForm', [
             { type: 'text', id: 'title', errorId: 'error-title', message: 'A title is required.' },
@@ -110,7 +110,7 @@ export function initAnnouncementForm() {
 }
 
 export function readAnnouncement() {
-    // 3. The Click Event (With Navigation Pause)
+    // The Click Event (With Navigation Pause)
     document.querySelectorAll('.announcement-link').forEach(link => {
         link.addEventListener('click', function(e) {
             // STOP the browser from navigating instantly
@@ -156,9 +156,7 @@ export function readAnnouncement() {
 }
 
 export function setFileIcon() {
-    /* =========================================
-       SMART FILE ATTACHMENT ICONS
-       ========================================= */
+    /* SMART FILE ATTACHMENT ICONS */
     document.querySelectorAll('.card-content a').forEach(link => {
         const url = link.href.toLowerCase();
         let iconClass = 'fa-link'; // Default icon
@@ -261,22 +259,22 @@ export function toggleLightboxModal() {
     
     if (lightboxModal) {
         lightboxModal.addEventListener('show.bs.modal', function (event) {
-            // 1. Get the element that the user just clicked
+            // Get the element that the user just clicked
             const triggerElement = event.relatedTarget;
             
-            // 2. Extract the URL from the custom data attribute we added in Step 1
+            // Extract the URL from the custom data attribute we added in Step 1
             const imageUrl = triggerElement.getAttribute('data-img-url');
             
-            // 3. Inject the URL into the modal's <img> tag
+            // Inject the URL into the modal's <img> tag
             const modalImage = document.getElementById('lightboxImage');
             modalImage.src = imageUrl;
             
-            // 4. Inject the URL into the Download button's data-url attribute
+            // Inject the URL into the Download button's data-url attribute
             const downloadBtn = document.getElementById('lightboxDownloadBtn');
             downloadBtn.setAttribute('data-url', imageUrl);
         });
 
-        // Optional but recommended: Clear the image when the modal closes 
+        // Clear the image when the modal closes 
         // to prevent a brief flash of the old image the next time it opens.
         lightboxModal.addEventListener('hidden.bs.modal', function () {
             document.getElementById('lightboxImage').src = "";
@@ -284,11 +282,9 @@ export function toggleLightboxModal() {
     }
 }
 
-/* =========================================
-    DYNAMIC BADGE COUNTER
-========================================= */
 export function updateAnnouncementBadge() {
-    // 1. Update the Dashboard Pill (Counts physical tags on the screen)
+    /* DYNAMIC BADGE COUNTER */
+    // Update the Dashboard Pill (Counts physical tags on the screen)
     const dashBadge = document.getElementById('announcement-badge');
     if (dashBadge) {
         let unreadCount = 0;
@@ -299,7 +295,7 @@ export function updateAnnouncementBadge() {
         dashBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
     }
 
-    // 2. Update the Global Sidebar Pill & Dot (Simply decrements the number by 1)
+    // Update the Global Sidebar Pill & Dot (Simply decrements the number by 1)
     const sidebarBadge = document.getElementById('sidebar-announcement-badge');
     if (sidebarBadge) {
         let currentCount = parseInt(sidebarBadge.textContent) || 0;

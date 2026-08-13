@@ -7,10 +7,10 @@
     flex-direction: column;
     background-color: var(--sidebar-bg);
     height: 100dvh;
-    /* 1. Remove the horizontal scrollbar entirely */
+    /* Remove the horizontal scrollbar entirely */
     overflow-x: hidden; 
     
-    /* 2. Allow vertical scrolling ONLY if content overflows (for mobile) */
+    /* Allow vertical scrolling ONLY if content overflows (for mobile) */
     overflow-y: auto;
 }
 
@@ -65,7 +65,7 @@
     flex: 1 1 auto;
 }
 
-/* 1. UPDATE THE LINK TO USE FLEXBOX FOR PERFECT ALIGNMENT */
+/* UPDATE THE LINK TO USE FLEXBOX FOR PERFECT ALIGNMENT */
 a.sidebar-link {
     padding: .625rem 1.625rem;
     color: #FFF;
@@ -97,13 +97,12 @@ a.sidebar-link {
     flex-shrink: 0;
 }
 
-/* 2. BADGE VISIBILITY LOGIC */
 /* The Number Pill is visible by default, but hidden when collapsed */
 #sidebar:not(.expand) .sidebar-badge-num {
     display: none !important;
 }
 
-/* Make the red dot hidden by default! */
+/* Make the red dot hidden by default */
 .sidebar-badge-dot {
     display: none !important;
     position: absolute;
@@ -114,7 +113,7 @@ a.sidebar-link {
     border: 2px solid var(--sidebar-bg);
 }
 
-/* --- NEW: Anti-Flash Animation --- */
+/* --- Anti-Flash Animation for red dot --- */
 @keyframes preventFlash {
     0% { opacity: 0; }
     99% { opacity: 0; }
@@ -143,8 +142,6 @@ a.sidebar-link:hover {
     background-color: rgba(255,255,255,.075);
     border-left:3px solid var(--accent-purple);
 } 
-
-
 
 #sidebar.expand .sidebar-dropdown .sidebar-link {
     padding-left: 2.5rem;

@@ -1,8 +1,8 @@
-# 1. Import create_app instead of app
+# Import create_app instead of app
 from app import create_app, db
 from app.models import Tag, Course
 
-# 2. Build the app using your factory function
+# Build the app using your factory function
 app = create_app()
 
 # Your default CS 2103 tags
@@ -51,7 +51,7 @@ courses_2103 = [
     {'code': 'PHYS 111', 'title': 'General Physics 1', 'units': 3.00, 'instructor': "Ma'am Baby Karen L. Mendoza"},
 ]
 
-# 3. Use the newly created app to open the context
+# Use the newly created app to open the context
 with app.app_context():
     for tag_data in default_tags:
         # Check if it already exists so we don't cause an error

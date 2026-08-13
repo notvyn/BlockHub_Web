@@ -188,10 +188,10 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def __init__(self, **kwargs):
-        # 1. Run the standard SQLAlchemy initialization
+        # Run the standard SQLAlchemy initialization
         super(User, self).__init__(**kwargs)
         
-        # 2. If no profile image was provided, generate one!
+        # If no profile image was provided, generate one
         if not self.profile_image and self.name:
             # Format the name for a URL (e.g., "Juan Dela Cruz" -> "Juan+Dela+Cruz")
             formatted_name = self.name.replace(' ', '+')

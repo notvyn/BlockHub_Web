@@ -125,7 +125,7 @@
     background-color: var(--sidebar-bg);
 }
 
-/* 1. Default State (Unchecked) */
+/* Default State (Unchecked) */
 .btn-obsidian {
     color: var(--text-muted); /* Faded gray/violet icon */
     border: 1px solid rgba(21, 16, 44, 0.2); /* Ghost border */
@@ -134,14 +134,13 @@
     padding: 0.25rem 0.5rem; /* Keeps the box tight and minimal */
 }
 
-/* 2. Hover State */
+/* Hover State */
 .btn-obsidian:hover {
     color: var(--text-dark); /* Dark violet icon */
     border-color: var(--text-dark); /* Dark violet border */
     background-color: rgba(21, 16, 44, 0.05); /* Very subtle dark background */
 }
 
-/* 3. Checked State (The Magic) */
 /* This triggers when the hidden .btn-check is checked, targeting the label next to it */
 .btn-check:checked + .btn-obsidian {
     background-color: var(--text-dark); /* Fills with solid dark violet */
@@ -149,11 +148,11 @@
     border-color: var(--text-dark);
 }
 
-/* Optional: Add a slight focus ring for accessibility */
+/* Add a slight focus ring for accessibility */
 .btn-check:focus + .btn-obsidian {
     box-shadow: 0 0 0 0.25rem rgba(21, 16, 44, 0.25);
 }
-/* The class we will inject using JavaScript */
+/* The class that will be injected using JavaScript */
 .task-done-text {
     opacity: 0.5;
     transition: all 0.2s ease;
@@ -270,7 +269,7 @@
     display: inline-flex;
 }
 
-/* Update your existing .feed-image class */
+/* Update the existing .feed-image class */
 .feed-image {
     max-height: 280px;
     max-width: 100%;

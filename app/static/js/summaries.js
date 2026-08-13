@@ -1,10 +1,10 @@
 export function getCourseRadios() {
     // GET COURSE RADIOS
-    // 1. Target the elements
+    // Target the elements
     const courseRadios = document.querySelectorAll('.course-radio');
     const scheduleContainer = document.getElementById('dynamic-date-container');
     
-    // 2. Listen for clicks on ANY course radio button
+    // Listen for clicks on ANY course radio button
     courseRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             const selectedCourseId = this.value;
@@ -21,11 +21,11 @@ export function getCourseRadios() {
                         return;
                     }
 
-                    // NEW: Grab the hidden saved ID from the HTML
+                    // Grab the hidden saved ID from the HTML
                     const savedScheduleId = scheduleContainer.getAttribute('data-saved-schedule');
                     
                     data.schedules.forEach(sched => {
-                        // NEW: If the current loop matches the saved ID, add the 'checked' attribute
+                        // If the current loop matches the saved ID, add the 'checked' attribute
                         const isChecked = (savedScheduleId == sched.id) ? 'checked' : '';
                         
                         const htmlString = `
@@ -39,27 +39,27 @@ export function getCourseRadios() {
         });
     });
 
-    // NEW: Auto-trigger the loading process when the page first opens!
+    // Auto-trigger the loading process when the page first opens
     // If WTForms pre-selected a course, we simulate a click on it so the schedules load instantly.
     const preSelectedCourse = document.querySelector('.course-radio:checked');
     if (preSelectedCourse) {
         preSelectedCourse.dispatchEvent(new Event('change'));
     }
     
-    // 2. Listen for any clicks inside this container
+    // Listen for any clicks inside this container
     if (scheduleContainer) {
         scheduleContainer.addEventListener('change', function(e) {
             
-            // 3. Ensure they actually clicked a radio button
+            //Ensure they actually clicked a radio button
             if (e.target && e.target.matches('input[name="schedule"]')) {
                 
-                // 4. Find the label attached to this radio button and read its text
+                // Find the label attached to this radio button and read its text
                 const labelText = document.querySelector(`label[for="${e.target.id}"]`).innerText;
                 
                 // Extract just the day part (e.g., splits "Monday | 07:00 AM" and grabs "Monday")
                 const selectedDayString = labelText.split('|')[0].trim(); 
                 
-                // 5. Map the text string to JavaScript's numbered days (0 = Sunday, 1 = Monday)
+                // Map the text string to JavaScript's numbered days (0 = Sunday, 1 = Monday)
                 const daysOfWeek = {
                     'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 
                     'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6
@@ -71,7 +71,7 @@ export function getCourseRadios() {
                     const today = new Date();
                     const currentDayNum = today.getDay();
                     
-                    // 6. Calculate the math to find the most recent occurrence of that day
+                    // Calculate the math to find the most recent occurrence of that day
                     let daysToSubtract = currentDayNum - targetDayNum;
                     
                     // If the target day is ahead of us in the week (e.g., today is Tuesday(2), target is Friday(5)),
@@ -80,11 +80,11 @@ export function getCourseRadios() {
                         daysToSubtract += 7; 
                     }
                     
-                    // 7. Calculate the exact historical date
+                    // Calculate the exact historical date
                     const targetDate = new Date(today);
                     targetDate.setDate(today.getDate() - daysToSubtract);
                     
-                    // 8. Command Flatpickr to jump to this new date instantly!
+                    // Command Flatpickr to jump to this new date instantly
                     const dateInput = document.querySelector(".custom-date-input");
                     if (dateInput && dateInput._flatpickr) {
                         dateInput._flatpickr.setDate(targetDate);
@@ -144,7 +144,7 @@ export function initSummaryForm() {
         allowInput: true
     });
 
-    // 3. Read the "Jinja Bridge" to check for Python server errors
+    // Read the "Jinja Bridge" to check for Python server errors
     const hasError = textArea.getAttribute('data-has-error') === 'true';
     if (hasError && easyMDE.element.nextSibling) {
         easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');

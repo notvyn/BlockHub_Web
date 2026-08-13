@@ -25,7 +25,7 @@
 
 /* --- CUSTOM DEADLINE CHECKBOX --- */
 
-/* 1. The Unchecked State (A subtle, hollow circle) */
+/* The Unchecked State (A subtle, hollow circle) */
 .dl-checkbox {
     display: inline-flex;
     align-items: center;
@@ -44,21 +44,21 @@
     border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* 2. The Hover State (Gives the user feedback before clicking) */
+/* The Hover State (Gives the user feedback before clicking) */
 .dl-checkbox:hover {
     border-color: var(--accent-purple);
     background-color: rgba(142, 68, 173, 0.1); /* Extremely light purple fill */
 }
 
-/* 3. The Checked State (Fills with solid purple and reveals the checkmark) */
-/* We use the sibling selector (+) to detect when the hidden input is checked */
+/* The Checked State (Fills with solid purple and reveals the checkmark) */
+/* Used the sibling selector (+) to detect when the hidden input is checked */
 .task-checkbox:checked + .dl-checkbox {
     background-color: var(--accent-purple);
     border-color: var(--accent-purple);
     color: #ffffff; /* Turns the checkmark white */
 }
 
-/* 4. Sizing the icon perfectly inside the circle */
+/* Sizing the icon perfectly inside the circle */
 .dl-checkbox i {
     font-size: 0.85rem;
 }
@@ -87,7 +87,7 @@
     color: var(--text-muted);
 }
 
-/* 1. Locks the entire Left Section (Checkbox + Core Info) to exactly 45% */
+/* Locks the entire Left Section (Checkbox + Core Info) to exactly 55% */
 .deadline-card > .d-flex.align-items-start, 
 .dl-core {
     flex: 1 1 55%;
@@ -98,13 +98,13 @@
     flex: 1 1 45%;
 }
 
-/* 2. Locks the Notes section to exactly 35% */
+/* Locks the Notes section to exactly 40% */
 .dl-notes {
     flex: 1 1 40%;
     min-width: 0; 
 }
 
-/* 3. Locks the Action buttons and Status to exactly 20% */
+/* Locks the Action buttons and Status to exactly 20% */
 .dl-actions {
     flex: 1 1 20%;
     min-width: 0;

@@ -3,7 +3,7 @@ export function toggleFeedbackReplyModal() {
     const submitBtn = document.getElementById('submitReplyBtn');
     
     if (replyModal) {
-        // 1. When the modal opens, grab the ID from the button that was clicked
+        // When the modal opens, grab the ID from the button that was clicked
         replyModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget; // The button that triggered the modal
             const feedbackId = button.getAttribute('data-id');
@@ -15,7 +15,7 @@ export function toggleFeedbackReplyModal() {
             document.getElementById('adminReplyText').value = '';
         });
 
-        // 2. When the admin clicks "Resolve Feedback" inside the modal
+        // When the admin clicks "Resolve Feedback" inside the modal
         submitBtn.addEventListener('click', function() {
             const feedbackId = document.getElementById('feedbackIdInput').value;
             const replyText = document.getElementById('adminReplyText').value;
@@ -50,7 +50,7 @@ export function resolveFeedback() {
     const completeBtn = document.querySelectorAll('.complete-btn');
 
     completeBtn.forEach(btn => {
-        // 1. Pass 'event' into the function so we can stop the default link behavior
+        // Pass 'event' into the function so we can stop the default link behavior
         btn.addEventListener('click', function(event) {
             // Prevent the page from jumping to the top!
             event.preventDefault(); 
@@ -79,7 +79,7 @@ export function resolveFeedback() {
                     if (statusText) statusText.textContent = 'Resolved';
                     if (taskContainer) taskContainer.style.filter = 'grayscale(1)';
                     
-                    // Optional UI Polish: Hide the button so they can't click it again
+                    // Hide the button so they can't click it again
                     this.style.display = 'none'; 
                 }
             })
@@ -89,7 +89,7 @@ export function resolveFeedback() {
 }
 
 export function initFeedbackForm() {
-    // 1. Safety Check: Only run if we are actually on the Add Announcement page
+    // Safety Check: Only run if we are actually on the Add Announcement page
     const textArea = document.getElementById('feedback-message');
     if (!textArea) return; 
 
@@ -122,7 +122,7 @@ export function initFeedbackForm() {
             .then(response => response.json())
             .then(data => {
                 if (data.data && data.data.filePath) {
-                    // If successful, tell EasyMDE the URL to insert!
+                    // If successful, tell EasyMDE the URL to insert
                     onSuccess(data.data.filePath);
                 } else {
                     onError("Upload failed");
@@ -134,7 +134,7 @@ export function initFeedbackForm() {
         }
     });
 
-    // 3. Read the "Jinja Bridge" to check for Python server errors
+    // Read the "Jinja Bridge" to check for Python server errors
     const hasError = textArea.getAttribute('data-has-error') === 'true';
     if (hasError && easyMDE.element.nextSibling) {
         easyMDE.element.nextSibling.classList.add('border', 'border-danger', 'rounded');

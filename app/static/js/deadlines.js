@@ -145,11 +145,11 @@ function updateBadges(newTotal, archiveTotal) {
 }
 
 export function initDeadlineForm() {
-    // 1. Safety Check: Only run if the deadline form is on the screen
+    // Safety Check: Only run if the deadline form is on the screen
     const form = document.getElementById('deadlineForm');
     if (!form) return;
 
-    // 2. Initialize Flatpickr instances
+    // Initialize Flatpickr instances
     const fpDateGiven = flatpickr("#date_given", {
         altInput: true,
         altFormat: "D - M d, Y", 
