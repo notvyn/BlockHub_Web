@@ -32,7 +32,7 @@
             <!-- Added 'deadline-item' and 'position-relative' for JS and mobile positioning -->
             <div id="deadline{{ d.id }}" class="card-wrapper deadline-card deadline-item position-relative d-flex flex-column flex-md-row justify-content-between p-3 p-md-3 mb-2" style="border-right: 2px solid var(--accent-purple); opacity: {% if d.id in completed_ids %}0.75{% else %}1{% endif %}; transition: opacity 0.3s ease;">
 
-                <!-- 1. MOBILE CHECKBOX (Top Right, Hidden on Desktop) -->
+                <!-- MOBILE CHECKBOX (Top Right, Hidden on Desktop) -->
                 <div class="d-md-none position-absolute" style="top: 1rem; right: 1rem; z-index: 5;">
                     <input type="checkbox" class="btn-check task-checkbox" id="btn-check-mob-{{ d.id }}" data-id="{{ d.id }}" autocomplete="off" {% if d.id in completed_ids %}checked{% endif %}>
                     <label class="dl-checkbox m-0" for="btn-check-mob-{{ d.id }}">
@@ -40,7 +40,7 @@
                     </label>
                 </div>
 
-                <!-- 2. LEFT COLUMN: Desktop Checkbox + Core Info -->
+                <!-- LEFT COLUMN: Desktop Checkbox + Core Info -->
                 <div class="d-flex align-items-start gap-3 flex-grow-1" style="min-width: 0;">
                     
                     <!-- DESKTOP CHECKBOX (Hidden on Mobile) -->
@@ -62,7 +62,7 @@
 
                 <div class="dl-footer d-flex flex-grow-1 border-start px-md-4 mt-3 mt-md-0 align-items-start" style="min-width: 0;">
 
-                    <!-- 3. MIDDLE COLUMN: Notes -->
+                    <!-- MIDDLE COLUMN: Notes -->
                     <div class="dl-notes flex-grow-1 w-100 pe-3">
                         <div class="fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Note/s:</div>
                         <div class="" style="font-size: 0.85rem;">
@@ -70,7 +70,7 @@
                         </div>
                     </div>
 
-                    <!-- 4. RIGHT COLUMN: Actions & Status -->
+                    <!-- RIGHT COLUMN: Actions & Status -->
                     <div class="dl-actions flex-shrink-0 d-flex flex-column align-items-end justify-content-end ms-2">
                         {% if current_user.role == 'Officer' or current_user.is_admin %}                  
                         <div class="d-flex gap-2 mb-1">

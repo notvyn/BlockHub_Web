@@ -31,13 +31,13 @@
                 <!-- The Link Card -->
                 <div id="link-{{ link.id }}" class="card-wrapper link-card p-3 d-flex align-items-center w-100 shadow-sm" style="overflow: visible !important;">
                     
-                    <!-- 1. The Dynamic Icon Box -->
+                    <!-- The Dynamic Icon Box -->
                     <div class="link-icon-box flex-shrink-0 me-3 d-flex justify-content-center align-items-center rounded-circle">
                         <!-- Using the Auto-Favicon Trick -->
                         <img src="https://www.google.com/s2/favicons?domain={{ link.url }}&sz=64" alt="icon" style="width: 24px; height: 24px; border-radius: 4px;">
                     </div>
 
-                    <!-- 2. Title & URL (The Clickable Area) -->
+                    <!-- Title & URL (The Clickable Area) -->
                     <div class="link-info flex-grow-1 overflow-hidden pe-2">
                         <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="d-block">
                             <div class="fw-bold text-wrap mb-1 d-flex align-items-center" style="color: var(--text-dark); font-size: 1.05rem;">
@@ -55,15 +55,15 @@
                         </a>
                     </div>
 
-                    <!-- 3. Action Buttons -->
+                    <!-- Action Buttons -->
                     {% if current_user.role == 'Officer' %}
                      <div class="dropdown">
-                        <!-- 1. The Three Dots Trigger Button -->
+                        <!-- The Three Dots Trigger Button -->
                         <button class="btn btn-icon-action px-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
                         </button>
 
-                        <!-- 2. The Dropdown Menu -->
+                        <!-- The Dropdown Menu -->
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px;">
                             
                             <!-- Pin / Unpin Action -->

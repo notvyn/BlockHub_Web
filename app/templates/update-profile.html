@@ -13,7 +13,7 @@
     <div class="col-12 col-lg-8">
         <div class="card-wrapper p-4 p-md-5">
             
-            <!-- Notice the enctype! It is MANDATORY for file uploads -->
+            <!-- The enctype! It is MANDATORY for file uploads -->
             <form method="POST" enctype="multipart/form-data" novalidate>
                 {{ form.hidden_tag() }}
 
@@ -47,7 +47,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <label class="form-label fw-bold text-muted small mb-0" style="letter-spacing: 1px;">PROFILE TAGS</label>
-                            <!-- NEW: Tag Limit Counter Badge -->
+                            <!-- Tag Limit Counter Badge -->
                             <span class="badge bg-secondary ms-2" id="tagCounter">0/5</span>
                         </div>
                         
@@ -66,7 +66,7 @@
                         {% set is_officer = current_user.role == 'Officer' %}
                         {% set categories = all_tags | map(attribute='category') | unique | list %}
 
-                        <!-- NEW: Bootstrap Accordion Wrapper -->
+                        <!-- Bootstrap Accordion Wrapper -->
                         <div class="accordion" id="tagsAccordion">
                             {% for category in categories %}
                                 {% if category != 'Role' or is_officer %}
@@ -145,9 +145,7 @@
     </div>
 </div>
 
-<!-- ==========================================
-     FORM 2: THE CREATE TAG MODAL
-     ========================================== -->
+<!-- FORM 2: THE CREATE TAG MODAL -->
 <div class="modal fade" id="createTagModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content card-wrapper border-0 shadow-lg">
@@ -162,7 +160,7 @@
                 </div>
                 
                 <div class="modal-body px-4">
-                    <!-- NEW: Inline Alert Box for "Already Exists" backend errors -->
+                    <!-- Inline Alert Box for "Already Exists" backend errors -->
                     <div class="alert alert-danger d-none fw-bold small py-2" id="modalAlertBox"></div>
 
                     <div class="mb-3">
@@ -184,7 +182,6 @@
                 
                 <div class="modal-footer border-top-0 pb-4 px-4 pt-0">
                     <button type="button" class="btn btn-outline-secondary fw-bold px-4" data-bs-dismiss="modal">Cancel</button>
-                    <!-- CRITICAL FIX: type="button" bypasses global JS alerts -->
                     <button type="button" class="btn btn-submit fw-bold px-4" id="exclusiveSubmitBtn">Create Tag</button>
                 </div>
             </form>

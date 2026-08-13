@@ -97,12 +97,11 @@
                 <a href="{{ url_for('main.announcement', id=a.id) }}" id="copy-title-{{ a.id }}" class="card-title announcement-link" data-id="{{ a.id }}">{{ a.title }}</a>
                 
                 {% if a.id not in read_ids %}
-                    <!-- Added the id and the new-tag class here! -->
                     <span id="tag-{{ a.id }}" class="badge bg-danger rounded-pill new-tag" style="font-size: 0.7rem;">NEW</span>
                 {% endif %}
             </div>
 
-            <!-- 1. Split the data using our new Python filters -->
+            <!-- Split the data using the Python filters -->
             {% set images = a.content | extract_images %}
             {% set text_only = a.content | remove_images %}
 
@@ -112,7 +111,7 @@
                 {{ text_only | markdown | truncate(300, True, '...') }}
             </div>
 
-            <!-- 3. Render the Image Gallery BELOW the text -->
+            <!-- Render the Image Gallery BELOW the text -->
             {% if images %}
                 <div class="feed-image-gallery mb-3">
                     {% for alt, url in images %}

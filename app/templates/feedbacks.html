@@ -52,14 +52,9 @@
         <div class="feedback-content flex-grow-1">
             <!-- Added flex-wrap so badges don't overflow on small screens -->
             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-<<<<<<< HEAD
-                <a href="{{ url_for('feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
-=======
                 <a href="{{ url_for('main.feedback', id=f.id) }}" class="feedback-title fw-bold" style="font-size: 1.2rem; color: var(--text-dark); text-decoration: {{ line_through_on }};">
->>>>>>> 58c4f9d31dfce2527f414e8b98bdb9e751a6aedc
                     {{ f.title }}
                 </a>
-                <!-- Swapped p-2 to px-2 py-1 for sleeker pill badges -->
                 <div class="rounded-pill px-2 py-1" style="color: var(--accent-purple); border: 1px solid var(--accent-purple); font-size: 0.8rem;">
                     <i class="fa-solid {{ icon_map.get(f.category) }}"></i> {{ f.category }}
                 </div>
@@ -67,11 +62,7 @@
                     {{ f.status }}
                 </div>
             </div>
-<<<<<<< HEAD
             <div class="mb-2 small text-muted">Submitted by: {{ f.user.name }} @ {{ f.date_added.strftime('%b %d, %Y') }}</div>
-=======
-            <div class="mb-2 small text-muted">Submitted by: {{ f.user.name }}</div>
->>>>>>> 58c4f9d31dfce2527f414e8b98bdb9e751a6aedc
             <div class="mb-2" style="color: var(--text-muted);">{{ f.message | markdown | truncate(200, true, '...') | safe }}</div>
             {% if f.admin_reply %}
                 <div class="mb-1 fw-medium">ADMIN REPLY:</div>
@@ -84,11 +75,9 @@
         <div class="feedback-actions d-flex flex-row flex-md-column justify-content-between align-items-md-end pt-3 pt-md-0 ps-md-4 mt-2 mt-md-0" style="min-width: 140px;">
             {% if current_user.id == f.user_id and f.status != 'Resolved' %}                        
             <div class="d-flex gap-2 order-2 order-md-1">
-                <!-- Make sure to add the correct update_feedback URL here -->
                 <a href="{{ url_for('main.update_feedback', id=f.id)}}" class="btn btn-icon-action" title="Edit">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
-                <!-- FIXED: Changed data-type from 'deadline' to 'feedback' -->
                 <button type="button" class="btn btn-icon-action btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ f.id }}" data-type="feedback" title="Delete">
                     <i class="fa-solid fa-trash"></i>
                 </button>
@@ -99,7 +88,7 @@
                 <a href="{{ url_for('main.feedback', id=f.id) }}" class="btn btn-sm btn-outline-secondary align-self-center align-self-md-auto">View Feedback</a>
                 {% if current_user.role == 'Officer' or current_user.is_admin %}
                     {% if f.status == 'Pending' %}
-                        <!-- RESOLVE BUTTON: Added mt-md-auto -->
+                        <!-- RESOLVE BUTTON-->
                         <button type="button" class="btn btn-sm btn-outline-success fw-bold reply-trigger-btn order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto order-1 order-md-2" 
                                 data-bs-toggle="modal" 
                                 data-bs-target="#replyModal" 
@@ -107,7 +96,7 @@
                             <i class="fa-solid fa-check me-1"></i> Resolve
                         </button>
                     {% else %}
-                        <!-- BADGE: Added mt-md-auto -->
+                        <!-- BADGE -->
                         <span class="badge bg-success order-1 order-md-2 align-self-center align-self-md-auto mt-md-auto">Resolved</span>
                     {% endif %}
                 {% endif %}
@@ -120,9 +109,7 @@
     <div class="card-container">
         {% if current_user.role == 'Officer' or current_user.is_admin %}
             
-            <!-- ==========================================
-                OFFICER / ADMIN VIEW
-                ========================================== -->
+            <!-- OFFICER / ADMIN VIEW-->
             {% if total_pending > 0 %}
                 {% for f in feedback %}
                     {{ feedback_content(f) }}
@@ -137,9 +124,7 @@
 
         {% else %}
             
-            <!-- ==========================================
-                STUDENT VIEW
-                ========================================== -->
+            <!-- STUDENT VIEW -->
             {% if user_total_pending > 0 %}
                 {% for f in feedback %}
                     {% if current_user.id == f.user_id %}

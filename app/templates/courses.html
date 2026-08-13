@@ -48,7 +48,7 @@
                                         <!-- Added schedule-row and data-row here -->
                                         <tr class="align-middle schedule-row data-row {% if s.conflict %}table-danger conflict-row{% endif %}">
                                             
-                                            <!-- 1. TIME COLUMN -->
+                                            <!-- TIME COLUMN -->
                                             <td class="ps-4 fw-medium py-2" style="width: 20%; color: var(--accent-purple, #5c2c7a); font-size: 0.9rem;">
                                                 {{ s.start_time.strftime('%I:%M %p') }} - {{ s.end_time.strftime('%I:%M %p') }}
                                             </td>
@@ -57,7 +57,7 @@
                                                 {{ s.room }}
                                             </td>
                                             
-                                            <!-- 2. COURSE COLUMN -->
+                                            <!-- COURSE COLUMN -->
                                             <td class="py-3">
                                                 <div class="fw-bold mb-1" style="width: 40%; color: var(--accent-purple, #8e44ad); font-size: 0.8rem;">{{ s.course_code }}</div>
                                                 <div class="text-wrap" style="font-size: 0.9rem; color: var(--text-dark);">
@@ -65,7 +65,7 @@
                                                 </div>
                                             </td>
                                             
-                                            <!-- 3. INSTRUCTOR COLUMN -->
+                                            <!-- INSTRUCTOR COLUMN -->
                                             <td class="py-3" style="width: 30%; font-size: 0.9rem; color: var(--text-muted);">
                                                 <i class="fa-solid fa-user-tie me-2" style="font-size: 0.85rem; color: var(--text-muted)"></i> {{ s.instructor }}
                                             </td>
@@ -122,7 +122,7 @@
 
                 <div class="course-footer d-flex justify-content-end flex-grow-1 border-start">
     
-                    <!-- 3. MIDDLE COLUMN: Schedules -->
+                    <!-- MIDDLE COLUMN: Schedules -->
                     <div class="course-schedules flex-grow-1 px-md-4" style="min-width: 0;">
                         <div class="fw-bold mb-2" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);">Schedules:</div>
                         
@@ -167,7 +167,7 @@
                         </div>
                     </div>
 
-                    <!-- 4. RIGHT COLUMN: Actions & Units -->
+                    <!-- RIGHT COLUMN: Actions & Units -->
                     <div class="course-actions d-flex flex-column align-items-end justify-content-center ps-3">
                         {% if current_user.role == 'Officer' or current_user.is_admin %}
                         <div class="d-flex gap-2 mb-2">

@@ -96,9 +96,8 @@
                     <button id="m-search-close" class="btn text-white p-0 ms-3 border-0 fs-4">
                         <i class="bi bi-x"></i>
                     </button>
-                </div> <!-- <-- Notice the overlay closes right here! -->
+                </div>
 
-                <!-- FIX: Move this line OUTSIDE the overlay container! -->
                 <div id="mobile-search-results" class="search-dropdown shadow-lg rounded" style="display: none; top: 100%; left: 0; width: 100%;"></div>
 
             </div>
@@ -124,15 +123,13 @@
                     </div>
                     
                     <div class="tb-btn d-none d-md-flex align-items-center justify-content-evenly">
-                        <!-- ADDED: position-relative -->
                         {% if not is_auth %}
                         <div class="search-box position-relative">
                             <i class="bi bi-search"></i>
                             
-                            <!-- ADDED: id="desktop-search-input", class="live-search-input", and autocomplete="off" -->
                             <input type="text" id="desktop-search-input" class="live-search-input" autocomplete="off" placeholder="e.g. Online Enrollment...">
                             
-                            <!-- ADDED: The Desktop Results Dropdown -->
+                            <!-- The Desktop Results Dropdown -->
                             <div id="desktop-search-results" class="search-dropdown shadow-lg rounded" style="display: none;"></div>
                         </div>
                         {% endif %}
@@ -162,8 +159,6 @@
                     </div>
                 </div>
                 
-                
-                <!-- Can be remove -->
                 {% block extra_header %}{% endblock %}
 
                 {% block content %}{% endblock %}

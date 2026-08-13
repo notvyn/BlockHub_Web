@@ -14,7 +14,7 @@
             
         <div class="card-wrapper p-4 p-md-5">
             
-            <!-- 1. HEADER SECTION -->
+            <!-- HEADER SECTION -->
             <div class="summary-header mb-2 pb-2">
                 <h2 class="mb-2" style="color: var(--accent-purple);">
                     <span class="fw-bold">{{ summary.course.code }}</span>
@@ -41,13 +41,13 @@
                 </div>
             </div>
 
-            <!-- 2. MAIN CONTENT SECTION -->
+            <!-- MAIN CONTENT SECTION -->
             <!-- Removed striptags and truncate. Added 'safe' to render your EasyMDE formatting -->
             <div class="card-content summary-content mb-3" style="font-size: 1.05rem; line-height: 1.8;">
                 {{ summary.content | markdown }}
             </div>
 
-            <!-- 3. EXTRA NOTE SECTION -->
+            <!-- EXTRA NOTE SECTION -->
             {% if summary.note %}
             <div class="summary-note rounded mb-2">
                 <div class="fw-bold mb-1 pt-3" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Extra Note</div>
@@ -55,7 +55,7 @@
             </div>
             {% endif %}
 
-            <!-- 4. ACTION BUTTONS -->
+            <!-- ACTION BUTTONS -->
             <div class="d-flex justify-content-end gap-3 mt-auto pt-4">
                 <a href="{{ url_for('main.update_summary', id=summary.id) }}" class="btn btn btn-icon-action" title="Edit">
                     <i class="fa-solid fa-pencil"></i> Edit

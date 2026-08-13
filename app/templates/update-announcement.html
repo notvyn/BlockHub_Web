@@ -18,7 +18,7 @@
             <form id="announcementForm" method="POST" class="update-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
-                <!-- 1. Title -->
+                <!-- Title -->
                 <div class="mb-5">
                     {{ form.title(class="form-control title-input border-0 shadow-none px-0 " + ("is-invalid" if form.title.errors else ""), autocomplete="off", placeholder="Announcement Title...") }}
                     <div class="invalid-feedback fw-bold" id="error-title">
@@ -26,12 +26,12 @@
                     </div>
                 </div>
 
-                <!-- 2. EasyMDE Content -->
+                <!-- EasyMDE Content -->
                 <div class="mb-4">
                     <label class="form-label md-code border-0 bg-transparent mb-1">CONTENT</label>
                     {{ form.content(id="announcement-content", placeholder="e.g. Good day...", data_has_error="true" if form.content.errors else "false") }}
                     
-                    <!-- We force this error to show if WTForms rejects it -->
+                    <!-- force this error to show if WTForms rejects it -->
                     <div class="invalid-feedback fw-bold mt-2" id="error-content" style="{% if form.content.errors %}display: block;{% endif %}">
                         {% if form.content.errors %}{{ form.content.errors[0] }}{% endif %}
                     </div>

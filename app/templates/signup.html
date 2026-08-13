@@ -13,12 +13,11 @@
         <div class="card-wrapper px-md-5">
             <!-- Main Title -->
             <h3 class="fw-bold text-center mb-1" style="font-family: var(--ADLamDisplayFont);">Create an Account</h3>
-            <!-- Flavor Text Subtitle -->
+            <!-- Text Subtitle -->
             <p class="text-center small mb-4" style="font-family: monospace; color: var(--text-muted);">> Join the block!</p>
             
             <form method="POST" novalidate>
                 {{ form.hidden_tag() }}
-                <!-- Use the macro instead of manual HTML -->
                 <div class="col-md-12 mb-3">
                     {{ render_field(form.name, placeholder="e.g. Juan Dela Cruz") }}
                 </div>
@@ -43,7 +42,7 @@
                                 <!-- The hidden radio button -->
                                 {{ subfield(class="btn-check", autocomplete="off") }}
                                 
-                                <!-- Our custom label with injected icons -->
+                                <!-- The custom label with injected icons -->
                                 <label class="btn w-100 py-2 fw-bold btn-pill" for="{{ subfield.id }}" >
                                     {% if subfield.data == 'Student' %}
                                         <i class="fa-solid fa-user-graduate me-2"></i>

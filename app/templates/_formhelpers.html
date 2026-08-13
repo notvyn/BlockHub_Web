@@ -18,9 +18,8 @@
                 </button>
             {% endif %}
         </div> 
-        <!-- The input-group always closes here -->
         
-        <!-- The error text is always outside, waiting for our CSS to reveal it -->
+        <!-- The error text is outside, waiting for the CSS to reveal it -->
         <div class="invalid-feedback fw-bold" id="error-{{ field.id }}">
             {% if field.errors %}{{ field.errors[0] }}{% endif %}
         </div>

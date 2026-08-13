@@ -107,7 +107,7 @@
                         </div>
                         <div class="md-code md-date p-0">Posted by: {{ a.author.name }} @ {{ a.date_posted.strftime("%b %d, %Y") }}</div>
                         <div class="md-quote-content">
-                            <!-- 1. Split the data using our new Python filters -->
+                            <!-- Split the data using our new Python filters -->
                             {% set images = a.content | extract_images %}
                             {% set text_only = a.content | remove_images %}
 
@@ -117,7 +117,7 @@
                                 {{ text_only | markdown | truncate(300, True, '...') }}
                             </div>
 
-                            <!-- 3. Render the Image Gallery BELOW the text -->
+                            <!-- Render the Image Gallery BELOW the text -->
                             {% if images %}
                                 <div class="feed-image-gallery mb-3">
                                     {% for alt, url in images %}
@@ -196,7 +196,7 @@
                                         <p style="font-size: 0.85rem; font-style: italic; opacity: 0.8;">Note: {{ summary.note }}</p>
                                     {% endif %}
 
-                                    <!-- FIX: The link is now tied directly to the individual summary loop -->
+                                    <!-- The link is now tied directly to the individual summary loop -->
                                     <a href="{{ url_for('main.summary', id=summary.id) }}" class="read-summary">
                                         Read Full Summary <i class="fa-solid fa-arrow-right ms-1"></i>
                                     </a>
@@ -213,9 +213,7 @@
         </div>
     </div>
 
-    <!-- ==========================================
-     THE MULTI-STEP ONBOARDING MODAL
-     ========================================== -->
+    <!-- THE MULTI-STEP ONBOARDING MODAL -->
     <div class="modal fade" id="welcomeTourModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg card-wrapper">

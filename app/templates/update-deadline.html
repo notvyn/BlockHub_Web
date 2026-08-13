@@ -18,7 +18,7 @@
             <form id="deadlineForm" method="POST" class="add-entry-form" novalidate>
                 {{ form.hidden_tag() }}
 
-                <!-- 1. Title / Description -->
+                <!-- Title / Description -->
                 <div class="mb-5">
                     {{ form.description(class="form-control title-input border-0 shadow-none px-0 " + ("is-invalid" if form.description.errors else ""), autocomplete="off", placeholder="Deadline Title...") }}
                     <div class="invalid-feedback fw-bold" id="error-description">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Course Radio Group -->
+                <!-- Course Radio Group -->
                 <div class="mb-4">
                     <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">COURSE</label>
                     <!-- Apply red border if WTForms catches an error -->
@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 
-                <!-- 3. Category Radio Group -->
+                <!-- Category Radio Group -->
                 <div class="mb-4" id="group-category">
                     <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">CATEGORY</label>
                     <div class="d-flex flex-wrap gap-2 pill-group {% if form.category.errors %}border border-danger p-2 rounded{% endif %}" id="categoryContainer">
@@ -56,7 +56,7 @@
                     </div>
                 </div>
 
-                <!-- 4. Status Radio Group -->
+                <!-- Status Radio Group -->
                 <div class="mb-4" id="group-status">
                     <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">STATUS</label>
                     <div class="d-flex flex-wrap gap-2 pill-group {% if form.status.errors %}border border-danger p-2 rounded{% endif %}" id="statusContainer">
@@ -70,7 +70,7 @@
                     </div>
                 </div>
 
-                <!-- 5. Dates -->
+                <!-- Dates -->
                 <div class="date-grid mb-4">
                     <div>
                         <label class="form-label fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">DATE GIVEN</label>

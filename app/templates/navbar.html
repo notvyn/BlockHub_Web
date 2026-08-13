@@ -27,7 +27,6 @@
                 <span>Announcements</span>
 
                 {% if badges and badges.get('announcements', 0) > 0 %}
-                    <!-- Cleaned up the inline style here -->
                     <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
                     
                     <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="sidebar-announcement-badge">
@@ -44,7 +43,6 @@
                 <span>Deadlines</span>
                 
                 {% if badges and badges.get('deadlines', 0) > 0 %}
-                    <!-- Cleaned up the inline style here -->
                     <div class="bg-danger rounded-circle sidebar-badge-dot"></div>
                     
                     <span class="badge bg-danger rounded-pill ms-auto sidebar-badge-num" id="sidebar-deadline-badge">
@@ -93,7 +91,6 @@
             </a>    
             <ul id="auth" class="sidebar-dropdown list-unstyled collapse">
                 <li class="sidebar-item">
-                    <!-- Removed standard 'sidebar-link' class from child to prevent layout breaking, added custom padding -->
                     <a href="{{ url_for('main.wallpaper_generator') }}" class="sidebar-link" style="font-size: 0.9rem;">
                         <i class="fa-regular fa-file-image"></i>            
                         <span>Wallpaper Generator</span>
@@ -129,7 +126,6 @@
             {% if current_user.is_authenticated %}
                 <li class="sidebar-item">
                     <a href="{{ url_for('auth.logout') }}" class="sidebar-link text-danger">
-                        <!-- Swapped to a standard power/exit icon -->
                         <i class="fa-solid fa-power-off"></i>                   
                         <span>Logout</span>
                     </a>
@@ -137,7 +133,6 @@
             {% else %}
                 <li class="sidebar-item">
                     <a href="{{ url_for('auth.login') }}" class="sidebar-link">
-                        <!-- Swapped to an 'entering the door' icon -->
                         <i class="fa-solid fa-right-to-bracket"></i>                   
                         <span>Login</span>
                     </a>

@@ -15,7 +15,6 @@
             <!-- HEADER: Author, Date, and Badges -->
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div class="auth-wrapper">
-                    <!-- Placeholder for an avatar, optional but looks great in feeds -->
                     <img src="{{ announcement.author.profile_image }}" class="rounded-circle" style="width: 50px; height: 50px;">
                     <div class="auth-txt">
                         <div class="auth-name">{{ announcement.author.name }}</div>
@@ -25,12 +24,12 @@
 
                 {% if (current_user.id == announcement.author.id) and (current_user.role == 'Officer' or current_user.is_admin) %}
                     <div class="dropdown">
-                        <!-- 1. The Three Dots Trigger Button -->
+                        <!-- The Three Dots Trigger Button -->
                         <button class="btn btn-icon-action px-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
                         </button>
                         
-                        <!-- 2. The Dropdown Menu -->
+                        <!-- The Dropdown Menu -->
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px;">
                             
                             <!-- Pin / Unpin Action -->
@@ -79,7 +78,7 @@
                 <div id="copy-title-{{ announcement.id }}" class="card-title" style="display: inline;">{{ announcement.title }}</div>
             </div>
 
-            <!-- 1. Split the data using our new Python filters -->
+            <!-- Split the data using the Python filters -->
             {% set images = announcement.content | extract_images %}
             {% set text_only = announcement.content | remove_images %}
 
@@ -89,7 +88,7 @@
                 {{ text_only | markdown }}
             </div>
 
-            <!-- 3. Render the Image Gallery BELOW the text -->
+            <!-- Render the Image Gallery BELOW the text -->
             {% if images %}
                 <div class="feed-image-gallery mb-3">
                     {% for alt, url in images %}
@@ -113,9 +112,8 @@
                     {% if attached_links %}
                         <div class="d-flex justify-content-start flex-wrap">
                             {% for title, link_url in attached_links %}
-                                <!-- ADDED: download="{{ title }}" -->
-                                <a href="{{ link_url }}" target="_blank" download="{{ title }}" class="attached-link-card">
-                                    <i class="fa-solid fa-file-arrow-down me-2"></i> <!-- Changed icon to a download file icon -->
+                                <a href="{{ link_url }}" target="_blank" class="attached-link-card">
+                                    <i class="fa-solid fa-link me-2"></i>
                                     <span>{{ title }}</span>
                                 </a>
                             {% endfor %}
@@ -123,8 +121,7 @@
                         
                     <!-- Scenario B: Fallback for raw URLs -->
                     {% else %}
-                        <!-- ADDED: download attribute -->
-                        <a href="{{ announcement.url }}" target="_blank" download class="attached-link-card">
+                        <a href="{{ announcement.url }}" target="_blank" class="attached-link-card">
                             <i class="fa-solid fa-link me-2"></i>
                             <span class="text-break">{{ announcement.url }}</span>
                         </a>
