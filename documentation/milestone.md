@@ -182,7 +182,8 @@ A centralized class management system for CS 2103.
 - Fixed day sorting on wallpaper generator import
 - Refine description of Landing page
 - Added "check spam" text for new users
-- Refine responsiveness of preview content on wallpaper generator  
+- Refine responsiveness of preview content on wallpaper generator
+- Refine styling of profile forms (i.e. updateEmail, updatePassword, and deleteIcon)
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -232,7 +233,7 @@ A centralized class management system for CS 2103.
 - [/] Create a conditional text for no urgent task right now or within this week 
 - [/] Fix size of sidebar profile pic
 - [/] Create a conditional text for no current pending feedback 
-- [ ] Fix sidebar visual issue when new tag is created 
+- [/] Fix sidebar visual issue when new tag is created 
 
 Known Bugs 
 - [ ] Task update element display not in real-time 

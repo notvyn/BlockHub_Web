@@ -34,6 +34,18 @@
     border-color: var(--text-dark);
 }
 
+#updateEmailForm, #changePasswordForm {
+    border-color: var(--hue-shade) !important;
+}
+
+.deleteAccountWrapper {
+    background-color: #f9f9f9 !important;    
+}
+
+[data-theme='dark'] .deleteAccountWrapper {
+    background-color: #151515 !important;
+}
+
 /* Container Box (Input wrapper itself) */
 input[type="file"].custom-file-upload {
     width: 100%;
