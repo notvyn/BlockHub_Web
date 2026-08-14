@@ -705,28 +705,40 @@ def summaries():
                            page_title="Class Summary")
 
 @main.route('/tools/wallpaper')
-@login_required
+# @login_required
 def wallpaper_generator():
-    # Fetch all schedules and join them with Course
     all_schedules = CourseSchedule.query.join(Course).all()
     
-    # Prepare a standard dictionary
-    grouped_schedule = {}
+    # Prepare dictionaries for both UI components
+    grouped_schedule = {} # For the Wallpaper (Grouped by Day)
+    course_schedule = {}  # For the Accordion (Grouped by Course)
     
     for sched in all_schedules:
-        # Strip hidden spaces and force capitalization (e.g., ' monday ' -> 'Monday')
         day = sched.day.strip().capitalize()
+        time_str = f"{sched.start_time.strftime('%I:%M %p')} - {sched.end_time.strftime('%I:%M %p')}"
         
-        # If we haven't seen this day yet, create a list for it
+        sched_dict = {
+            'id': sched.id, 
+            'time': time_str,
+            'course': sched.course.code,
+            'course_title': sched.course.title,
+            'room': sched.room,
+            'day': day,
+            'raw_time': sched.start_time 
+        }
+        
+        # Populate Day Group (Wallpaper)
         if day not in grouped_schedule:
             grouped_schedule[day] = []
-            
-        grouped_schedule[day].append({
-            'time': f"{sched.start_time.strftime('%I:%M %p')} - {sched.end_time.strftime('%I:%M %p')}",
-            'course': sched.course.code,
-            'room': sched.room,
-            'raw_time': sched.start_time # We keep this hidden value to sort chronologically 
-        })
+        grouped_schedule[day].append(sched_dict)
+        
+        # Populate Course Group (Accordion)
+        if sched.course.code not in course_schedule:
+            course_schedule[sched.course.code] = {
+                'title': sched.course.title,
+                'classes': []
+            }
+        course_schedule[sched.course.code]['classes'].append(sched_dict)
         
     # Sort the days in order
     day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -734,11 +746,11 @@ def wallpaper_generator():
     
     for target_day in day_order:
         if target_day in grouped_schedule:
-            # Sort the classes inside that day from morning to evening using the hidden raw_time
             sorted_classes = sorted(grouped_schedule[target_day], key=lambda x: x['raw_time'])
             sorted_schedule[target_day] = sorted_classes
 
-    return render_template('wallpaper.html', schedule_data=sorted_schedule)
+    # Pass both dictionaries to the template
+    return render_template('wallpaper.html', schedule_data=sorted_schedule, course_data=course_schedule)
 
 # --- FORM NEW ENTRIES ---
 @main.route('/add-entry/announcement', methods=['GET', 'POST'])

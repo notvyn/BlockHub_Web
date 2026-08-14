@@ -119,6 +119,45 @@ export function initWallpaperGenerator() {
         });
     }
 
+    document.querySelectorAll('.btn-remove-course').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const courseCode = this.getAttribute('data-course');
+            const safeCourseCode = courseCode.replace(/\s+/g, ''); // Matches the Jinja replace filter
+            
+            // Find all schedule IDs tied to this specific course
+            const courseItems = document.querySelectorAll(`.course-item-${safeCourseCode}`);
+            
+            courseItems.forEach(item => {
+                const classId = item.getAttribute('data-id');
+                
+                // Find the specific elements on the Wallpaper Preview
+                const timeEl = document.getElementById(`preview-time-${classId}`);
+                const courseEl = document.getElementById(`preview-course-${classId}`);
+                
+                if (timeEl && courseEl) {
+                    const scheduleRow = timeEl.closest('.schedule-row');
+                    const timeContainer = timeEl.closest('.time-text');
+                    
+                    // Delete the paragraph tags from the preview
+                    timeEl.remove();
+                    courseEl.remove();
+                    
+                    // Clean up Empty Days
+                    // If a day on the wallpaper has no more classes left, remove the whole row
+                    if (timeContainer && timeContainer.querySelectorAll('p').length === 0) {
+                        scheduleRow.remove(); 
+                    }
+                }
+            });
+            
+            // Remove the entire course block from the Accordion Manager
+            const managerBlock = document.getElementById(`manager-course-${safeCourseCode}`);
+            if (managerBlock) {
+                managerBlock.remove();
+            }
+        });
+    });
+
     // DOWNLOAD WALLPAPER (html2canvas)
     const downloadBtn = document.getElementById('download-btn');
     if (downloadBtn) {

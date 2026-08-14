@@ -53,6 +53,55 @@
                 </div>
             </div>
 
+            <div class="accordion" id="scheduleManageAccordion">
+                <div class="accordion-item mb-3 bg-transparent">
+
+                    <h2 class="accordion-header" id="headingSchedules">
+                        <!-- The Accordion Button -->
+                        <button class="accordion-button collapsed bg-transparent shadow-none text-muted fw-bold small text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSchedules" aria-expanded="false" aria-controls="collapseSchedules" style="font-size: 0.85rem;">
+                            <i class="fa-solid fa-sliders me-2"></i> Schedule Manager
+                        </button>
+                    </h2>
+
+                    <div id="collapseSchedules" class="accordion-collapse collapse" aria-labelledby="headingSchedules" data-bs-parent="#scheduleManageAccordion">
+                        <div class="accordion-body p-0">
+                            
+                            <!-- Loop through each course -->
+                            {% for course_code, data in course_data.items() %}
+                            
+                                <!-- Wrap the entire course block in a div with an ID we can target -->
+                                <div class="course-manager-block px-4 py-1" id="manager-course-{{ course_code | replace(' ', '') }}">
+                                    
+                                    <!-- Header & Delete Button Container -->
+                                    <div class="d-flex justify-content-between align-items-start pt-3 mb-1 border-top border-bottom border-1" style="border-color: var(--hue-shade) !important;">
+                                        <p class="fs-6 fw-bold text-dark ">
+                                            {{ course_code }} <span class="text-muted fw-normal">| {{ data.title }}</span>
+                                        </p>
+                                        
+                                        <!-- The targetable Delete button -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm px-3 py-1 fw-bold btn-remove-course" data-course="{{ course_code }}">
+                                            <i class="fa-solid fa-close"></i>
+                                        </button>
+                                    </div>
+                                        
+                                    <div class="d-flex flex-wrap gap-2 bg-transparent">
+                                        {% for c in data.classes %}
+                                            <div class="course-item-{{ course_code | replace(' ', '') }} p-2 flex-grow-1" data-id="{{ c.id }}" style="min-width: 150px;">
+                                                <div class="d-flex flex-column">
+                                                    <span class="fw-bold text-dark" style="font-size: 0.8rem;">{{ c.day }}</span>
+                                                    <span class="text-muted" style="font-size: 0.75rem;">{{ c.time }} <span style="opacity: 0.5;">|</span> {{ c.room }}</span>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Accordion for Advanced Sliders -->
             <div class="accordion mb-4" id="advancedSettingsAccordion">
                 <div class="accordion-item bg-transparent">
@@ -160,7 +209,7 @@
                                     <div class="day-text">{{ day_map[day] }}</div>
                                     <div class="time-text">
                                         {% for class in classes %}
-                                            <p>{{ class.time }}</p>
+                                            <p id="preview-time-{{ class.id }}">{{ class.time }}</p>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -168,7 +217,7 @@
                                 <!-- RIGHT COLUMN: Classes -->
                                 <div class="right-panel">
                                     {% for class in classes %}
-                                        <p>{{ class.course }} | {{ class.room }}</p>
+                                        <p class="mb-0" id="preview-course-{{ class.id }}">{{ class.course }} | {{ class.room }}</p>
                                     {% endfor %}
                                 </div>
                                 

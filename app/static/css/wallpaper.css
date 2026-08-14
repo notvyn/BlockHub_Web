@@ -235,8 +235,8 @@
 /* LEFT SIDE: Day & Time (Holds the borders) */
 .left-panel {
     width: 70%;
-    padding: 30px 20px 30px 0; /* Padding for breathing room */
-    margin: 0 10px 0 0;
+    padding: 30px 30px 30px 0px; /* Padding for breathing room */
+    margin: 0 0 0 0;
     display: flex;
     align-items: flex-start; /* Aligns the day text to the top */
     border-bottom: 3px solid rgba(255, 255, 255, 0.8); /* The horizontal line */
