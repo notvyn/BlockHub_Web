@@ -175,6 +175,9 @@ A centralized class management system for CS 2103.
 - Added Schedule Manager for wallpaper generator
 - Added custom schedule importer on wallpaper generator
 - Added import course and schedule on courses page
+- Added email verification on sign up
+- Ensure that only one flash message is shown on login page
+- Added restriction on dashboard links
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

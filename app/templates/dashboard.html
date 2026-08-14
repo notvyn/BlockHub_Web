@@ -157,16 +157,25 @@
                             <i class="fa-solid fa-chevron-right text-muted"></i>
                         </a>
                     </div>
-                    {% if links %}
-                    <ul class="md-list">
-                        {% for l in links %}
-                            <li>
-                                <a href="{{ l.url }}" target="_blank" class="md-link">{{ l.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% if current_user.is_authenticated %}
+                        {% if links %}
+                        <ul class="md-list">
+                            {% for l in links %}
+                                <li>
+                                    <a href="{{ l.url }}" target="_blank" class="md-link">{{ l.title }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="md-code border-0 bg-transparent text-muted fst-italic">
+                            No links posted yet.
+                        </div>
+                        {% endif %}
                     {% else %}
-                     <div class="md-code border-0 bg-transparent">No links posted yet.</div>
+                        <div class="md-code border-0 bg-transparent">
+                            <i class="fa-solid fa-lock me-2" style="color: var(--text-muted); opacity: 0.7;"></i>
+                            <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold" style="color: var(--accent-purple); transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Login</a> <span class="text-muted">to view links</span>
+                        </div>
                     {% endif %}
                 </div>
 
