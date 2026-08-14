@@ -3,6 +3,7 @@ from flask_login import current_user, login_required, logout_user
 from sqlalchemy import func, or_
 from werkzeug.utils import secure_filename
 import cloudinary, cloudinary.uploader, json, os, uuid
+import pdfplumber
 
 from app import db
 
@@ -440,13 +441,102 @@ def mark_read(id):
         announcement_id=id
     ).first()
     
-    # If not, create one!
+    # If not, create one
     if not existing_receipt:
         receipt = AnnouncementRead(user_id=current_user.id, announcement_id=id)
         db.session.add(receipt)
         db.session.commit()
         
-    return {"status": "success"} # We just return a tiny dictionary, no HTML template!
+    return {"status": "success"} # We just return a tiny dictionary, no HTML template
+
+@api.route('/api/parse-schedule', methods=['POST'])
+def parse_schedule():
+    if 'schedule_pdf' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded.'}), 400
+
+    file = request.files['schedule_pdf']
+    
+    parsed_data = {
+        'Monday': [], 'Tuesday': [], 'Wednesday': [], 
+        'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []
+    }
+    
+    previous_subjects = [""] * 7
+    previous_rooms = [""] * 7
+
+    try:
+        with pdfplumber.open(file) as pdf:
+            first_page = pdf.pages[0]
+            table = first_page.extract_table()
+            
+            if not table:
+                return jsonify({'success': False, 'error': 'Could not find a table in this PDF.'}), 400
+
+            for row in table[2:]: 
+                time_block = row[0]
+                if not time_block: 
+                    continue 
+
+                days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                col_index = 1
+                
+                for i, day in enumerate(days):
+                    if col_index + 1 < len(row):
+                        subject = row[col_index]
+                        room = row[col_index + 1]
+
+                        if subject and str(subject).strip() != "":
+                            if "-do-" in str(subject).lower():
+                                subject = previous_subjects[i]
+                            else:
+                                previous_subjects[i] = str(subject).strip()
+
+                            if room and "-do-" in str(room).lower():
+                                room = previous_rooms[i]
+                            else:
+                                previous_rooms[i] = str(room).strip()
+
+                            # --- THE SMART MERGE LOGIC ---
+                            time_str = str(time_block).strip().replace('\n', '')
+                            time_parts = time_str.split('-')
+                            start_time = time_parts[0].strip()
+                            end_time = time_parts[1].strip() if len(time_parts) > 1 else start_time
+
+                            day_list = parsed_data[day]
+                            
+                            # If this class is identical to the last one on this day, extend the time
+                            if day_list and day_list[-1]['course'] == subject and day_list[-1]['room'] == room:
+                                prev_start = day_list[-1]['time'].split('-')[0].strip()
+                                day_list[-1]['time'] = f"{prev_start} - {end_time}"
+                            else:
+                                import uuid
+                                day_list.append({
+                                    'id': uuid.uuid4().hex[:8], # Dynamic ID for JS targeting
+                                    'time': f"{start_time} - {end_time}",
+                                    'course': subject,
+                                    'room': room,
+                                    'day': day
+                                })
+                            
+                    col_index += 2
+
+        # --- PREPARE DATA FOR THE ACCORDION ---
+        course_data = {}
+        for day, classes in parsed_data.items():
+            for c in classes:
+                course_code = c['course']
+                if course_code not in course_data:
+                    course_data[course_code] = {
+                        'title': 'Imported', # PDFs lack descriptive titles, so we use a placeholder
+                        'classes': []
+                    }
+                course_data[course_code]['classes'].append(c)
+
+        return jsonify({'success': True, 'data': parsed_data, 'course_data': course_data})
+
+    except Exception as e:
+        print(f"PDF Parse Error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to process the PDF format.'}), 500
 
 @api.route('/api/reply-feedback/<int:id>', methods=['POST'])
 @login_required

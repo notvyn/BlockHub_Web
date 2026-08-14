@@ -119,44 +119,144 @@ export function initWallpaperGenerator() {
         });
     }
 
-    document.querySelectorAll('.btn-remove-course').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const courseCode = this.getAttribute('data-course');
-            const safeCourseCode = courseCode.replace(/\s+/g, ''); // Matches the Jinja replace filter
+    // A reusable function to attach deletion logic to existing AND newly injected buttons
+    function attachRemoveListeners() {
+        document.querySelectorAll('.btn-remove-course').forEach(btn => {
+            // Clone and replace to prevent duplicate events on old buttons
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
             
-            // Find all schedule IDs tied to this specific course
-            const courseItems = document.querySelectorAll(`.course-item-${safeCourseCode}`);
-            
-            courseItems.forEach(item => {
-                const classId = item.getAttribute('data-id');
+            newBtn.addEventListener('click', function() {
+                const courseCode = this.getAttribute('data-course');
+                const safeCourseCode = courseCode.replace(/\s+/g, '');
                 
-                // Find the specific elements on the Wallpaper Preview
-                const timeEl = document.getElementById(`preview-time-${classId}`);
-                const courseEl = document.getElementById(`preview-course-${classId}`);
+                const courseItems = document.querySelectorAll(`.course-item-${safeCourseCode}`);
                 
-                if (timeEl && courseEl) {
-                    const scheduleRow = timeEl.closest('.schedule-row');
-                    const timeContainer = timeEl.closest('.time-text');
+                courseItems.forEach(item => {
+                    const classId = item.getAttribute('data-id');
+                    const timeEl = document.getElementById(`preview-time-${classId}`);
+                    const courseEl = document.getElementById(`preview-course-${classId}`);
                     
-                    // Delete the paragraph tags from the preview
-                    timeEl.remove();
-                    courseEl.remove();
-                    
-                    // Clean up Empty Days
-                    // If a day on the wallpaper has no more classes left, remove the whole row
-                    if (timeContainer && timeContainer.querySelectorAll('p').length === 0) {
-                        scheduleRow.remove(); 
+                    if (timeEl && courseEl) {
+                        const scheduleRow = timeEl.closest('.schedule-row');
+                        const timeContainer = timeEl.closest('.time-text');
+                        
+                        timeEl.remove();
+                        courseEl.remove();
+                        
+                        if (timeContainer && timeContainer.querySelectorAll('p').length === 0) {
+                            scheduleRow.remove(); 
+                        }
                     }
+                });
+                
+                const managerBlock = document.getElementById(`manager-course-${safeCourseCode}`);
+                if (managerBlock) managerBlock.remove();
+            });
+        });
+    }
+
+    // Fire once on initial page load for Jinja-rendered templates
+    attachRemoveListeners();
+
+    const pdfUpload = document.getElementById('pdf-upload');
+
+    if (pdfUpload) {
+        pdfUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('schedule_pdf', file);
+
+            glassCard.innerHTML = '<div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fa-2x text-white"></i><p class="mt-2 text-white">Analyzing Schedule...</p></div>';
+
+            fetch('/api/parse-schedule', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // CLEAR BOTH CONTAINERS
+                    glassCard.innerHTML = '';
+                    const accordionBody = document.querySelector('#collapseSchedules .accordion-body');
+                    if (accordionBody) accordionBody.innerHTML = '';
+
+                    // REBUILD THE WALLPAPER CANVAS
+                    const dayMap = {
+                        'Monday': 'mon', 'Tuesday': 'tues', 'Wednesday': 'wed', 
+                        'Thursday': 'thurs', 'Friday': 'fri', 'Saturday': 'sat', 'Sunday': 'sun'
+                    };
+
+                    for (const [day, classes] of Object.entries(data.data)) {
+                        if (classes.length > 0) {
+                            let rowHtml = `
+                                <div class="schedule-row">
+                                    <div class="left-panel">
+                                        <div class="day-text">${dayMap[day]}</div>
+                                        <div class="time-text">
+                            `;
+                            classes.forEach(c => { rowHtml += `<p id="preview-time-${c.id}">${c.time}</p>`; });
+                            rowHtml += `</div></div><div class="right-panel">`;
+                            classes.forEach(c => { rowHtml += `<p class="mb-0" id="preview-course-${c.id}">${c.course} | ${c.room}</p>`; });
+                            rowHtml += `</div></div>`; 
+                            
+                            glassCard.insertAdjacentHTML('beforeend', rowHtml);
+                        }
+                    }
+
+                    // REBUILD THE ACCORDION MANAGER
+                    if (accordionBody && data.course_data) {
+                        for (const [courseCode, courseInfo] of Object.entries(data.course_data)) {
+                            const safeCourseCode = courseCode.replace(/\s+/g, '');
+                            
+                            let courseHtml = `
+                                <div class="course-manager-block px-4 py-1" id="manager-course-${safeCourseCode}">
+                                    <div class="d-flex justify-content-between align-items-start pt-3 mb-1 border-top border-bottom border-1" style="border-color: var(--hue-shade) !important;">
+                                        <p class="fs-6 fw-bold text-dark ">
+                                            ${courseCode} <span class="text-muted fw-normal">| ${courseInfo.title}</span>
+                                        </p>
+                                        <button type="button" class="btn btn-outline-danger btn-sm px-3 py-1 fw-bold btn-remove-course" data-course="${courseCode}">
+                                            <i class="fa-solid fa-close"></i>
+                                        </button>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2 bg-transparent">
+                            `;
+                            
+                            courseInfo.classes.forEach(c => {
+                                courseHtml += `
+                                    <div class="course-item-${safeCourseCode} p-2 flex-grow-1" data-id="${c.id}" style="min-width: 150px;">
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold text-dark" style="font-size: 0.8rem;">${c.day}</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">${c.time} <span style="opacity: 0.5;">|</span> ${c.room}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            
+                            courseHtml += `</div></div>`;
+                            accordionBody.insertAdjacentHTML('beforeend', courseHtml);
+                        }
+                    }
+
+                    // BIND THE NEW DELETE BUTTONS
+                    attachRemoveListeners();
+
+                } else {
+                    alert("Error: " + data.error);
+                    glassCard.innerHTML = '<div class="text-center p-3 text-white">Failed to parse PDF. Please try manually.</div>';
                 }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert("Something went wrong communicating with the server.");
             });
             
-            // Remove the entire course block from the Accordion Manager
-            const managerBlock = document.getElementById(`manager-course-${safeCourseCode}`);
-            if (managerBlock) {
-                managerBlock.remove();
-            }
+            // Reset file input to allow re-uploads
+            this.value = '';
         });
-    });
+    }
 
     // DOWNLOAD WALLPAPER (html2canvas)
     const downloadBtn = document.getElementById('download-btn');
