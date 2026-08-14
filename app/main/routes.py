@@ -104,9 +104,19 @@ def inject_global_badges():
 
     return dict(badges=badges)
 
+# --- Public Onboarding ---
+@main.route('/')
+def landing_page():
+    # If they are already logged in, skip the landing page!
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+        
+    # Otherwise, show the beautiful public welcome page
+    return render_template('landing.html', is_guest=True)
+
 # --- DEDICATED PAGES --- 
-@main.route('/', methods=['GET', 'POST'])
 @main.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
     announcement_form = AnnouncementForm()
     class_summary_form = DeadlineForm()
@@ -548,6 +558,7 @@ def links():
     return render_template('links.html', links=links, is_dedicated_page=True)
 
 @main.route('/notifications')
+@login_required
 def notifications():
     # Create an empty master list
     master_feed = []
@@ -712,7 +723,10 @@ def wallpaper_generator():
     # Prepare dictionaries for both UI components
     grouped_schedule = {} # For the Wallpaper (Grouped by Day)
     course_schedule = {}  # For the Accordion (Grouped by Course)
-    
+
+    is_guest = not current_user.is_authenticated 
+        
+
     for sched in all_schedules:
         day = sched.day.strip().capitalize()
         time_str = f"{sched.start_time.strftime('%I:%M %p')} - {sched.end_time.strftime('%I:%M %p')}"
@@ -750,7 +764,7 @@ def wallpaper_generator():
             sorted_schedule[target_day] = sorted_classes
 
     # Pass both dictionaries to the template
-    return render_template('wallpaper.html', schedule_data=sorted_schedule, course_data=course_schedule)
+    return render_template('wallpaper.html', schedule_data=sorted_schedule, course_data=course_schedule, is_guest=is_guest)
 
 # --- FORM NEW ENTRIES ---
 @main.route('/add-entry/announcement', methods=['GET', 'POST'])

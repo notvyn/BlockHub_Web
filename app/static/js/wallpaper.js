@@ -189,8 +189,15 @@ export function initWallpaperGenerator() {
                         'Thursday': 'thurs', 'Friday': 'fri', 'Saturday': 'sat', 'Sunday': 'sun'
                     };
 
-                    for (const [day, classes] of Object.entries(data.data)) {
-                        if (classes.length > 0) {
+                    // Define the strict chronological order
+                    const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+                    // Loop through the ordered array
+                    dayOrder.forEach(day => {
+                        const classes = data.data[day];
+                        
+                        // Only build a row if there are actually classes scheduled that day
+                        if (classes && classes.length > 0) {
                             let rowHtml = `
                                 <div class="schedule-row">
                                     <div class="left-panel">
@@ -204,7 +211,7 @@ export function initWallpaperGenerator() {
                             
                             glassCard.insertAdjacentHTML('beforeend', rowHtml);
                         }
-                    }
+                    });
 
                     // REBUILD THE ACCORDION MANAGER
                     if (accordionBody && data.course_data) {

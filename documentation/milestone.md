@@ -178,6 +178,8 @@ A centralized class management system for CS 2103.
 - Added email verification on sign up
 - Ensure that only one flash message is shown on login page
 - Added restriction on dashboard links
+- Added landing page and made wallpaper generator public
+- Fixed day sorting on wallpaper generator import
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

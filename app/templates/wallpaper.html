@@ -19,7 +19,14 @@
         
         <!-- LEFT COLUMN: The Controls -->
         <div class="col-md-5 pe-md-5">
-            <h2 class="fw-bold mb-1" style="color: var(--accent-purple);">Wallpaper Generator</h2>
+            <div class="d-flex align-items-center">
+                {% if is_guest %}
+                    <a href="{{ url_for('main.landing_page') }}" style="color: #2b1f4c; text-decoration: none; font-size: 1.2rem;">
+                        <i class="fa-solid fa-arrow-left me-2"></i>
+                    </a>
+                {% endif %}
+                <h2 class="fw-bold mb-1" style="color: var(--accent-purple);">Wallpaper Generator</h2>
+            </div>
             <p class="text-muted mb-4">Customize your class schedule into an aesthetic lock screen.</p>
 
             <!-- Class Block Input -->
@@ -185,7 +192,7 @@
                     <i class="fa-solid fa-magic me-2"></i> Auto-Generate Schedule
                 </label>
                 <input class="form-control form-control-sm custom-file-upload" type="file" id="pdf-upload" accept="application/pdf">
-                <div class="form-text text-muted" style="font-size: 0.75rem;">Upload your official class schedule PDF to instantly build the wallpaper.</div>
+                <div class="form-text text-muted" style="font-size: 0.75rem;">Upload your class schedule PDF from the <a href="https://dione.batstate-u.edu.ph/student/#/" target="_blank" style="color: var(--accent-purple);">student portal</a> to instantly build the wallpaper.</div>
             </div>
 
             <!-- Download Button -->
@@ -213,30 +220,40 @@
 
                     <div class="schedule-glass-card">
                         
-                        <!-- Map full days to short days for the exact aesthetic -->
+                        <!-- The Mapping -->
                         {% set day_map = {'Monday': 'mon', 'Tuesday': 'tues', 'Wednesday': 'wed', 'Thursday': 'thurs', 'Friday': 'fri', 'Saturday': 'sat', 'Sunday': 'sun'} %}
                         
-                        {% for day, classes in schedule_data.items() %}
-                            <div class="schedule-row">
+                        <!-- The Strict Chronological Order -->
+                        {% set day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                        
+                        <!-- Loop through the explicit order, NOT the raw dictionary -->
+                        {% for day in day_order %}
+                            
+                            <!-- Only draw the row if there are actually classes scheduled for this day -->
+                            {% if day in schedule_data and schedule_data[day] %}
                                 
-                                <!-- LEFT COLUMN: Day & Time -->
-                                <div class="left-panel">
-                                    <div class="day-text">{{ day_map[day] }}</div>
-                                    <div class="time-text">
-                                        {% for class in classes %}
-                                            <p id="preview-time-{{ class.id }}">{{ class.time }}</p>
+                                <div class="schedule-row">
+                                    
+                                    <!-- LEFT COLUMN: Day & Time -->
+                                    <div class="left-panel">
+                                        <div class="day-text">{{ day_map[day] }}</div>
+                                        <div class="time-text">
+                                            {% for class in schedule_data[day] %}
+                                                <p id="preview-time-{{ class.id }}">{{ class.time }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- RIGHT COLUMN: Classes -->
+                                    <div class="right-panel">
+                                        {% for class in schedule_data[day] %}
+                                            <p class="mb-0" id="preview-course-{{ class.id }}">{{ class.course }} | {{ class.room }}</p>
                                         {% endfor %}
                                     </div>
+                                    
                                 </div>
                                 
-                                <!-- RIGHT COLUMN: Classes -->
-                                <div class="right-panel">
-                                    {% for class in classes %}
-                                        <p class="mb-0" id="preview-course-{{ class.id }}">{{ class.course }} | {{ class.room }}</p>
-                                    {% endfor %}
-                                </div>
-                                
-                            </div>
+                            {% endif %}
                         {% endfor %}
                         
                     </div>

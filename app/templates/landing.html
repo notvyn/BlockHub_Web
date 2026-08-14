@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/landing.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}What is BlockHub?{% endblock %}
+
+{%block page_title_txt %}
+    An exclusive, centralized command center for our Blockmates.
+{% endblock %}
+
+{% block content %}
+<div id="dashboard-container" class="container-fluid py-4">
+    
+    <!-- 1. The Split Hero Section -->
+    <div class="row align-items-center mb-5 mt-4">
+        
+        <!-- Left: Copy & Call to Action -->
+        <div class="col-lg-6 pe-lg-5 mb-4 mb-lg-0">
+            <h1 class="fw-bold mb-3 text-dark"># The Command Center</h1>
+            <p class="lead text-muted" style="font-size: 1.1rem;">
+                &gt; Less chat clutter, more clarity. A simple, organized space for all our block's deadlines announcements, course information, class summaries, and important link.
+            </p>
+            
+            <div class="d-flex gap-3 mt-4">
+                <a href="{{ url_for('auth.login') }}" class="btn" style="background-color: var(--accent-purple); color: var(--main-bg); border-radius: 0;">Log In</a>
+                <a href="{{ url_for('auth.signup') }}" class="btn" style="border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 0;">Sign Up</a>
+            </div>
+        </div>
+
+        <!-- Right: The Visual Proof -->
+        <div class="col-lg-6 ps-lg-4">
+            <!-- Light Mode Image -->
+            <img src="{{ url_for('static', filename='img/dashboard-preview-light.png') }}" 
+                class="img-fluid rounded shadow-sm border border-secondary border-opacity-25 preview-light" 
+                style="transform: rotate(1.5deg); transition: transform 0.3s ease;" 
+                onmouseover="this.style.transform='rotate(0deg)'" 
+                onmouseout="this.style.transform='rotate(1.5deg)'"
+                alt="Dashboard Light Mode">
+
+            <!-- Dark Mode Image -->
+            <img src="{{ url_for('static', filename='img/dashboard-preview-dark.png') }}" 
+                class="img-fluid rounded shadow-sm border border-secondary border-opacity-25 preview-dark" 
+                style="transform: rotate(1.5deg); transition: transform 0.3s ease;" 
+                onmouseover="this.style.transform='rotate(0deg)'" 
+                onmouseout="this.style.transform='rotate(1.5deg)'"
+                alt="Dashboard Dark Mode">
+        </div>
+    </div>
+
+    <hr class="border-secondary border-opacity-25 my-5">
+
+    <!-- 2. The Public Lead Magnet -->
+    <section class="mb-5 text-center">
+        <h2 class="h4 fw-bold mb-3 text-dark">## Try the Wallpaper Generator</h2>
+        <p class="mb-4 text-muted">Instantly generate a custom schedule wallpaper for your device, no account required.</p>
+        <a href="{{ url_for('main.wallpaper_generator') }}" class="btn" style="border: 1px dashed var(--accent-purple); color: var(--accent-purple); border-radius: 0;">
+            Launch Generator <i class="fa-solid fa-wand-magic-sparkles ms-2"></i>
+        </a>
+    </section>
+
+    <!-- Feature Grid (Reusing your 2-column layout) -->
+    <div class="row mb-5">
+        
+        <!-- Left Column -->
+        <div class="col-md-6 pe-md-5">
+            <div class="mb-5">
+                <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Pending Deadlines <i class="fa-solid fa-angle-right ms-1"></i></h2>
+                <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
+                    <p class="mb-0 text-dark">Never ask "When is this due?" again. Track urgent, weekly, and upcoming requirements in one place.</p>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Recent Announcements <i class="fa-solid fa-angle-right ms-1"></i></h2>
+                <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
+                    <p class="mb-0 text-dark">Read crucial updates from professors or block officers without scrolling through hundreds of chat messages.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-6 ps-md-4">
+            <div class="mb-5">
+                <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Quick Links <i class="fa-solid fa-angle-right ms-1"></i></h2>
+                <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
+                    <p class="mb-3">Instant access to the portals and drives we use every day</p>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Latest Summary <i class="fa-solid fa-angle-right ms-1"></i></h2>
+                <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
+                    <p class="mb-0 text-dark">Quickly review the most important notes or class summaries before an exam.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center">
+        <p class="text-muted" style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif ;">BlockHub | KomSy3 @ 2026 - Created by John Calvin Samson</p>
+    </div>
+</div>
+{% endblock %}

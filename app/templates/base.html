@@ -40,7 +40,9 @@
 <body>
     <div class="wrapper">
         <!-- The Sidebar -->
-        {% include 'navbar.html' %}
+        {% if not is_guest %}
+            {% include 'navbar.html' %}
+        {% endif %}
 
         <!-- The Main Content Area -->
         <div class="main-content">
@@ -113,12 +115,12 @@
                             <a href="{% block url_back %}javascript:history.back(){% endblock %}" class="back-btn">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </a>
-                        {% endif %}
-                        
+                        {% endif %}                       
                         <div>
                             <h2 class="page-title"># {% block page_title %}{% endblock %}</h2>
                             <p class="page-title-txt">> {%block page_title_txt %}{% endblock %}</p> 
                         </div>
+                        
                     {% endif %}
                     </div>
                     

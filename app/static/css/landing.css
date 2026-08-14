@@ -1,0 +1,7 @@
+/* Default state (Light Mode) */
+.preview-dark { display: none; }
+.preview-light { display: block; }
+
+/* Dark Mode state */
+[data-theme="dark"] .preview-light { display: none; }
+[data-theme="dark"] .preview-dark { display: block; }

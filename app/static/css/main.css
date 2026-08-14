@@ -353,7 +353,6 @@ main {
     border-bottom: none;
 }
 
-
 /* THE BULLETPROOF HIGHLIGHT */
 .highlight-glow {
     animation: target-highlight 2s ease-out !important;
