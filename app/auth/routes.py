@@ -25,7 +25,7 @@ def login():
                 resend_url = url_for('auth.resend_verification', email=user.email)
                 
                 # Inject the link directly into the flash message
-                flash(f'Please verify your email address before logging in. <br><a href="{resend_url}" class="alert-link text-decoration-underline"><i class="fa-solid fa-envelope me-1"></i> Click here to resend the email.</a>', 'warning')
+                flash(f'Please verify your email address before logging in. Don\'t forget to check your spam folder! <br><a href="{resend_url}" class="alert-link text-decoration-underline"><i class="fa-solid fa-envelope me-1"></i> Click here to resend the email.</a>', 'warning')
                 
                 return redirect(url_for('auth.login'))
                 
@@ -93,7 +93,7 @@ def signup():
         try:
             # Attempt to send the email
             send_verification_email(new_user, new_user.email)
-            flash('Account created! Please check your university email to verify your account.', 'info')
+            flash('Account created! Please check your university email (and spam folder) to verify your account.', 'info')
             return redirect(url_for('auth.login'))
             
         except Exception as e:
