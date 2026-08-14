@@ -7,7 +7,7 @@
 {% block page_title %}What is BlockHub?{% endblock %}
 
 {%block page_title_txt %}
-    An exclusive, centralized command center for our Blockmates.
+    An exclusive, centralized command center for our blockmates :>
 {% endblock %}
 
 {% block content %}
@@ -23,9 +23,13 @@
                 &gt; Less chat clutter, more clarity. A simple, organized space for all our block's deadlines announcements, course information, class summaries, and important link.
             </p>
             
-            <div class="d-flex gap-3 mt-4">
+            <div class="d-flex gap-3 mt-4 mb-2">
                 <a href="{{ url_for('auth.login') }}" class="btn" style="background-color: var(--accent-purple); color: var(--main-bg); border-radius: 0;">Log In</a>
                 <a href="{{ url_for('auth.signup') }}" class="btn" style="border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 0;">Sign Up</a>
+            </div>
+
+            <div class="mt-4">
+                <p class="text-muted fst-italic" style="font-size: 0.75rem;">Note: Currently exclusive to BatState-U CS 2103 students.</p>
             </div>
         </div>
 
@@ -68,14 +72,14 @@
             <div class="mb-5">
                 <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Pending Deadlines <i class="fa-solid fa-angle-right ms-1"></i></h2>
                 <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
-                    <p class="mb-0 text-dark">Never ask "When is this due?" again. Track urgent, weekly, and upcoming requirements in one place.</p>
+                    <p class="mb-0 text-dark">Stay ahead of your schedule. Easily track urgent, weekly, and upcoming requirements in one central spot so nothing slips through the cracks.</p>
                 </div>
             </div>
 
             <div class="mb-5">
                 <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Recent Announcements <i class="fa-solid fa-angle-right ms-1"></i></h2>
                 <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
-                    <p class="mb-0 text-dark">Read crucial updates from professors or block officers without scrolling through hundreds of chat messages.</p>
+                    <p class="mb-0 text-dark">Stay in the loop. Find crucial updates from professors and officers instantly, keeping you informed without having to scroll through busy group chats.</p>
                 </div>
             </div>
         </div>
@@ -85,21 +89,25 @@
             <div class="mb-5">
                 <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Quick Links <i class="fa-solid fa-angle-right ms-1"></i></h2>
                 <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
-                    <p class="mb-3">Instant access to the portals and drives we use every day</p>
+                    <p class="mb-3">Everything you need, one click away. Jump straight to the university portals, shared drives, and tools we use every day.</p>
                 </div>
             </div>
 
             <div class="mb-5">
                 <h2 class="h5 fw-bold" style="color: var(--accent-purple);">## Latest Summary <i class="fa-solid fa-angle-right ms-1"></i></h2>
                 <div class="border-top border-secondary border-opacity-25 pt-3 mt-2">
-                    <p class="mb-0 text-dark">Quickly review the most important notes or class summaries before an exam.</p>
+                    <p class="mb-0 text-dark">Study smarter. Access essential notes and class overviews to quickly refresh your memory before a big exam.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="d-flex justify-content-center align-items-center">
-        <p class="text-muted" style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif ;">BlockHub | KomSy3 @ 2026 - Created by John Calvin Samson</p>
+        <p class="large" style="font-family: cursive; font-size: 1.2rem;">"Built by a blockmate, for blockmates"</p>
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center">
+        <p class="text-muted text-center" style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif ;">BlockHub | KomSy3 @ 2026 - Created by John Calvin Samson</p>
     </div>
 </div>
 {% endblock %}
