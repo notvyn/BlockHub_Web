@@ -8,10 +8,79 @@ from app import mail
 import json
 import os
 import re
+import pdfplumber
+import uuid
+from datetime import datetime
 
 # Grab the keys from the environment variables
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY') 
 VAPID_CLAIM_EMAIL = os.environ.get('VAPID_CLAIM_EMAIL') # e.g., "mailto:your@email.com"
+
+def extract_schedule_from_pdf(file_stream):
+    """
+    Reads the messy schedule PDF and returns a clean dictionary grouped by Day.
+    """
+    parsed_data = {
+        'Monday': [], 'Tuesday': [], 'Wednesday': [], 
+        'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []
+    }
+    
+    previous_subjects = [""] * 7
+    previous_rooms = [""] * 7
+
+    with pdfplumber.open(file_stream) as pdf:
+        first_page = pdf.pages[0]
+        table = first_page.extract_table()
+        
+        if not table:
+            raise ValueError("Could not find a table in this PDF.")
+
+        for row in table[2:]: 
+            time_block = row[0]
+            if not time_block: 
+                continue 
+
+            days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            col_index = 1
+            
+            for i, day in enumerate(days):
+                if col_index + 1 < len(row):
+                    subject = row[col_index]
+                    room = row[col_index + 1]
+
+                    if subject and str(subject).strip() != "":
+                        if "-do-" in str(subject).lower():
+                            subject = previous_subjects[i]
+                        else:
+                            previous_subjects[i] = str(subject).strip()
+
+                        if room and "-do-" in str(room).lower():
+                            room = previous_rooms[i]
+                        else:
+                            previous_rooms[i] = str(room).strip()
+
+                        time_str = str(time_block).strip().replace('\n', '')
+                        time_parts = time_str.split('-')
+                        start_time = time_parts[0].strip()
+                        end_time = time_parts[1].strip() if len(time_parts) > 1 else start_time
+
+                        day_list = parsed_data[day]
+                        
+                        # Merge logic for consecutive identical classes
+                        if day_list and day_list[-1]['course'] == subject and day_list[-1]['room'] == room:
+                            prev_start = day_list[-1]['time'].split('-')[0].strip()
+                            day_list[-1]['time'] = f"{prev_start} - {end_time}"
+                        else:
+                            day_list.append({
+                                'id': uuid.uuid4().hex[:8],
+                                'time': f"{start_time} - {end_time}",
+                                'course': subject,
+                                'room': room,
+                                'day': day
+                            })
+                col_index += 2
+
+    return parsed_data
 
 def send_web_push(subscription_dict, notification_title, notification_body, target_url="/"):
     """

@@ -2,14 +2,14 @@ from flask import jsonify, url_for, request
 from flask_login import current_user, login_required, logout_user
 from sqlalchemy import func, or_
 from werkzeug.utils import secure_filename
+from datetime import datetime
 import cloudinary, cloudinary.uploader, json, os, uuid
-import pdfplumber
 
 from app import db
 
 from app.forms import CreateTagForm, LinkForm
 from app.models import Announcement, AnnouncementHeart, AnnouncementRead, ClassSummary, Course, CourseSchedule, Deadline, DeadlineCompletion, Feedback, Link, PushSubscription, Tag, User
-from app.utils import send_verification_email, send_web_push
+from app.utils import extract_schedule_from_pdf, send_verification_email, send_web_push
 
 from app.api import api
 
@@ -110,6 +110,71 @@ def api_update_password():
     db.session.commit()
     
     return jsonify({'success': True, 'message': 'Password updated successfully!'})
+
+@api.route('/api/bulk-import-schedule', methods=['POST'])
+@login_required 
+def bulk_import_schedule():
+    if 'schedule_pdf' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded.'}), 400
+
+    try:
+        # Call the EXACT same parsing logic
+        parsed_data = extract_schedule_from_pdf(request.files['schedule_pdf'])
+        classes_added = 0
+        
+        # Iterate through the clean data
+        for day, classes in parsed_data.items():
+            for c in classes:
+                course_code = c['course']
+                room = c['room']
+                
+                # Split and convert "07:30 AM - 09:00 AM" into Python time objects
+                time_parts = c['time'].split('-')
+                start_str = time_parts[0].strip()
+                end_str = time_parts[1].strip() if len(time_parts) > 1 else start_str
+                
+                start_time_obj = datetime.strptime(start_str, "%I:%M %p").time()
+                end_time_obj = datetime.strptime(end_str, "%I:%M %p").time()
+
+                # Verify or Create the Course
+                course = Course.query.filter_by(code=course_code).first()
+                if not course:
+                    # Fill in defaults if the PDF has a new course not yet in the DB
+                    course = Course(code=course_code, title="TBA", instructor="TBA", units=3.0) 
+                    db.session.add(course)
+                    db.session.flush() # Get the new ID without committing yet
+
+                # Prevent Duplicates! Check if this exact schedule already exists
+                existing_schedule = CourseSchedule.query.filter_by(
+                    course_id=course.id,
+                    day=day,
+                    start_time=start_time_obj,
+                    end_time=end_time_obj
+                ).first()
+
+                if not existing_schedule:
+                    new_schedule = CourseSchedule(
+                        course_id=course.id,
+                        day=day,
+                        start_time=start_time_obj,
+                        end_time=end_time_obj,
+                        room=room
+                    )
+                    db.session.add(new_schedule)
+                    classes_added += 1
+
+        # Commit everything to the database
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Successfully imported {classes_added} new classes!'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Bulk Import Error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to save schedules to the database.'}), 500
 
 @api.route('/complete-deadline/<int:id>', methods=['POST'])
 @login_required
@@ -454,89 +519,24 @@ def parse_schedule():
     if 'schedule_pdf' not in request.files:
         return jsonify({'success': False, 'error': 'No file uploaded.'}), 400
 
-    file = request.files['schedule_pdf']
-    
-    parsed_data = {
-        'Monday': [], 'Tuesday': [], 'Wednesday': [], 
-        'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []
-    }
-    
-    previous_subjects = [""] * 7
-    previous_rooms = [""] * 7
-
     try:
-        with pdfplumber.open(file) as pdf:
-            first_page = pdf.pages[0]
-            table = first_page.extract_table()
-            
-            if not table:
-                return jsonify({'success': False, 'error': 'Could not find a table in this PDF.'}), 400
+        # Call the shared helper function!
+        parsed_data = extract_schedule_from_pdf(request.files['schedule_pdf'])
 
-            for row in table[2:]: 
-                time_block = row[0]
-                if not time_block: 
-                    continue 
-
-                days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-                col_index = 1
-                
-                for i, day in enumerate(days):
-                    if col_index + 1 < len(row):
-                        subject = row[col_index]
-                        room = row[col_index + 1]
-
-                        if subject and str(subject).strip() != "":
-                            if "-do-" in str(subject).lower():
-                                subject = previous_subjects[i]
-                            else:
-                                previous_subjects[i] = str(subject).strip()
-
-                            if room and "-do-" in str(room).lower():
-                                room = previous_rooms[i]
-                            else:
-                                previous_rooms[i] = str(room).strip()
-
-                            # --- THE SMART MERGE LOGIC ---
-                            time_str = str(time_block).strip().replace('\n', '')
-                            time_parts = time_str.split('-')
-                            start_time = time_parts[0].strip()
-                            end_time = time_parts[1].strip() if len(time_parts) > 1 else start_time
-
-                            day_list = parsed_data[day]
-                            
-                            # If this class is identical to the last one on this day, extend the time
-                            if day_list and day_list[-1]['course'] == subject and day_list[-1]['room'] == room:
-                                prev_start = day_list[-1]['time'].split('-')[0].strip()
-                                day_list[-1]['time'] = f"{prev_start} - {end_time}"
-                            else:
-                                import uuid
-                                day_list.append({
-                                    'id': uuid.uuid4().hex[:8], # Dynamic ID for JS targeting
-                                    'time': f"{start_time} - {end_time}",
-                                    'course': subject,
-                                    'room': room,
-                                    'day': day
-                                })
-                            
-                    col_index += 2
-
-        # --- PREPARE DATA FOR THE ACCORDION ---
+        # Prepare the secondary grouping for the Accordion UI
         course_data = {}
         for day, classes in parsed_data.items():
             for c in classes:
                 course_code = c['course']
                 if course_code not in course_data:
-                    course_data[course_code] = {
-                        'title': 'Imported', # PDFs lack descriptive titles, so we use a placeholder
-                        'classes': []
-                    }
+                    course_data[course_code] = {'title': 'Imported', 'classes': []}
                 course_data[course_code]['classes'].append(c)
 
         return jsonify({'success': True, 'data': parsed_data, 'course_data': course_data})
 
     except Exception as e:
         print(f"PDF Parse Error: {e}")
-        return jsonify({'success': False, 'error': 'Failed to process the PDF format.'}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @api.route('/api/reply-feedback/<int:id>', methods=['POST'])
 @login_required

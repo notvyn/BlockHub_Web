@@ -9,10 +9,28 @@
 {% block page_title_txt %}Success is one step ahead! :}{% endblock %}
 
 {% block extra_header %}
-    <div class="d-flex justify-content-end gap-3">
-        <div style="color: var(--text-muted);">Total Units: <span id="course-page-total-units" style="transition: all 0.3s ease;">{{ courses|sum(attribute='units') }}</span></div>
-        <div style="color: var(--text-muted);">Total Courses: <span id="course-page-total-count" style="transition: all 0.3s ease;">{{ courses|length }}</span></div>
-    </div> 
+    <div class="d-flex justify-content-between align-items-center w-100 mb-2 mt-1">
+        
+        <!-- LEFT SIDE: Officer Actions -->
+        <div>
+            {% if current_user.role == 'Officer' or current_user.is_admin %}
+            <div class="d-inline-block position-relative">
+                <input type="file" id="bulk-schedule-upload" accept="application/pdf" style="display: none;">
+                <!-- Styled to match your accent colors and rounded-pill aesthetics -->
+                <button id="bulk-upload-btn" class="btn btn-sm text-white px-3 py-2 fw-bold rounded-pill shadow-sm" style="background-color: var(--accent-purple); transition: all 0.2s ease;" onclick="document.getElementById('bulk-schedule-upload').click();">
+                    <i class="fa-solid fa-file-pdf me-2"></i> Import Course & Schedule
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT SIDE: Course Stats -->
+        <div class="d-flex gap-3 align-items-center">
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Total Units: <span id="course-page-total-units" class="fw-bold text-dark" style="transition: all 0.3s ease;">{{ courses|sum(attribute='units') }}</span></div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Total Courses: <span id="course-page-total-count" class="fw-bold text-dark" style="transition: all 0.3s ease;">{{ courses|length }}</span></div>
+        </div> 
+        
+    </div>
 {% endblock %}
 
 {% block content %}

@@ -1,7 +1,7 @@
 import {getReadHistory, initAnnouncementForm, readAnnouncement, setFileIcon, toggleAnnouncementPin, toggleHeartReact, toggleLightboxModal, updateAnnouncementBadge} from './announcements.js';
 import {eyeToggle, validateSignUpInput} from './auth.js';
 import {toggleDarkMode, toggleDeleteEntry, toggleLiveSearch, toggleMobileSearchBar, toggleSearchHighlight, toggleSidebarExpand} from './core.js';
-import {initCourseForm} from './courses.js';
+import {initCourseForm, initCoursePage} from './courses.js';
 import {initOnboardingTour} from './dashboard.js';
 import {completeDeadline, filterDeadline, initDeadlineForm} from './deadlines.js';
 import {initFeedbackForm, resolveFeedback, toggleFeedbackReplyModal} from './feedbacks.js';
@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Course Features
     initCourseForm();
+    initCoursePage();
 
     // Dashboard Features
     initOnboardingTour();
