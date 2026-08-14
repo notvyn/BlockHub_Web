@@ -171,6 +171,11 @@ A centralized class management system for CS 2103.
 **August 13, 2026**
 - Refined file comments
 
+**August 14, 2026**
+- Added Schedule Manager for wallpaper generator
+- Added custom schedule importer on wallpaper generator
+- Added import course and schedule on courses page
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
