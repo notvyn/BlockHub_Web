@@ -86,9 +86,9 @@ def api_update_email():
     if existing_user and existing_user.id != current_user.id:
         return jsonify({'success': False, 'message': 'This email is already in use.'}), 400
 
-    # Send the verification email instead of saving to the database
     try:
-        send_verification_email(current_user, new_email)
+        # Specify the action here
+        send_verification_email(current_user, new_email, action='update_email')
         return jsonify({'success': True, 'message': 'Verification email sent! Please check your inbox.'})
     except Exception as e:
         print(f"Mail Error: {e}")

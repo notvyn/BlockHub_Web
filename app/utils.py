@@ -1,6 +1,6 @@
 from pywebpush import webpush, WebPushException
 from flask import url_for, current_app
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 from flask_mail import Message
 from wtforms.validators import ValidationError
 from app import mail
@@ -111,34 +111,86 @@ def send_web_push(subscription_dict, notification_title, notification_body, targ
             
         return "error"
 
-def send_verification_email(user, new_email):
-    # Initialize the serializer with your app's secret key
+def send_verification_email(user, target_email, action='verify_account'):
     serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     
-    # Package the user's ID and the NEW email into a secure token
-    # We salt it so it can only be used for email updates
-    token = serializer.dumps({'user_id': user.id, 'new_email': new_email}, salt='email-update-salt')
+    # SET THE PROFESSIONAL SENDER NAME
+    sender_info = ('BlockHub Admin', 'blockhub.komsy3@gmail.com')
+
+    if action == 'update_email':
+        token = serializer.dumps({'user_id': user.id, 'new_email': target_email}, salt='email-update-salt')
+        verify_url = url_for('auth.verify_email_update', token=token, _external=True) 
+        
+        subject = 'Confirm Your BlockHub Email Update'
+        
+        # CREATE A STYLED HTML BODY
+        html_body = f"""
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 12px; background-color: #ffffff;">
+            <h2 style="color: #6c5ce7; text-align: center; margin-bottom: 20px;">Email Update Request</h2>
+            <p style="color: #333; font-size: 16px;">Hello <strong>{user.name}</strong>,</p>
+            <p style="color: #555; font-size: 15px; line-height: 1.5;">You requested to change your BlockHub email address. To confirm and apply this change, please click the button below:</p>
+            
+            <div style="text-align: center; margin: 35px 0;">
+                <a href="{verify_url}" style="background-color: #6c5ce7; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Confirm Email Update</a>
+            </div>
+            
+            <p style="font-size: 12px; color: #999; text-align: center; margin-top: 30px border-top: 1px solid #eaeaea; padding-top: 20px;">
+                If you did not make this request, please ignore this email. Your account remains secure.<br>This link will expire in 30 minutes.
+            </p>
+        </div>
+        """
+        
+        # Fallback text for email clients that block HTML
+        fallback_body = f"Hello {user.name},\n\nConfirm your email update here: {verify_url}"
+
+    else:
+        token = serializer.dumps({'user_id': user.id}, salt='account-verify-salt')
+        verify_url = url_for('auth.verify_email', token=token, _external=True)
+        
+        subject = 'Welcome to BlockHub! Verify Your Account'
+        
+        # HTML for New Account Sign-Up
+        html_body = f"""
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 12px; background-color: #ffffff;">
+            <h2 style="color: #6c5ce7; text-align: center; margin-bottom: 20px;">Welcome to BlockHub!</h2>
+            <p style="color: #333; font-size: 16px;">Hello <strong>{user.name}</strong>,</p>
+            <p style="color: #555; font-size: 15px; line-height: 1.5;">We are excited to have you on board! To fully activate your account and access the dashboard, please verify your university email address by clicking the button below:</p>
+            
+            <div style="text-align: center; margin: 35px 0;">
+                <a href="{verify_url}" style="background-color: #6c5ce7; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Verify My Account</a>
+            </div>
+            
+            <p style="font-size: 12px; color: #999; text-align: center; margin-top: 30px; border-top: 1px solid #eaeaea; padding-top: 20px;">
+                If the button above does not work, copy and paste this link into your browser:<br>
+                <span style="color: #6c5ce7;">{verify_url}</span><br><br>
+                This link will expire in 30 minutes.
+            </p>
+        </div>
+        """
+        
+        fallback_body = f"Hello {user.name},\n\nWelcome to BlockHub! Verify your account here: {verify_url}"
+
+    # ASSEMBLE AND SEND
+    # Notice we pass the sender_info tuple here
+    msg = Message(subject, sender=sender_info, recipients=[target_email])
     
-    # Create the unique verification link
-    verify_url = url_for('verify_email_update', token=token, _external=True)
+    # Attach both the beautiful HTML and the raw text fallback
+    msg.html = html_body
+    msg.body = fallback_body 
     
-    # Construct the email
-    msg = Message('Confirm Your BlockHub Email Update',
-                  sender='noreply@blockhub.com',
-                  recipients=[new_email]) # Send it to the NEW email to prove they own it
-                  
-    msg.body = f'''Hello {user.name},
-
-You requested to change your BlockHub email address.
-To confirm and apply this change, please visit the following link:
-
-{verify_url}
-
-If you did not make this request, please ignore this email and your account will remain secure.
-This link will expire in 30 minutes.
-'''
-    # Send it!
     mail.send(msg)
+
+def decode_token(token, salt, expiration=1800):
+    """
+    Securely decodes a token. Returns the data if valid, or None if expired/tampered.
+    expiration=1800 means 30 minutes.
+    """
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        data = serializer.loads(token, salt=salt, max_age=expiration)
+        return data
+    except (SignatureExpired, BadTimeSignature):
+        return None
 
 def validate_school_email(form, field):
     """Ensures the user is signing up with a valid BatStateU email format."""
