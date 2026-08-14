@@ -185,6 +185,7 @@ A centralized class management system for CS 2103.
 - Refine responsiveness of preview content on wallpaper generator
 - Refine styling of profile forms (i.e. updateEmail, updatePassword, and deleteIcon)
 - Refine extra header style on courses page
+- Refine margin of landing page contents
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
