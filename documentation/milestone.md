@@ -181,6 +181,8 @@ A centralized class management system for CS 2103.
 - Added landing page and made wallpaper generator public
 - Fixed day sorting on wallpaper generator import
 - Refine description of Landing page
+- Added "check spam" text for new users
+- Refine responsiveness of preview content on wallpaper generator  
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
