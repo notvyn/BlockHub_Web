@@ -3,11 +3,16 @@ export function initTourReset() {
     
     if (replayBtn) {
         replayBtn.addEventListener('click', function() {
-            // Erase the memory
-            localStorage.removeItem('blockhub_onboarding_complete');
-            
-            // Redirect back to the dashboard (where the modal will pop up again!)
-            window.location.href = '/dashboard';
+            fetch('/api/reset-onboarding', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/dashboard';
+                }
+            });
         });
     }
 }

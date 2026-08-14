@@ -233,6 +233,13 @@ def complete_feedback(id):
         'success': True
     })
 
+@api.route('/api/complete-onboarding', methods=['POST'])
+@login_required
+def complete_onboarding():
+    current_user.is_onboarded = True
+    db.session.commit()
+    return jsonify({'success': True})
+
 @api.route('/api/create-tag', methods=['POST'])
 @login_required
 def create_tag():
@@ -553,6 +560,14 @@ def reply_feedback(id):
     db.session.commit()
 
     return jsonify({'success': True})
+
+@api.route('/api/reset-onboarding', methods=['POST'])
+@login_required
+def reset_onboarding():
+    current_user.is_onboarded = False
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Onboarding reset! Visit the dashboard to see the tour.'})
 
 @api.route('/api/save-subscription', methods=['POST'])
 @login_required # Ensures we know exactly who is saving this subscription

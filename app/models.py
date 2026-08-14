@@ -161,6 +161,7 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
     profile_image = db.Column(db.String(255), nullable=True)
     is_verified = db.Column(db.Boolean, nullable=False, default=False)
+    is_onboarded = db.Column(db.Boolean, nullable=False, default=False)
     
     # Store it as a string, but it will hold the long scrambled hash
     password_hash = db.Column(db.String(256), nullable=False)

@@ -17,7 +17,8 @@
 
 {% block content %}
     <!-- Dashboard Grid Layout -->
-    <div id="dashboard-container" data-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}">
+    <div id="dashboard-container" data-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}"
+     data-onboarded="{{ 'true' if current_user.is_onboarded else 'false' }}">
 
         <div class="row mt-4">
             <!-- Left Column (Wider for main content) -->
