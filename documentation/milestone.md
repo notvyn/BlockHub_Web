@@ -191,6 +191,7 @@ A centralized class management system for CS 2103.
 - Replace anchor tag of Komsy3 logo to text on mobile view
 - Add hover toggle expand for sidebar
 - Fixed visual bug of Blockmate bio displaying as current user bio
+- Added copy blocklist on blockmates page
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.

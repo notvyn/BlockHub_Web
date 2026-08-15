@@ -9,7 +9,10 @@
 {% block page_title_txt %}Make friends with them! ;>{% endblock %}
 
 {% block extra_header %}
-<div class="d-flex flex-row-reverse justify-content-start align-items-center gap-3">
+<div class="d-flex justify-content-end align-items-center gap-3">
+    <button type="button" id="copyClasslistBtn" class="btn btn-sm text-white px-3 py-2 fw-bold rounded-pill shadow-sm" style="background-color: var(--accent-purple); transition: all 0.2s ease;" onclick="copyBlocklist()">
+        <i class="fa-regular fa-copy me-2"></i> Copy Classlist
+    </button>
     <div style="color: var(--text-muted);">
         Total Students: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ students|length }}</span> 
     </div>
@@ -57,4 +60,43 @@
             </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        async function copyBlocklist() {
+            // Build the text directly in JS using a Jinja loop
+            const classListArray = [
+                {% for student in students %}
+                    "{{ loop.index }}. {{ student.name }}",
+                {% endfor %}
+            ];
+            
+            // Join the array into a single string with line breaks
+            const classListText = classListArray.join('\n');
+            
+            // Grab the button for visual feedback
+            const copyBtn = document.getElementById('copyClasslistBtn');
+            const originalHTML = copyBtn.innerHTML;
+
+            try {
+                // Copy to clipboard
+                await navigator.clipboard.writeText(classListText);
+                
+                // Change button appearance temporarily
+                copyBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i> Copied!';
+                copyBtn.style.backgroundColor = '#28a745'; // Success green
+                
+                // Revert after 2 seconds
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.backgroundColor = 'var(--accent-purple)';
+                }, 2000);
+                
+            } catch (err) {
+                console.error("Failed to copy:", err);
+                alert("Failed to copy text. Your browser might not support this feature.");
+            }
+        }
+    </script>
 {% endblock %}
