@@ -187,6 +187,9 @@ A centralized class management system for CS 2103.
 - Refine extra header style on courses page
 - Refine margin of landing page contents
 
+**August 15, 2026**
+- Replace anchor tag of Komsy3 logo to text on mobile view
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
