@@ -10,11 +10,35 @@
 
 {% block extra_header %}
 <div class="d-flex justify-content-end align-items-center gap-3">
-    <button type="button" id="copyClasslistBtn" class="btn btn-sm text-white px-3 py-2 fw-bold rounded-pill shadow-sm" style="background-color: var(--accent-purple); transition: all 0.2s ease;" onclick="copyBlocklist()">
-        <i class="fa-regular fa-copy me-2"></i> Copy Classlist
-    </button>
+    
+    <!-- Dropdown Wrapper -->
+    <div class="dropdown d-inline-block">
+        <button id="copyClasslistBtn" class="btn btn-sm text-white px-3 py-2 fw-bold rounded-pill shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--accent-purple); transition: all 0.2s ease;">
+            <i class="fa-regular fa-copy me-2"></i> Copy Classlist
+        </button>
+        
+        <!-- The Dropdown Options -->
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="font-size: 0.85rem; border-radius: 12px;">
+            <li>
+                <button class="dropdown-item py-2 fw-medium d-flex align-items-center" type="button" onclick="copyBlocklist('both')">
+                    <i class="fa-solid fa-address-card me-2 text-muted" style="width: 16px;"></i> Names & SR-Codes
+                </button>
+            </li>
+            <li>
+                <button class="dropdown-item py-2 fw-medium d-flex align-items-center" type="button" onclick="copyBlocklist('names')">
+                    <i class="fa-solid fa-user me-2 text-muted" style="width: 16px;"></i> Names Only
+                </button>
+            </li>
+            <li>
+                <button class="dropdown-item py-2 fw-medium d-flex align-items-center" type="button" onclick="copyBlocklist('srcodes')">
+                    <i class="fa-solid fa-hashtag me-2 text-muted" style="width: 16px;"></i> SR-Codes Only
+                </button>
+            </li>
+        </ul>
+    </div>
+    
     <div style="color: var(--text-muted);">
-        Total Students: <span id="deadline-page-total-count" style="transition: all 0.3s ease;">{{ students|length }}</span> 
+        Total Students: <span id="deadline-page-total-count" class="fw-bold text-dark" style="transition: all 0.3s ease;">{{ students|length }}</span> 
     </div>
 </div>
 {% endblock %}
@@ -64,14 +88,29 @@
 
 {% block script %}
     <script>
-        async function copyBlocklist() {
-            // Build the text directly in JS using a Jinja loop
-            const classListArray = [
+        async function copyBlocklist(formatType) {
+            // Let Jinja build a data array of all students, extracting the SR-Code from the email
+            const studentsData = [
                 {% for student in students %}
-                    "{{ loop.index }}. {{ student.name }}",
+                    {
+                        index: "{{ loop.index }}",
+                        name: "{{ student.name }}",
+                        srCode: "{{ student.email.split('@')[0] }}" 
+                    },
                 {% endfor %}
             ];
             
+            // Map the data based on the requested format
+            let classListArray = [];
+            
+            if (formatType === 'both') {
+                classListArray = studentsData.map(s => `${s.index}. ${s.name} - ${s.srCode}`);
+            } else if (formatType === 'names') {
+                classListArray = studentsData.map(s => `${s.index}. ${s.name}`);
+            } else if (formatType === 'srcodes') {
+                classListArray = studentsData.map(s => `${s.index}. ${s.srCode}`);
+            }
+
             // Join the array into a single string with line breaks
             const classListText = classListArray.join('\n');
             

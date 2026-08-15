@@ -192,6 +192,7 @@ A centralized class management system for CS 2103.
 - Add hover toggle expand for sidebar
 - Fixed visual bug of Blockmate bio displaying as current user bio
 - Added copy blocklist on blockmates page
+- Added more choices for copying blocklist
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
