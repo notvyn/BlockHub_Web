@@ -72,16 +72,44 @@ export function toggleMobileSearchBar() {
 }
 
 export function toggleSidebarExpand() {
-    // Grab the sidebar
     const sidebar = document.querySelector("#sidebar");
-
-    // Grab both possible toggle buttons (desktop and mobile)
     const toggles = document.querySelectorAll("#toggle-btn, #mobile-toggle");
 
-    // Add the click event to any button that exists
+    // Safety check in case the elements don't exist on the page
+    if (!sidebar) return; 
+
+    // Variable to track if the sidebar was locked open via a button click
+    let isPinned = false;
+
+    // HOVER IN: Only expand if it isn't already pinned open
+    sidebar.addEventListener("mouseenter", () => {
+        if (!isPinned) {
+            sidebar.classList.add("expand");
+        }
+    });
+
+    // HOVER OUT: Only collapse if it isn't pinned open
+    sidebar.addEventListener("mouseleave", () => {
+        if (!isPinned) {
+            sidebar.classList.remove("expand");
+        }
+    });
+
+    // CLICK: Toggle the pinned state and update the class
     toggles.forEach(btn => {
-        btn?.addEventListener("click", function () {
-            sidebar.classList.toggle("expand");
+        btn?.addEventListener("click", function (e) {
+            // Prevent the click from triggering other unwanted events
+            e.stopPropagation(); 
+            
+            // Flip the pinned state
+            isPinned = !isPinned; 
+            
+            // Apply the class based on the new pinned state
+            if (isPinned) {
+                sidebar.classList.add("expand");
+            } else {
+                sidebar.classList.remove("expand");
+            }
         });
     });
 }

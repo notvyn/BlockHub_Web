@@ -189,6 +189,7 @@ A centralized class management system for CS 2103.
 
 **August 15, 2026**
 - Replace anchor tag of Komsy3 logo to text on mobile view
+- Add hover toggle expand for sidebar 
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -247,3 +248,8 @@ Known Bugs
 FUTURE VISION
 - [ ] Add a GWA Calculator that stores user's scores (w/ accordance to data privacy and the syllabus)
 - [ ] Maybe add a grading computation for Course (possibly creation of a dedicated page for each course)
+- [ ] Add category to links and make it so that the display is based on its category
+
+FEEDBACKS
+- [ ] Dedicated Page for Social Blogs by Students (Suggested by Loraine)
+- [ ] Make the sidebar when hovered it automatically extends (Suggested by Jeush)
