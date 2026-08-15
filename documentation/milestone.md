@@ -189,7 +189,8 @@ A centralized class management system for CS 2103.
 
 **August 15, 2026**
 - Replace anchor tag of Komsy3 logo to text on mobile view
-- Add hover toggle expand for sidebar 
+- Add hover toggle expand for sidebar
+- Fixed visual bug of Blockmate bio displaying as current user bio
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
@@ -253,3 +254,6 @@ FUTURE VISION
 FEEDBACKS
 - [ ] Dedicated Page for Social Blogs by Students (Suggested by Loraine)
 - [ ] Make the sidebar when hovered it automatically extends (Suggested by Jeush)
+
+BUG FOUNDS
+- [/] Visual bug on blockmates bio (Found by Loraine)
