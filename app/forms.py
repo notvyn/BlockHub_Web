@@ -66,6 +66,7 @@ class FeedbackForm(FlaskForm):
 class LinkForm(FlaskForm):
     title = StringField("Link Title", validators=[DataRequired()])
     url = URLField("URL", validators=[DataRequired(), URL()], widget=TextArea())
+    category = SelectField('Category', choices=['Academics', 'Communications', 'Organizations', 'Resources', 'Others'], validators=[DataRequired()])
     submit = SubmitField('Save Link')
 
 class LoginForm(FlaskForm):

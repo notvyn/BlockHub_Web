@@ -15,94 +15,98 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <!-- EMPTY STATE (If there's zero deadline) -->
-        {% if not links %}
-            <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
-                <i class="fa-solid fa-anchor mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
-                <h5>No links found.</h5>
-                <p style="font-size: 0.9rem;">Try adding one!</p>
+    <!-- EMPTY STATE (If there are zero links in the database) -->
+    {% if not links %}
+        <div class="text-center py-5 text-muted mt-5" style="color: var(--text-muted) !important;">
+            <i class="fa-solid fa-anchor mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+            <h5>No links found.</h5>
+            <p style="font-size: 0.9rem;">Try adding one!</p>
+        </div>
+    {% else %}
+        
+        <!-- Group the links by their new category column -->
+        {% for category, items in links|groupby('category') %}
+            
+            <!-- Category Header -->
+            <div class="mb-3 mt-4 border-bottom pb-2 d-flex align-items-center" style="border-color: var(--hue-shade) !important;">
+                <h5 class="fw-bold mb-0" style="color: var(--accent-purple); letter-spacing: 1px;">
+                    {% if category == 'Academics' %}<i class="fa-solid fa-graduation-cap me-2"></i>
+                    {% elif category == 'Communications' %}<i class="fa-solid fa-comments me-2"></i>
+                    {% elif category == 'Organizations' %}<i class="fa-solid fa-users me-2"></i>
+                    {% elif category == 'Resources' %}<i class="fa-solid fa-folder me-2"></i>
+                    {% else %}<i class="fa-solid fa-paperclip me-2"></i>{% endif %}
+                    {{ category|upper }}
+                </h5>
+                <span class="badge bg-secondary ms-3 rounded-pill">{{ items|length }}</span>
             </div>
-        {% endif %}
 
-        {% for link in links %}
-            <div class="col-12 col-lg-6 col-xl-4 d-flex">
-                
-                <!-- The Link Card -->
-                <div id="link-{{ link.id }}" class="card-wrapper link-card p-3 d-flex align-items-center w-100 shadow-sm" style="overflow: visible !important;">
-                    
-                    <!-- The Dynamic Icon Box -->
-                    <div class="link-icon-box flex-shrink-0 me-3 d-flex justify-content-center align-items-center rounded-circle">
-                        <!-- Using the Auto-Favicon Trick -->
-                        <img src="https://www.google.com/s2/favicons?domain={{ link.url }}&sz=64" alt="icon" style="width: 24px; height: 24px; border-radius: 4px;">
-                    </div>
-
-                    <!-- Title & URL (The Clickable Area) -->
-                    <div class="link-info flex-grow-1 overflow-hidden pe-2">
-                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="d-block">
-                            <div class="fw-bold text-wrap mb-1 d-flex align-items-center" style="color: var(--text-dark); font-size: 1.05rem;">
-                                
-                                <!-- VISUAL INDICATOR: Show the pin icon if it is pinned -->
-                                {% if link.is_pinned %}
-                                    <i class="fa-solid fa-map-pin me-2 text-danger" style="font-size: 1.1rem; transform: rotate(30deg);"></i> 
-                                {% endif %}
-                                
-                                {{ link.title }}
-                            </div>
-                            <div id="copy-content-{{ link.id }}" class="text-truncate" style="color: var(--text-muted); font-size: 0.8rem;">
-                                {{ link.url }}
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    {% if current_user.role == 'Officer' %}
-                     <div class="dropdown">
-                        <!-- The Three Dots Trigger Button -->
-                        <button class="btn btn-icon-action px-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
-                        </button>
-
-                        <!-- The Dropdown Menu -->
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px;">
+            <!-- The Grid for this specific category -->
+            <div class="row mb-4">
+                {% for link in items %}
+                    <div class="col-12 col-lg-6 col-xl-4 d-flex mb-3">
+                        
+                        <!-- The Link Card -->
+                        <div id="link-{{ link.id }}" class="card-wrapper link-card p-3 d-flex align-items-center w-100 shadow-sm" style="overflow: visible !important;">
                             
-                            <!-- Pin / Unpin Action -->
-                            <li>
-                                <button type="button" class="dropdown-item md-dropdown-item py-2 btn-link-pin" data-id="{{ link.id }}">
-                                    <i class="fa-solid {{ 'fa-thumbtack-slash' if link.is_pinned else 'fa-thumbtack' }}" style="width: 16px;"></i> 
-                                    {{ 'Unpin' if link.is_pinned else 'Pin' }}
-                                </button>
-                            </li>
+                            <!-- The Dynamic Icon Box -->
+                            <div class="link-icon-box flex-shrink-0 me-3 d-flex justify-content-center align-items-center rounded-circle">
+                                <img src="https://www.google.com/s2/favicons?domain={{ link.url }}&sz=64" alt="icon" style="width: 24px; height: 24px; border-radius: 4px;">
+                            </div>
 
-                            <!-- Copy Action -->
-                            <li>
-                                <button type="button" class="dropdown-item md-dropdown-item py-2" onclick="copyLink('{{ link.id }}')">
-                                    <i class="fa-regular fa-copy" style="width: 16px;"></i> Copy
-                                </button>
-                            </li>
-
-                            <li>
-                                <a href="#" class="dropdown-item md-dropdown-item py-2" title="Edit" data-bs-toggle="modal" data-bs-target="#addLinkModal" data-mode="edit" data-id="{{ link.id }}" data-title="{{ link.title }}" data-url="{{ link.url }}">
-                                    <i class="fa-solid fa-pencil" style="width: 16px;"></i> Edit
+                            <!-- Title & URL -->
+                            <div class="link-info flex-grow-1 overflow-hidden pe-2">
+                                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="d-block">
+                                    <div class="fw-bold text-wrap mb-1 d-flex align-items-center" style="color: var(--text-dark); font-size: 1.05rem;">
+                                        {% if link.is_pinned %}
+                                            <i class="fa-solid fa-map-pin me-2 text-danger" style="font-size: 1.1rem; transform: rotate(30deg);"></i> 
+                                        {% endif %}
+                                        {{ link.title }}
+                                    </div>
+                                    <div id="copy-content-{{ link.id }}" class="text-truncate" style="color: var(--text-muted); font-size: 0.8rem;">
+                                        {{ link.url }}
+                                    </div>
                                 </a>
-                            </li>
+                            </div>
 
-                            <!-- Divider -->
-                            <li><hr class="dropdown-divider opacity-10"></li>
-
-                            <li>
-                                <button type="button" class="dropdown-item md-dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ link.id }}" data-type="link" title="Delete">
-                                    <i class="fa-solid fa-trash" style="width: 16px;"></i> Delete
+                            <!-- Action Buttons -->
+                            {% if current_user.role == 'Officer' %}
+                             <div class="dropdown">
+                                <button class="btn btn-icon-action px-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
                                 </button>
-                            </li>
-                            
-                        </ul>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px;">
+                                    <li>
+                                        <button type="button" class="dropdown-item md-dropdown-item py-2 btn-link-pin" data-id="{{ link.id }}">
+                                            <i class="fa-solid {{ 'fa-thumbtack-slash' if link.is_pinned else 'fa-thumbtack' }}" style="width: 16px;"></i> 
+                                            {{ 'Unpin' if link.is_pinned else 'Pin' }}
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item md-dropdown-item py-2" onclick="copyLink('{{ link.id }}')">
+                                            <i class="fa-regular fa-copy" style="width: 16px;"></i> Copy
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-item md-dropdown-item py-2" title="Edit" data-bs-toggle="modal" data-bs-target="#addLinkModal" data-mode="edit" data-id="{{ link.id }}" data-title="{{ link.title }}" data-url="{{ link.url }}" data-category="{{ link.category }}">
+                                            <i class="fa-solid fa-pencil" style="width: 16px;"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider opacity-10"></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item md-dropdown-item py-2 text-danger fw-bold btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ link.id }}" data-type="link" title="Delete">
+                                            <i class="fa-solid fa-trash" style="width: 16px;"></i> Delete
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>    
                     </div>
-                    {% endif %}
-                </div>    
+                {% endfor %}
             </div>
+            
         {% endfor %}
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block script %}

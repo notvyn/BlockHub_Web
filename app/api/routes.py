@@ -22,6 +22,7 @@ def add_link_api():
         new_link = Link(
             title=form.title.data, 
             url=form.url.data,
+            category=form.category.data
             # user_id=current_user.id  # If your links are tied to specific users
         )
         db.session.add(new_link)
@@ -725,6 +726,7 @@ def update_link(id):
         # Overwrite its data
         link_to_update.title = form.title.data
         link_to_update.url = form.url.data
+        link_to_update.category = form.category.data
         
         # Commit (DO NOT use db.session.add() here)
         db.session.commit()

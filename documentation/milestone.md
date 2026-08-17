@@ -194,6 +194,9 @@ A centralized class management system for CS 2103.
 - Added copy blocklist on blockmates page
 - Added more choices for copying blocklist
 
+**August 17, 2026**
+- Added categories to links page for easier visibility
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)

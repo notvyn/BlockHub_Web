@@ -11,7 +11,7 @@
                     {{ link_form.hidden_tag() }}
                     
                     <div class="mb-3">
-                        <label class="form-label md-code border-0 bg-transparent mb-1 font-">{{ link_form.title.label() }}</label>
+                        <label class="form-label md-code border-0 bg-transparent mb-1">{{ link_form.title.label() }}</label>
                         {{ link_form.title(class="form-control", placeholder="e.g., Student Portal") }}
                         <div class="text-danger mt-2" id="title-error" style="font-size: 0.8rem; display: none;"></div>
                     </div>
@@ -20,6 +20,12 @@
                         <label class="form-label md-code border-0 bg-transparent mb-1">{{ link_form.url.label() }}</label>
                         {{ link_form.url(class="form-control", placeholder="https://...") }}
                         <div class="text-danger mt-2" id="url-error" style="font-size: 0.8rem; display: none;"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label md-code border-0 bg-transparent mb-1">{{ link_form.category.label() }}</label>
+                        {{ link_form.category(class="form-select") }}
+                        <div class="text-danger mt-2" id="category-error" style="font-size: 0.8rem; display: none;"></div>
                     </div>
                     
                     <div class="form-btn d-flex justify-content-end gap-2 mt-4">

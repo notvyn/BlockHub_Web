@@ -25,6 +25,7 @@
     --accent-yellow: #ca7d01;
     --accent-blue: #0ea5e9;
     --hue-shade: rgba(0, 0, 0, 0.1);
+    --form-shade: rgb(226, 219, 194);
     --ADLamDisplayFont: "ADLaM Display";
     --ABeeZeeFont: "ABeeZee";
     --ActorFont: "Actor";
@@ -48,6 +49,7 @@
     --text-muted: #9a91b5;
     
     --hue-shade: rgba(255, 255, 255, 0.1);
+    --form-shade: rgb(34, 32, 41);
 
     /* Accents */
     --accent-purple: #8b5cf6;

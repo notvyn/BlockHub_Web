@@ -2,25 +2,25 @@ export function cleanInputLinkModal() {
     /* MODAL CLEANUP ROUTINE */
     const addLinkModal = document.getElementById('addLinkModal');
     
-    // Create a reusable function to scrub everything clean
     function scrubLinkForm() {
         const form = document.getElementById('addLinkForm');
-        if (form) form.reset(); // 1. Clear the text
+        if (form) form.reset(); 
         
-        // Hide the error messages
+        // Hide ALL error messages, including the new category error
         const tError = document.getElementById('title-error');
         const uError = document.getElementById('url-error');
+        const cError = document.getElementById('category-error');
         if (tError) tError.style.display = 'none';
         if (uError) uError.style.display = 'none';
+        if (cError) cError.style.display = 'none';
         
-        // Strip away all the green/red validation glows
-        const inputs = form.querySelectorAll('.form-control');
+        // Strip away validation glows from inputs AND selects
+        const inputs = form.querySelectorAll('.form-control, .form-select');
         inputs.forEach(input => {
             input.classList.remove('is-valid', 'is-invalid');
         });
     }
 
-    // Tell Bootstrap to run the scrub function every time the modal closes
     if (addLinkModal) {
         addLinkModal.addEventListener('hidden.bs.modal', function () {
             scrubLinkForm();
@@ -29,41 +29,37 @@ export function cleanInputLinkModal() {
 }
 
 export function toggleLinkModal() {
-/* UNIFIED MODAL AJAX SUBMISSION (ADD & UPDATE) */
+    /* UNIFIED MODAL AJAX SUBMISSION (ADD & UPDATE) */
     const linkModal = document.getElementById('addLinkModal');
     const linkForm = document.getElementById('addLinkForm');
 
     if (linkModal) {
-        // SHAPESHIFT THE MODAL WHEN IT OPENS
         linkModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
-            
-            // Check if we are adding or editing (default to add if no attribute exists)
             const mode = button.getAttribute('data-mode') || 'add';
             
             const modalTitle = linkModal.querySelector('.modal-title');
             const titleInput = document.getElementById('title');
             const urlInput = document.getElementById('url');
+            const categoryInput = document.getElementById('category'); // WTForms automatically assigns this ID
             
-            // Hide any lingering error messages
+            // Hide lingering errors
             document.getElementById('title-error').style.display = 'none';
             document.getElementById('url-error').style.display = 'none';
+            document.getElementById('category-error').style.display = 'none';
 
             if (mode === 'edit') {
-                // Transform into an UPDATE modal
                 modalTitle.textContent = 'Update Quick Link';
                 titleInput.value = button.getAttribute('data-title');
                 urlInput.value = button.getAttribute('data-url');
+                categoryInput.value = button.getAttribute('data-category'); // Set the dropdown to match the DB
                 
-                // Tell the form it is in edit mode and give it the specific ID
                 linkForm.setAttribute('data-form-mode', 'edit');
                 linkForm.setAttribute('data-target-id', button.getAttribute('data-id'));
             } else {
-                // Transform into an ADD modal
                 modalTitle.textContent = 'Add Quick Link';
-                linkForm.reset(); // Clear the text boxes
+                linkForm.reset(); 
                 
-                // Tell the form it is in add mode
                 linkForm.setAttribute('data-form-mode', 'add');
                 linkForm.removeAttribute('data-target-id');
             }
@@ -71,17 +67,16 @@ export function toggleLinkModal() {
     }
 
     if (linkForm) {
-        // HANDLE THE FORM SUBMISSION
         linkForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Stop page reload
+            e.preventDefault(); 
             
             document.getElementById('title-error').style.display = 'none';
             document.getElementById('url-error').style.display = 'none';
+            document.getElementById('category-error').style.display = 'none';
             
             const formData = new FormData(this);
             const mode = this.getAttribute('data-form-mode');
             
-            // Dynamically set the correct Python route based on the mode
             let fetchUrl = '/api/add-link';
             if (mode === 'edit') {
                 const targetId = this.getAttribute('data-target-id');
@@ -95,10 +90,9 @@ export function toggleLinkModal() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // The easiest way to show the new/updated data is a clean reload
                     window.location.reload();
                 } else {
-                    // Show errors
+                    // Show errors for all fields if validation fails
                     if (data.errors.title) {
                         const err = document.getElementById('title-error');
                         err.textContent = data.errors.title[0];
@@ -107,6 +101,11 @@ export function toggleLinkModal() {
                     if (data.errors.url) {
                         const err = document.getElementById('url-error');
                         err.textContent = data.errors.url[0];
+                        err.style.display = 'block';
+                    }
+                    if (data.errors.category) {
+                        const err = document.getElementById('category-error');
+                        err.textContent = data.errors.category[0];
                         err.style.display = 'block';
                     }
                 }

@@ -126,6 +126,7 @@ class Link(db.Model):
     url = db.Column(db.Text, nullable=False)
     date_added = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
     is_pinned = db.Column(db.Boolean, default=False, nullable=True)
+    category = db.Column(db.String(50), nullable=False, default='Academics')
 
 class PushSubscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)

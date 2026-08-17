@@ -17,15 +17,44 @@ input:-webkit-autofill:active {
 
 /* --- Standard Form Inputs --- */
 .add-entry-form .form-control {
-    background-color: transparent;
-    color: var(--text-dark);
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
+    background-color: transparent !important;
+    color: var(--text-dark) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
 }
-.add-entry-form .form-control:focus {
-    box-shadow: 0 0 0 2px var(--accent-purple);
-    border-color: transparent;
+
+.add-entry-form .form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 2px var(--accent-purple) !important;
+    border-color: transparent !important;
 }
+
+.form-select {
+    background-color: var(--form-shade) !important;
+    color: var(--text-dark) !important;
+    border: 1px solid var(--hue-shade) !important;
+    border-radius: 6px !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a1a1aa' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* --- Dropdown Options Styling --- */
+.form-select option {
+    /* Use a solid background so options don't become transparent over other text */
+    background-color: var(--main-bg) !important; 
+    color: var(--text-dark) !important;
+    font-weight: 500;
+    
+    /* Adds a little breathing room in browsers that support option padding (like Firefox) */
+    padding: 12px; 
+}
+
+/* Add a hover/focus state for browsers that support it */
+.form-select option:checked,
+.form-select option:hover,
+.form-select option:focus {
+    background-color: var(--form-shade) !important; /* A very faint purple highlight */
+    color: var(--text-muted) !important;
+}
+
 .form-container {
     border-radius: 0.5rem;
     border: solid 1px rgba(0, 0, 0, 0.15) !important;
@@ -424,10 +453,11 @@ input:-webkit-autofill:active {
 /* --- DARK MODE DYNAMIC OVERRIDES --- */
 [data-theme="dark"] .add-entry-form .form-control,
 [data-theme="dark"] .CodeMirror,
-[data-theme="dark"] .editor-toolbar {
+[data-theme="dark"] .editor-toolbar,
+[data-theme="dark"] .form-select {
     border-color: rgba(255, 255, 255, 0.15) !important;
 }
-[data-theme="dark"] .add-entry-form .form-control {
+[data-theme="dark"] .add-entry-form .form-control, [data-theme="dark"] .form-select {
     background-color: rgba(255,255,255,0.05);
 }
 [data-theme="dark"] .editor-toolbar button:hover, 
@@ -437,7 +467,7 @@ input:-webkit-autofill:active {
 [data-theme="dark"] .editor-preview-side {
     border-left: 1px dashed rgba(255,255,255,0.15) !important;
 }
-[data-theme="dark"] .form-container {
+[data-theme="dark"] .form-container, [data-theme="dark"] .form-select {
     border: solid 1px rgba(255, 255, 255, 0.15) !important;
 }
 /* Change the EasyMDE blinking cursor color in Dark Mode */
@@ -445,6 +475,6 @@ input:-webkit-autofill:active {
     border-left-color: var(--text-dark) !important;
 }
 /* Change the blinking cursor for all standard inputs in Dark Mode */
-[data-theme="dark"] .add-entry-form .form-control {
+[data-theme="dark"] .add-entry-form .form-control, [data-theme="dark"] .form-select {
     caret-color: var(--text-dark) !important; 
 }
