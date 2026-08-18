@@ -197,6 +197,9 @@ A centralized class management system for CS 2103.
 **August 17, 2026**
 - Added categories to links page for easier visibility
 
+**August 18, 2026**
+- Fixed sidebar red dot issue of unread announcement count
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)

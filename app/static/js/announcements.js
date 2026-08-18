@@ -284,25 +284,26 @@ export function toggleLightboxModal() {
 
 export function updateAnnouncementBadge() {
     /* DYNAMIC BADGE COUNTER */
-    // Update the Dashboard Pill (Counts physical tags on the screen)
+    
+    // Calculate the true unread count by counting the physical tags currently on the screen
+    let unreadCount = 0;
+    document.querySelectorAll('.new-tag').forEach(tag => {
+        if (tag.style.display !== 'none') unreadCount++;
+    });
+
+    // Update the Dashboard Pill (if we are on the dashboard)
     const dashBadge = document.getElementById('announcement-badge');
     if (dashBadge) {
-        let unreadCount = 0;
-        document.querySelectorAll('.new-tag').forEach(tag => {
-            if (tag.style.display !== 'none') unreadCount++;
-        });
         dashBadge.textContent = unreadCount;
         dashBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
     }
 
-    // Update the Global Sidebar Pill & Dot (Simply decrements the number by 1)
+    // Update the Global Sidebar Pill & Dot based on the TRUE count
     const sidebarBadge = document.getElementById('sidebar-announcement-badge');
     if (sidebarBadge) {
-        let currentCount = parseInt(sidebarBadge.textContent) || 0;
-        let newCount = currentCount - 1;
-        
-        if (newCount > 0) {
-            sidebarBadge.textContent = newCount;
+        if (unreadCount > 0) {
+            sidebarBadge.textContent = unreadCount;
+            sidebarBadge.style.display = 'inline-block';
         } else {
             // If it hits 0, hide the pill AND force the red dot to disappear
             sidebarBadge.style.display = 'none'; 
