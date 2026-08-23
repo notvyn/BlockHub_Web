@@ -2,9 +2,10 @@ from flask import render_template, redirect, url_for, flash
 from flask_login import current_user, login_user, login_required, logout_user
 
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from werkzeug.security import generate_password_hash
 
 from app import db
-from app.forms import LoginForm, SignupForm
+from app.forms import LoginForm, SignupForm, RequestResetForm, ResetPasswordForm
 from app.models import User
 from app.utils import decode_token, send_verification_email
 
@@ -65,6 +66,50 @@ def resend_verification(email):
         flash('Failed to send the email. Please try again later.', 'danger')
         
     return redirect(url_for('auth.login'))
+
+@auth.route("/reset_password", methods=['GET', 'POST'])
+def reset_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+    
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        
+        if user:
+            # Send the email using the updated utils.py function
+            send_verification_email(user, user.email, action='reset_password')
+            
+        # Security Best Practice: Always flash the same message whether the email exists or not. 
+        # This prevents hackers from using your form to guess which emails are registered.
+        flash('If an account with that email exists, a password reset link has been sent.', 'info')
+        return redirect(url_for('auth.login'))
+        
+    return render_template('reset_request.html', form=form, is_auth=True)
+
+@auth.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+        
+    data = decode_token(token, salt='password-reset-salt')
+    
+    if not data:
+        flash('That password reset link is invalid or has expired.', 'warning')
+        return redirect(url_for('auth.reset_request'))
+        
+    user = User.query.get(data['user_id'])
+    
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        
+        user.set_password(form.password.data)
+        db.session.commit()
+        
+        flash('Your password has been successfully updated! You can now log in.', 'success')
+        return redirect(url_for('auth.login'))
+        
+    return render_template('reset_token.html', form=form, is_auth=True)
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():

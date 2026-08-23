@@ -203,6 +203,10 @@ A centralized class management system for CS 2103.
 **August 19, 2026**
 - Fixed copy classlist visual issue of text color
 
+**August 23, 2026**
+- Added reset password feature
+- Fixed login password placeholder issue (i.e. "Enter your email")
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)

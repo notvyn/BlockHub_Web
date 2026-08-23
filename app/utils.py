@@ -143,6 +143,29 @@ def send_verification_email(user, target_email, action='verify_account'):
         # Fallback text for email clients that block HTML
         fallback_body = f"Hello {user.name},\n\nConfirm your email update here: {verify_url}"
 
+    elif action == 'reset_password':
+        token = serializer.dumps({'user_id': user.id}, salt='password-reset-salt')
+        verify_url = url_for('auth.reset_token', token=token, _external=True) 
+        
+        subject = 'Reset Your BlockHub Password'
+        
+        html_body = f"""
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 12px; background-color: #ffffff;">
+            <h2 style="color: #6c5ce7; text-align: center; margin-bottom: 20px;">Password Reset Request</h2>
+            <p style="color: #333; font-size: 16px;">Hello <strong>{user.name}</strong>,</p>
+            <p style="color: #555; font-size: 15px; line-height: 1.5;">We received a request to reset your BlockHub password. Click the button below to choose a new one:</p>
+            
+            <div style="text-align: center; margin: 35px 0;">
+                <a href="{verify_url}" style="background-color: #6c5ce7; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Reset Password</a>
+            </div>
+            
+            <p style="font-size: 12px; color: #999; text-align: center; margin-top: 30px border-top: 1px solid #eaeaea; padding-top: 20px;">
+                If you did not make this request, please ignore this email. Your password will remain unchanged.<br>This link will expire in 30 minutes.
+            </p>
+        </div>
+        """
+        fallback_body = f"Hello {user.name},\n\nReset your password here: {verify_url}"
+
     else:
         token = serializer.dumps({'user_id': user.id}, salt='account-verify-salt')
         verify_url = url_for('auth.verify_email', token=token, _external=True)

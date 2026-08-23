@@ -88,6 +88,15 @@ class ProfileForm(FlaskForm):
     
     submit = SubmitField('Save Changes')
 
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset Password')
+
 class SignupForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(min=8, max=120, message="Name must be between 8 and 120 characters.")])
     email = StringField("Email", validators=[DataRequired(), validate_school_email])

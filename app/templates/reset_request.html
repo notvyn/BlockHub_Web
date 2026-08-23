@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/card.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% from "_formhelpers.html" import render_field %}
+
+{% block content %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-12 col-md-8 col-lg-5">
+            <div class="card-wrapper p-4 p-md-5 shadow-sm">
+                <h3 class="fw-bold text-center" style="font-family: var(--ADLamDisplayFont);">Reset Password</h3>
+                <p class="text-center small mb-4" style="font-family: monospace; color: var(--text-muted);">> We'll send you a recovery link ;></p>
+
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-4">
+                        {{ render_field(form.email, placeholder="Enter your university email", icon='fa-envelope', id='resetEmail')}}
+                    </div>
+                    <div class="d-grid mt-2">
+                        {{ form.submit(class="btn btn-submit fw-bold py-2", value="Send Reset Link") }}
+                    </div>
+                </form>
+
+                <div class="text-center mt-2 pt-4 small">
+                    <a href="{{ url_for('auth.login') }}" class="fw-bold text-decoration-none text-muted"><i class="fa-solid fa-angle-left"></i> Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

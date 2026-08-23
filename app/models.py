@@ -1,9 +1,11 @@
 """(The Database) — Where you define what an "Announcement" or "Deadline" looks like in SQL."""
 
 from app import db
+from flask import current_app
 from flask_login import UserMixin
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer as Serializer
 import json, os
 
 class Announcement(db.Model):
@@ -189,6 +191,20 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         """Takes a plain text password, hashes it, and compares it to the database."""
         return check_password_hash(self.password_hash, password)
+
+    def get_reset_token(self):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id}, salt='password-reset-salt')
+
+    @staticmethod
+    def verify_reset_token(token, expires_sec=1800):
+        # Token expires after 30 minutes (1800 seconds)
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, salt='password-reset-salt', max_age=expires_sec)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
     def __init__(self, **kwargs):
         # Run the standard SQLAlchemy initialization
