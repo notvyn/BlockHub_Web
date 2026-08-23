@@ -41,7 +41,7 @@
                     {{ render_field(form.email, placeholder="Enter your email", icon='fa-envelope', id='loginEmail')}}
                 </div>
                 
-                <div class="mb-4">
+                <div class="mb-3">
                     <label class="form-label small fw-bold" style="letter-spacing: 1px;">Password</label>
                     
                     <div class="input-group">
@@ -49,12 +49,16 @@
                             <i class="fa-solid fa-lock"></i>
                         </label>
                         
-                        {{ form.password(id="loginPassword", class="form-control", placeholder="Enter your email") }}
+                        {{ form.password(id="loginPassword", class="form-control", placeholder="Enter your password") }}
 
                         <button type="button" class="input-group-text eye-toggle">
                             <i class="fa-solid fa-eye-slash"></i>
                         </button>
                     </div> 
+                </div>
+
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="{{ url_for('auth.reset_request') }}" class="text-decoration-none" style="color: var(--text-muted); font-size: 0.75rem;">Forgot Password? Reset Now</a>
                 </div>
 
                 <div class="d-grid mt-2">
