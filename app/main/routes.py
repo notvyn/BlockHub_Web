@@ -10,7 +10,7 @@ from app.main import main
 
 import cloudinary, cloudinary.uploader, os
 
-from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion
+from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion, SyllabusWeek, SyllabusAssessment
 from app.forms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, FeedbackForm, ProfileForm, CreateTagForm
 from app.filters import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter, time_ago_filter
 from app.utils import send_web_push
@@ -449,10 +449,48 @@ def courses():
     # Clean up empty days so we don't render blank tables
     master_schedule = {day: scheds for day, scheds in master_schedule.items() if scheds}
 
+    all_weeks = SyllabusWeek.query.options(
+        joinedload(SyllabusWeek.course),
+        joinedload(SyllabusWeek.assessments)
+    ).all()
+
+    raw_calendar = {}
+
+    for week in all_weeks:
+        w_num = week.week_number
+        
+        # Create a new list for the week if it doesn't exist yet
+        if w_num not in raw_calendar:
+            raw_calendar[w_num] = []
+        
+        # 1. Package the Topics (if the professor provided any)
+        if week.topics and week.topics.strip():
+            raw_calendar[w_num].append({
+                'type': 'topic',
+                'course_code': week.course.code,
+                'data': week.topics
+            })
+            
+        # 2. Package the Assessments
+        for task in week.assessments:
+            raw_calendar[w_num].append({
+                'type': 'assessment',
+                'course_code': week.course.code,
+                'data': {
+                    'name': task.name,
+                    'category': task.category,
+                    'weight': task.weight
+                }
+            })
+
+    # Sort the dictionary by week number (Week 1, Week 2, etc.) so it displays chronologically
+    master_calendar = dict(sorted(raw_calendar.items()))
+
     return render_template(
         'courses.html', 
         courses=courses_list, 
         master_schedule=master_schedule,
+        master_calendar=master_calendar,
         is_dedicated_page=True, 
         page_title="Course"
     )

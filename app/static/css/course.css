@@ -187,6 +187,51 @@
     transform: scale(0.9);
 }
 
+/* --- Master Calendar Perspective Toggle --- */
+/* Default State (Unselected) */
+.mc-toggle-label {
+    color: var(--text-muted);
+    background-color: transparent;
+    transition: all 0.2s ease;
+}
+
+/* Active State (Selected) */
+.btn-check:checked + .mc-toggle-label {
+    color: var(--accent-purple) !important;
+    background-color: rgba(142, 68, 173, 0.1) !important;
+}
+
+/* --- Granular Syllabus Actions --- */
+
+/* Initially hide the action buttons */
+.group-hover-trigger .task-actions {
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+/* Reveal them when hovering over the parent row */
+.group-hover-trigger:hover .task-actions {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ensure icons don't break layout on tiny mobile screens */
+.task-actions button {
+    padding: 0 4px !important;
+}
+
+/* Fix accordion button overriding text color */
+.accordion-button.card-wrapper {
+    background-color: rgba(142, 68, 173, 0.05); 
+    border: 1px solid var(--hue-shade);
+    color: var(--accent-purple) !important;
+}
+.accordion-button:not(.collapsed) {
+    background-color: rgba(142, 68, 173, 0.1); 
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+}
+
 /* --- ACCORDION ARROW FIX --- */
 
 /* Target the default (collapsed) accordion arrow */

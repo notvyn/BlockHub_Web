@@ -82,6 +82,106 @@ def extract_schedule_from_pdf(file_stream):
 
     return parsed_data
 
+def is_assessment_line(text):
+    """Detects action items by looking for assessment keywords."""
+    t = text.lower().strip()
+    patterns = [
+        r'\bquiz(zes)?\b', r'\bcase\s*stud(y|ies)\b',
+        r'\b(prelim|midterms?|finals?|major|special)\s*(exam|examination|project)?\b',
+        r'\b(lab|laboratory|lecture)\s+exercise\b', r'\bexercise\s*\d+\b', 
+        r'\bpresentation\b', r'\bproject\b'
+    ]
+    if len(t.split()) < 12: 
+        return any(re.search(p, t) for p in patterns)
+    return False
+
+def parse_weeks(text):
+    """Finds week numbers (1-18) anywhere in a given text line."""
+    weeks = []
+    # Find ranges like "4-5" or "14-15"
+    for match in re.finditer(r'(\d+)\s*[-–—]\s*(\d+)', text):
+        start, end = int(match.group(1)), int(match.group(2))
+        if 1 <= start <= 18 and 1 <= end <= 18:
+            weeks.extend(list(range(start, end + 1)))
+            
+    # Find standalone numbers
+    text_no_ranges = re.sub(r'\d+\s*[-–—]\s*\d+', '', text)
+    for n in re.findall(r'\b\d+\b', text_no_ranges):
+        num = int(n)
+        if 1 <= num <= 18:
+            weeks.append(num)
+            
+    return sorted(list(set(weeks)))
+
+def extract_syllabus_data(file_stream):
+    syllabus_dict = {}
+    current_weeks = []
+    extracting = False
+
+    with pdfplumber.open(file_stream) as pdf:
+        for page in pdf.pages:
+            # Extract raw text line by line instead of hunting for tables!
+            text = page.extract_text()
+            if not text: continue
+            
+            lines = text.split('\n')
+            for line in lines:
+                line_clean = line.strip()
+                line_lower = line_clean.lower()
+
+                # Stop extracting if we hit the bottom sections
+                if any(kw in line_lower for kw in ['assessment schedule', 'grading system', 'course policies', 'prepared by:']):
+                    extracting = False
+                    continue
+
+                # Start extracting when we hit the TLA table headers
+                if 'topics/reading list' in line_lower or ('topics' in line_lower and 'wks' in line_lower):
+                    extracting = True
+                    continue
+
+                if not extracting:
+                    continue
+
+                # Look for week numbers appearing in the line (BatStateU usually puts weeks like "1", "4-5", "10")
+                line_weeks = parse_weeks(line_clean)
+                if line_weeks:
+                    current_weeks = line_weeks
+                    # Strip the week numbers out of the line so we are left with just the text
+                    line_clean = re.sub(r'\b\d+\s*[-–—]?\s*\d*\b', '', line_clean).strip()
+
+                if not current_weeks or not line_clean:
+                    continue
+
+                # Skip header repetitions or junk text
+                if any(kw in line_lower for kw in ['ch.', 'topic outcomes', 'delivery method', 'page ']):
+                    continue
+
+                # Sort into Topics vs Assessments
+                if is_assessment_line(line_clean):
+                    for w in current_weeks:
+                        if w not in syllabus_dict: syllabus_dict[w] = {'topics': [], 'assessments': []}
+                        if line_clean not in syllabus_dict[w]['assessments']:
+                            syllabus_dict[w]['assessments'].append(line_clean)
+                else:
+                    for w in current_weeks:
+                        if w not in syllabus_dict: syllabus_dict[w] = {'topics': [], 'assessments': []}
+                        if line_clean not in syllabus_dict[w]['topics']:
+                            syllabus_dict[w]['topics'].append(line_clean)
+
+    if not syllabus_dict:
+        raise ValueError("Text scraping found no matching week patterns.")
+
+    formatted_data = []
+    for w_num in sorted(syllabus_dict.keys()):
+        data = syllabus_dict[w_num]
+        formatted_data.append({
+            'week': w_num,
+            'topics': '\n\n'.join(data['topics']),
+            'assessments': data['assessments']
+        })
+
+    return formatted_data
+
 def send_web_push(subscription_dict, notification_title, notification_body, target_url="/"):
     """
     Packages the data and sends it to the browser's Push Service.

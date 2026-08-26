@@ -8,8 +8,8 @@ import cloudinary, cloudinary.uploader, json, os, uuid
 from app import db
 
 from app.forms import CreateTagForm, LinkForm
-from app.models import Announcement, AnnouncementHeart, AnnouncementRead, ClassSummary, Course, CourseSchedule, Deadline, DeadlineCompletion, Feedback, Link, PushSubscription, Tag, User
-from app.utils import extract_schedule_from_pdf, send_verification_email, send_web_push
+from app.models import Announcement, AnnouncementHeart, AnnouncementRead, ClassSummary, Course, CourseSchedule, Deadline, DeadlineCompletion, Feedback, Link, PushSubscription, SyllabusAssessment, SyllabusWeek, Tag, User
+from app.utils import extract_schedule_from_pdf, extract_syllabus_data, send_verification_email, send_web_push
 
 from app.api import api
 
@@ -401,6 +401,18 @@ def delete_link(id):
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@api.route('/api/syllabus-task/<int:task_id>', methods=['DELETE'])
+@login_required
+def delete_syllabus_task(task_id):
+    if current_user.role not in ['Officer', 'Admin']:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    task = SyllabusAssessment.query.get_or_404(task_id)
+    db.session.delete(task)
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
 @api.route('/delete-entry/class-summary/<int:id>', methods=['POST', 'DELETE'])
 @login_required
 def delete_summary(id):
@@ -504,6 +516,85 @@ def global_search():
         results.append({'type': 'Course', 'title': f"{c.code} | {c.title}", 'url': f"{url_for('main.courses')}#course-{c.id}", 'icon': 'fa-address-book'})
 
     return jsonify({'results': results})
+
+@api.route('/api/manual-syllabus/<int:course_id>', methods=['POST'])
+@login_required
+def manual_syllabus_entry(course_id):
+    # Security: Ensure only authorized users can modify the syllabus
+    if current_user.role not in ['Officer', 'Admin']:
+        return jsonify({'success': False, 'error': 'Unauthorized access.'}), 403
+
+    # Parse the incoming JSON payload from the frontend
+    data = request.get_json()
+    target_weeks = data.get('weeks', [])
+    topics = data.get('topics', '')
+    assessments = data.get('assessments', [])
+
+    if not target_weeks:
+        return jsonify({'success': False, 'error': 'Please select at least one target week.'})
+
+    try:
+        for week_num in target_weeks:
+            # 1. Check if this week already exists in the database for this course
+            week = SyllabusWeek.query.filter_by(course_id=course_id, week_number=int(week_num)).first()
+            
+            # 2. Create it if it doesn't exist
+            if not week:
+                week = SyllabusWeek(course_id=course_id, week_number=int(week_num))
+                db.session.add(week)
+            
+            # 3. Update the topics
+            week.topics = topics
+            
+            # Flush to ensure the week has an ID before assigning assessments
+            db.session.flush() 
+            
+            # 4. Wipe old assessments for this week to prevent duplicates upon editing
+            SyllabusAssessment.query.filter_by(week_id=week.id).delete()
+            
+            # 5. Insert the new assessments
+            for task in assessments:
+                # Basic validation to ensure empty rows aren't saved
+                if task.get('name'):
+                    new_task = SyllabusAssessment(
+                        week_id=week.id,
+                        name=task.get('name').strip(),
+                        category=task.get('category'),
+                        weight=task.get('weight', '').strip()
+                    )
+                    db.session.add(new_task)
+                
+        # Commit the entire batch
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Syllabus updated successfully!'})
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Manual Syllabus Error: {e}")
+        return jsonify({'success': False, 'error': 'An internal database error occurred.'})
+
+@api.route('/api/syllabus-week/<int:course_id>/<int:week_num>', methods=['GET', 'DELETE'])
+@login_required
+def manage_syllabus_week(course_id, week_num):
+    if current_user.role not in ['Officer', 'Admin']:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    week = SyllabusWeek.query.filter_by(course_id=course_id, week_number=week_num).first()
+    if not week:
+        return jsonify({'success': False, 'error': 'Week not found.'}), 404
+
+    # Handle the Delete Button
+    if request.method == 'DELETE':
+        db.session.delete(week)
+        db.session.commit()
+        return jsonify({'success': True})
+
+    # Handle the Edit Button (Returns data to populate the manual form)
+    return jsonify({
+        'success': True,
+        'topics': week.topics,
+        'assessments': [{'name': a.name, 'category': a.category, 'weight': a.weight} for a in week.assessments]
+    })
 
 @api.route('/mark-announcement-read/<int:id>', methods=['POST'])
 @login_required
@@ -734,3 +825,56 @@ def update_link(id):
         return jsonify({'success': True})
         
     return jsonify({'success': False, 'errors': form.errors})
+
+@api.route('/api/upload-syllabus/<int:course_id>', methods=['POST'])
+@login_required
+def upload_syllabus(course_id):
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded.'}), 400
+        
+    file = request.files['file']
+    
+    try:
+        # Run the updated extractor
+        extracted_weeks = extract_syllabus_data(file)
+        
+        # Clear old syllabus records for this course to prevent duplicates
+        SyllabusWeek.query.filter_by(course_id=course_id).delete()
+        
+        # Save parsed weeks and individual deliverables
+        for week_data in extracted_weeks:
+            new_week = SyllabusWeek(
+                course_id=course_id,
+                week_number=week_data['week'],
+                topics=week_data['topics']
+            )
+            db.session.add(new_week)
+            db.session.flush() # Secure new_week.id
+            
+            # Save all detected action items
+            for task_name in week_data['assessments']:
+                task_lower = task_name.lower()
+                
+                # Auto-assign category
+                if 'quiz' in task_lower:
+                    cat = 'quiz'
+                elif any(k in task_lower for k in ['exam', 'examination']):
+                    cat = 'exam'
+                else:
+                    cat = 'project'
+
+                new_assessment = SyllabusAssessment(
+                    week_id=new_week.id,
+                    name=task_name,
+                    category=cat,
+                    weight='' # Auto-extraction leaves weight optional
+                )
+                db.session.add(new_assessment)
+                
+        db.session.commit()
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Extraction Error: {e}")
+        return jsonify({'success': False, 'error': str(e), 'fallback': True})

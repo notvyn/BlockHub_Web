@@ -147,6 +147,23 @@ user_tags = db.Table('user_tags',
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
 )
 
+class SyllabusWeek(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    week_number = db.Column(db.Integer, nullable=False) # 1 to 18
+    topics = db.Column(db.Text, nullable=True)
+    
+    # Relationship to assessments
+    assessments = db.relationship('SyllabusAssessment', backref='week', lazy=True, cascade='all, delete-orphan')
+    course = db.relationship('Course', backref=db.backref('syllabus_weeks', lazy=True, cascade='all, delete-orphan'))
+
+class SyllabusAssessment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    week_id = db.Column(db.Integer, db.ForeignKey('syllabus_week.id'), nullable=False)
+    name = db.Column(db.String(150), nullable=False)
+    category = db.Column(db.String(50)) # e.g., 'quiz', 'exam', 'project'
+    weight = db.Column(db.String(20), nullable=True) # e.g., '15%'
+
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)

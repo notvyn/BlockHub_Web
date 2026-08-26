@@ -207,6 +207,9 @@ A centralized class management system for CS 2103.
 - Added reset password feature
 - Fixed login password placeholder issue (i.e. "Enter your email")
 
+**AUgust 26, 2026**
+- Added Syllabus Feature and Master Course Schedule
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)
