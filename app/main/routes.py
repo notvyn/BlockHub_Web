@@ -776,6 +776,22 @@ def summaries():
     current_user.last_viewed_summaries = datetime.now(timezone.utc)
     db.session.commit()
 
+    # Get the official term start (Fallback to today if not set)
+    config = SemesterConfig.query.first()
+    term_start = config.start_date if config else date.today()
+
+    # Calculate the Academic Week based on the currently viewed Monday
+    days_since_start = (monday - term_start).days
+    academic_week = (days_since_start // 7) + 1
+
+    # Future-Proofing: Handle out-of-bounds weeks (Sem breaks or summer)
+    if 1 <= academic_week <= 18:
+        display_week = f"WEEK {academic_week}"
+    elif academic_week > 18:
+        display_week = "POST-SEMESTER"
+    else:
+        display_week = "PRE-SEMESTER"
+
     return render_template('summaries.html', 
                            grouped_summaries=grouped_summaries, 
                            total_count=total_count,
@@ -783,6 +799,7 @@ def summaries():
                            req_week=req_week,
                            prev_year=prev_year, prev_week=prev_week,
                            next_year=next_year, next_week=next_week,
+                           display_week=display_week,
                            is_dedicated_page=True, 
                            page_title="Class Summary")
 

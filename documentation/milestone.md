@@ -211,8 +211,8 @@ A centralized class management system for CS 2103.
 - Added Syllabus Feature and Master Course Schedule
 
 **August 29, 2026**
-- Added Start of Semester date and dates per week 
-- Refined course syllabus feature with
+- Added Start of Semester date input and dates per week for master and individual syllabus information
+- Refined Semestral Week Text for Class Summaries 
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
