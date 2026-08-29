@@ -8,7 +8,7 @@ import cloudinary, cloudinary.uploader, json, os, uuid
 from app import db
 
 from app.forms import CreateTagForm, LinkForm
-from app.models import Announcement, AnnouncementHeart, AnnouncementRead, ClassSummary, Course, CourseSchedule, Deadline, DeadlineCompletion, Feedback, Link, PushSubscription, SyllabusAssessment, SyllabusWeek, Tag, User
+from app.models import Announcement, AnnouncementHeart, AnnouncementRead, ClassSummary, Course, CourseSchedule, Deadline, DeadlineCompletion, Feedback, Link, PushSubscription, SemesterConfig, SyllabusAssessment, SyllabusWeek, Tag, User
 from app.utils import extract_schedule_from_pdf, extract_syllabus_data, send_verification_email, send_web_push
 
 from app.api import api
@@ -825,6 +825,29 @@ def update_link(id):
         return jsonify({'success': True})
         
     return jsonify({'success': False, 'errors': form.errors})
+
+@api.route('/api/update-semester-start', methods=['POST'])
+@login_required
+def update_semester_start():
+    if current_user.role != 'Officer' and not current_user.is_admin:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+        
+    data = request.get_json()
+    new_date_str = data.get('start_date')
+    
+    try:
+        new_date = datetime.strptime(new_date_str, '%Y-%m-%d').date()
+        config = SemesterConfig.query.first()
+        if not config:
+            config = SemesterConfig(start_date=new_date)
+            db.session.add(config)
+        else:
+            config.start_date = new_date
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
 
 @api.route('/api/upload-syllabus/<int:course_id>', methods=['POST'])
 @login_required

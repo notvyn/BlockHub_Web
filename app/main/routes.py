@@ -10,7 +10,7 @@ from app.main import main
 
 import cloudinary, cloudinary.uploader, os
 
-from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion, SyllabusWeek, SyllabusAssessment
+from app.models import User, Announcement, AnnouncementRead, AnnouncementHeart, ClassSummary, Course, CourseSchedule, Deadline, Link, PushSubscription, Feedback, Tag, DeadlineCompletion, SyllabusWeek, SyllabusAssessment, SemesterConfig
 from app.forms import AnnouncementForm, ClassSummaryForm, CourseForm, CourseScheduleForm, DeadlineForm, LinkForm, LoginForm, FeedbackForm, ProfileForm, CreateTagForm
 from app.filters import markdown_filter, parse_links_filter, extract_images_filter, remove_images_filter, time_ago_filter
 from app.utils import send_web_push
@@ -38,6 +38,30 @@ def check_earned_badges(user_id):
         earned_badges.append({'name': 'Bug Finder', 'description': 'Find a bug on the program', 'icon': 'fa-bug-slash', 'color': 'secondary'})
 
     return earned_badges
+
+def get_semester_timeline():
+    """Calculates the 18-week dates based on the database setting."""
+    # Fallback to today if the officer hasn't set a date yet
+    semester_start = datetime.now()
+    
+    try:
+        config = SemesterConfig.query.first()
+        if config and config.start_date:
+            semester_start = datetime.combine(config.start_date, datetime.min.time())
+    except Exception:
+        pass # Fails gracefully if the database table doesn't exist yet
+        
+    today = datetime.now()
+    days_passed = (today - semester_start).days
+    current_week = (days_passed // 7) + 1 if days_passed >= 0 else 0
+    
+    week_dates = {}
+    for w in range(1, 19):
+        start = semester_start + timedelta(weeks=w-1)
+        end = start + timedelta(days=6)
+        week_dates[w] = f"{start.strftime('%b %d')} - {end.strftime('%b %d')}"
+        
+    return current_week, week_dates, semester_start.strftime('%Y-%m-%d')
 
 # --- GLOBAL CONTEXT PROCESSORS ---
 @main.route('/sw.js')
@@ -486,13 +510,22 @@ def courses():
     # Sort the dictionary by week number (Week 1, Week 2, etc.) so it displays chronologically
     master_calendar = dict(sorted(raw_calendar.items()))
 
+    current_week, week_dates, semester_start_str = get_semester_timeline()
+
+    start_obj = datetime.strptime(semester_start_str, '%Y-%m-%d')
+    semester_start_display = start_obj.strftime('%b %d, %Y')
+
     return render_template(
         'courses.html', 
         courses=courses_list, 
         master_schedule=master_schedule,
         master_calendar=master_calendar,
         is_dedicated_page=True, 
-        page_title="Course"
+        page_title="Course",
+        current_week=current_week, 
+        week_dates=week_dates,
+        semester_start_date=semester_start_str,
+        semester_start_display=semester_start_display
     )
 
 @main.route('/deadlines')

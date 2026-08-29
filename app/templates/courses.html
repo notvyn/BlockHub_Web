@@ -9,29 +9,46 @@
 {% block page_title_txt %}Success is one step ahead! :}{% endblock %}
 
 {% block extra_header %}
-    <!-- Added flex-column, flex-md-row, and gap-3 to prevent squishing -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 w-100 mb-3 mt-1">
         
-        <!-- LEFT SIDE: Officer Actions -->
-        <div class="d-flex align-items-center gap-2">
+        <!-- LEFT SIDE: Actions & Displays -->
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            
             {% if current_user.role == 'Officer' or current_user.is_admin %}
+            <!-- Import Button (Strictly Officers Only) -->
             <div class="d-inline-block position-relative">
                 <input type="file" id="bulk-schedule-upload" accept="application/pdf" style="display: none;">
                 <button id="bulk-upload-btn" class="btn btn-sm text-white px-3 py-2 fw-bold rounded-pill shadow-sm" style="background-color: var(--accent-purple); transition: all 0.2s ease;" onclick="document.getElementById('bulk-schedule-upload').click();">
-                    <i class="fa-solid fa-file-pdf me-2"></i> Import Course & Schedule
+                    <i class="fa-solid fa-file-pdf me-2"></i> Import Schedule
                 </button>
+            </div>
+            
+            <!-- Term Configuration Button (Clickable / Editable) -->
+            <button class="btn btn-sm px-3 py-2 fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2"
+                    style="background-color: var(--card-shade); border: 1px solid var(--hue-shade); color: var(--accent-purple); transition: all 0.2s ease;"
+                    data-bs-toggle="modal" data-bs-target="#termConfigModal" title="Edit Term Settings">
+                <i class="fa-solid fa-flag-checkered"></i> 
+                <span>Term Start: {{ semester_start_display }}</span>
+            </button>
+            
+            {% else %}
+            <!-- Term Configuration Badge (Static View for Students) -->
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 fw-bold rounded-pill shadow-sm"
+                 style="background-color: var(--card-shade); border: 1px solid var(--hue-shade); color: var(--accent-purple); font-size: 0.875rem; cursor: default;" 
+                 title="Current Term Start Date">
+                <i class="fa-solid fa-flag-checkered"></i> 
+                <span>Term Start: {{ semester_start_display }}</span>
             </div>
             {% endif %}
             
-            <!-- Master Course Calendar Button -->
-            <div class="">
-                <button class="btn w-100 d-flex justify-content-between align-items-center " 
+            <!-- Master Course Calendar Button (Visible to Everyone) -->
+            <div>
+                <button class="btn btn-sm w-100 d-flex justify-content-between align-items-center px-3 py-2 shadow-sm" 
                         style="background-color: var(--card-shade); border: 1px solid var(--hue-shade); border-radius: 8px; color: var(--accent-purple); font-weight: 600; transition: all 0.2s ease;" 
                         type="button" 
                         data-bs-toggle="modal" 
                         data-bs-target="#masterCalendarModal">
-                    <span><i class="fa-solid fa-calendar-days me-2"></i> View Master Course Calendar</span>
-                    <i class="fa-solid fa-chevron-right" style="color: var(--text-muted);"></i>
+                    <span><i class="fa-solid fa-calendar-days me-2"></i> Master Calendar</span>
                 </button>
             </div>
         </div>
@@ -180,7 +197,6 @@
                                         {% if current_user.role == 'Officer' or current_user.is_admin %}
                                         <!-- The Mini Edit/Delete Icons -->
                                         <div class="d-flex gap-2 mt-1">
-                                            <!-- Make sure to create an 'update_course_schedule' route in Python later! -->
                                             <a href="{{ url_for('main.update_course_schedule', id=sched.id) }}" class="mini-action-btn edit-btn" title="Edit Schedule">
                                                 <i class="fa-solid fa-pencil"></i>
                                             </a>
@@ -198,7 +214,6 @@
 
                             {% if current_user.role == 'Officer' or current_user.is_admin %}
                             <!-- The Circular Add Button -->
-                            <!-- Using inline hover styles here for ease, but you can move these to course.css! -->
                             <a href="{{ url_for('main.add_course_schedule', id=c.id) }}" class="btn-add-schedule btn rounded-circle d-flex align-items-center justify-content-center p-0 ms-1" title="Add Schedule">
                                 <i class="fa-solid fa-plus"></i>
                             </a>
@@ -263,33 +278,57 @@
                     <!-- The Vertical Timeline (Dynamic) -->
                     <div class="timeline-container ps-2" style="border-left: 2px solid rgba(142, 68, 173, 0.3); margin-left: 1rem;">
                         
-                        <!-- Assuming backend passes a dictionary: master_calendar = { 1: [{'course': 'AI101', 'type': 'topic', 'data': '...'}], ... } -->
                         {% for week_num, items in master_calendar.items() %}
-                        <div class="position-relative mb-4 ms-4 week-block">
-                            <span class="position-absolute rounded-circle" style="width: 12px; height: 12px; background-color: var(--accent-purple); left: -1.85rem; top: 0.3rem;"></span>
-                            <h6 class="fw-bold mb-3" style="color: var(--text-dark);">Week {{ week_num }}</h6>
-                            
-                            {% for item in items %}
-                                {% if item.type == 'assessment' %}
-                                <!-- Assessment Item (Shown by default) -->
-                                <div class="card-wrapper p-3 mb-2 shadow-sm d-flex align-items-center mc-assessment-item">
-                                    <span class="badge bg-danger rounded-pill me-3 px-3 py-2">{{ item.course_code }}</span>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ item.data.name }}</div>
-                                        <div class="small" style="color: var(--text-muted);">{{ item.data.category|capitalize }} {% if item.data.weight %}({{ item.data.weight }}){% endif %}</div>
-                                    </div>
+
+                            <!-- Logic to determine timeline status -->
+                            {% set is_past = week_num < current_week %}
+                            {% set is_current = week_num == current_week %}
+
+                            <!-- If it's a past week, drop the opacity and add a grayscale filter -->
+                            <div class="position-relative mb-4 ms-4 week-block" style="{% if is_past %}opacity: 0.8; filter: grayscale(100%);{% endif %} transition: all 0.3s ease;">
+                                
+                                <!-- Timeline Dot: Turns Red if Current, Gray if Past, Purple if Future -->
+                                <span class="position-absolute rounded-circle shadow-sm ms-1" 
+                                    style="width: 12px; height: 12px; 
+                                            background-color: {% if is_current %}var(--accent-red, #dc3545){% elif is_past %}#adb5bd{% else %}var(--accent-purple){% endif %}; 
+                                            left: -1.85rem; top: 0.3rem;">
+                                </span>
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0" style="color: var(--text-dark);">Week {{ week_num }}</h6>
+                                    
+                                    <!-- The Date Range Display -->
+                                    <span class="ms-2 fw-medium" style="font-size: 0.8rem; color: var(--text-muted);">
+                                        ({{ week_dates[week_num] }})
+                                    </span>
+                                    
+                                    <!-- Current Week Badge -->
+                                    {% if is_current %}
+                                        <span class="badge bg-danger rounded-pill ms-3 px-2 py-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">THIS WEEK</span>
+                                    {% endif %}
                                 </div>
-                                {% elif item.type == 'topic' %}
-                                <!-- Topic Item (Hidden by default) -->
-                                <div class="card-wrapper p-3 mb-2 shadow-sm align-items-center mc-topic-item" style="display: none; background-color: rgba(255,255,255,0.02);">
-                                    <span class="badge bg-secondary rounded-pill me-3 px-3 py-2">{{ item.course_code }}</span>
-                                    <div>
-                                        <div class="small text-dark" style="font-size: 0.9rem;">{{ item.data }}</div>
+                                
+                                {% for item in items %}
+                                    {% if item.type == 'assessment' %}
+                                    <!-- Assessment Item -->
+                                    <div class="card-wrapper p-3 mb-2 shadow-sm d-flex align-items-center mc-assessment-item">
+                                        <span class="badge bg-danger rounded-pill me-3 px-3 py-2">{{ item.course_code }}</span>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ item.data.name }}</div>
+                                            <div class="small" style="color: var(--text-muted);">{{ item.data.category|capitalize }} {% if item.data.weight %}({{ item.data.weight }}){% endif %}</div>
+                                        </div>
                                     </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+                                    {% elif item.type == 'topic' %}
+                                    <!-- Topic Item -->
+                                    <div class="card-wrapper p-3 mb-2 shadow-sm align-items-center mc-topic-item" style="display: none; background-color: rgba(255,255,255,0.02);">
+                                        <span class="badge bg-secondary rounded-pill me-3 px-3 py-2">{{ item.course_code }}</span>
+                                        <div>
+                                            <div class="small text-dark" style="font-size: 0.9rem;">{{ item.data }}</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         {% else %}
                             <!-- Fallback if the database has absolutely NO syllabus data yet -->
                             <div class="text-center py-5 ms-4">
@@ -327,9 +366,7 @@
 
                     <div class="modal-body">
                         
-                        <!-- ========================================== -->
-                        <!-- THE MAIN TIMELINE VIEW (Always Default)    -->
-                        <!-- ========================================== -->
+                        <!-- THE MAIN TIMELINE VIEW (Always Default) -->
                         <div id="syllabus-data-view-{{ c.id }}" class="pt-2">
                             
                             <h6 class="text-center text-dark fs-4 mb-3">Course Information Syllabus</h6>
@@ -353,7 +390,7 @@
                             <div class="timeline-container ps-2" style="border-left: 2px solid rgba(142, 68, 173, 0.3); margin-left: 1rem;">
                                 
                                 <!-- Dynamic Jinja Loop for each Week -->
-                                {% set valid_week_count = namespace(value=0) %}
+                                {% set active_weeks = [] %}
                                 
                                 {% for week in c.syllabus_weeks|sort(attribute='week_number') %}
                                     <!-- Strict validation filters out ghost data -->
@@ -363,15 +400,38 @@
 
                                     <!-- ONLY render the block if valid content actually exists -->
                                     {% if has_topics or has_assessments %}
-                                        {% set valid_week_count.value = valid_week_count.value + 1 %}
 
-                                        <div class="position-relative mb-4 ms-4 week-block">
-                                            <!-- Timeline Dot -->
-                                            <span class="position-absolute rounded-circle" style="width: 12px; height: 12px; background-color: var(--accent-purple); left: -1.85rem; top: 0.3rem;"></span>
+                                        {% set _ = active_weeks.append(1) %}
+
+                                        <!-- Determine status for fading/highlighting -->
+                                        {% set is_past = week.week_number < current_week %}
+                                        {% set is_current = week.week_number == current_week %}
+
+                                        <!-- Applied dynamic opacity and grayscale filter -->
+                                        <div class="position-relative mb-4 ms-4 week-block" style="{% if is_past %}opacity: 0.8; filter: grayscale(100%);{% endif %} transition: all 0.3s ease;">
+                                            
+                                            <!-- Timeline Dot: Red for Current, Gray for Past, Purple for Future -->
+                                            <span class="position-absolute rounded-circle shadow-sm ms-1" 
+                                                  style="width: 12px; height: 12px; 
+                                                         background-color: {% if is_current %}var(--accent-red, #dc3545){% elif is_past %}#adb5bd{% else %}var(--accent-purple){% endif %}; 
+                                                         left: -1.85rem; top: 0.3rem;"></span>
                                             
                                             <!-- Week Header with Always-Visible Action Buttons -->
                                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="fw-bold mb-0" style="color: var(--text-dark);">Week {{ week.week_number }}</h6>
+                                                
+                                                <div class="d-flex align-items-center">
+                                                    <h6 class="fw-bold mb-0" style="color: var(--text-dark);">Week {{ week.week_number }}</h6>
+                                                    
+                                                    <!-- The Date Range Display -->
+                                                    <span class="ms-2 fw-medium" style="font-size: 0.8rem; color: var(--text-muted);">
+                                                        ({{ week_dates[week.week_number] }})
+                                                    </span>
+                                                    
+                                                    <!-- Current Week Badge -->
+                                                    {% if is_current %}
+                                                        <span class="badge bg-danger rounded-pill ms-3 px-2 py-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">THIS WEEK</span>
+                                                    {% endif %}
+                                                </div>
                                                 
                                                 {% if current_user.role == 'Officer' or current_user.is_admin %}
                                                 <div>
@@ -438,7 +498,7 @@
                             </div>
                             
                             <!-- Fallback: Shows if database has NO weeks, or none of them contain valid text -->
-                            {% if valid_week_count.value == 0 %}
+                            {% if active_weeks|length == 0 %}
                                 <div class="text-center py-5 my-4" style="background-color: rgba(142, 68, 173, 0.02); border-radius: 12px; border: 1px dashed rgba(142, 68, 173, 0.2);">
                                     <i class="fa-solid fa-ghost mb-3" style="font-size: 2.5rem; color: var(--accent-purple); opacity: 0.4;"></i>
                                     <h6 class="fw-bold text-dark mb-1">No Active Content</h6>
@@ -447,11 +507,9 @@
                             {% endif %}
                         </div>
 
-                        <!-- ========================================== -->
-                        <!--          THE MANUAL ENTRY FORM             -->
-                        <!-- ========================================== -->
+                        <!-- THE MANUAL ENTRY FORM -->
                         <div id="syllabus-manual-form-{{ c.id }}" class="d-none">
-                            <div class="d-flex justify-content-center align-items-center mb-4 pb-2">
+                            <div class="d-flex justify-content-center align-items-center mb-2 pb-2">
                                 <h5 class="fw-bolder mb-0" style="color: var(--accent-purple);">
                                     <i class="fa-solid fa-keyboard me-2"></i> Manual Syllabus Entry
                                 </h5>
@@ -467,7 +525,6 @@
                                     <div class="d-flex flex-wrap gap-2 mt-1">
                                         {% for w in range(1, 19) %}
                                         <div>
-                                            <!-- FIX: Added -{{ c.id }} to make the ID unique across the whole page -->
                                             <input type="checkbox" class="btn-check" id="manual-w{{ w }}-{{ c.id }}" name="target_weeks" value="{{ w }}" autocomplete="off">
                                             <label class="btn-pill px-3 py-1 m-0" for="manual-w{{ w }}-{{ c.id }}" style="font-size: 0.8rem;">W{{ w }}</label>
                                         </div>
@@ -481,7 +538,6 @@
                                     <label class="form-label small fw-bold" style="color: var(--text-muted);">
                                         <i class="fa-solid fa-book-open me-1"></i> Discussion Topics
                                     </label>
-                                    <!-- FIX: Changed id to class="manual-topics" -->
                                     <textarea class="form-control bg-transparent manual-topics" rows="3" placeholder="e.g., Kinematics: Motion in Two Dimensions. Vectors and Scalars..."></textarea>
                                     <div class="form-text small opacity-75 text-muted">Separate distinct topics with a period or comma.</div>
                                 </div>
@@ -519,6 +575,38 @@
             </div>
         </div>
         {% endfor %}
+    </div>
+
+    <!-- Term Configuration Modal -->
+    <div class="modal fade" id="termConfigModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="background-color: var(--main-bg);">
+                
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bolder" style="color: var(--accent-purple);">
+                        <i class="fa-solid fa-gear me-2"></i> Term Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body pt-3">
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold" style="color: var(--text-muted);">
+                            <i class="fa-solid fa-calendar-day me-1"></i> Official Semester Start
+                        </label>
+                        <input type="date" id="modal-semester-start" class="form-control bg-transparent" value="{{ semester_start_date }}" style="border: 1px solid rgba(142, 68, 173, 0.3); color: var(--text-dark);">
+                        <div class="form-text small opacity-75 mt-2 text-muted">
+                            This date anchors the 18-week master calendar and highlights the current week for all courses.
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="save-term-btn" class="btn w-100 fw-bold text-white rounded-pill shadow-sm" style="background-color: var(--accent-purple); transition: all 0.3s ease;">
+                        Save Configuration
+                    </button>
+                </div>
+                
+            </div>
+        </div>
     </div>
 
 {% endblock %}

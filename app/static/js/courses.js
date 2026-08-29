@@ -19,16 +19,16 @@ export function initCoursePage() {
             const file = event.target.files[0];
             if (!file) return;
 
-            // 1. Visual Feedback: Lock the button and show a spinner
+            // Visual Feedback: Lock the button and show a spinner
             const originalContent = bulkUploadBtn.innerHTML;
             bulkUploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Importing...';
             bulkUploadBtn.disabled = true;
 
-            // 2. Package the PDF file
+            // Package the PDF file
             const formData = new FormData();
             formData.append('schedule_pdf', file);
 
-            // 3. Send it to your Python Bulk Import API
+            // Send it to your Python Bulk Import API
             fetch('/api/bulk-import-schedule', {
                 method: 'POST',
                 body: formData
@@ -54,14 +54,69 @@ export function initCoursePage() {
                 bulkUploadBtn.disabled = false;
             });
             
-            // 4. Clear the file input so the same file can be uploaded again if needed
+            // Clear the file input so the same file can be uploaded again if needed
             this.value = '';
         });
     }
 }
 
+export function initTermConfig() {
+    const saveBtn = document.getElementById('save-term-btn');
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function(event) {
+            event.preventDefault(); 
+            
+            const dateInput = document.getElementById('modal-semester-start');
+            const newDate = dateInput.value;
+            
+            // Validate input
+            if (!newDate) {
+                dateInput.classList.add('is-invalid');
+                return;
+            }
+            dateInput.classList.remove('is-invalid');
+
+            // Visual Loading State
+            const originalHTML = this.innerHTML;
+            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Saving...';
+            this.disabled = true;
+
+            // 3. Send to Backend
+            fetch('/api/update-semester-start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ start_date: newDate })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Success State
+                    this.innerHTML = '<i class="fa-solid fa-check me-2"></i>Saved!';
+                    this.style.backgroundColor = '#198754'; 
+                    this.style.borderColor = '#198754';
+                    
+                    // Smooth reload to apply the new dates across the whole app
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    // Error State
+                    alert("Failed to update: " + data.error);
+                    this.innerHTML = originalHTML;
+                    this.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error("Network Error:", err);
+                alert("A network error occurred.");
+                this.innerHTML = originalHTML;
+                this.disabled = false;
+            });
+        });
+    }
+}
+
 export function toggleCourseSyllabusModal() {
-    // --- 1. PDF UPLOAD LOGIC ---
+    // --- PDF UPLOAD LOGIC ---
     // (Remains unchanged, as it correctly handles dynamic IDs)
     document.querySelectorAll('input[type="file"][id^="syllabus-upload-"]').forEach(fileInput => {
         fileInput.addEventListener('change', function(event) {
@@ -110,11 +165,11 @@ export function toggleCourseSyllabusModal() {
         });
     });
 
-    // --- 2. MANUAL SYLLABUS ENTRY LOGIC ---
+    // --- MANUAL SYLLABUS ENTRY LOGIC ---
     // Using Event Delegation to handle multiple modals effortlessly
     document.addEventListener('click', function(event) {
         
-        // A. Add Assessment Row Button
+        // Add Assessment Row Button
         if (event.target.closest('.add-assessment-btn')) {
             const addBtn = event.target.closest('.add-assessment-btn');
             const currentModal = addBtn.closest('.modal'); 
@@ -142,13 +197,13 @@ export function toggleCourseSyllabusModal() {
             return;
         }
 
-        // B. Remove Row Button
+        // Remove Row Button
         if (event.target.closest('.remove-row-btn')) {
             event.target.closest('.assessment-row').remove();
             return;
         }
 
-        // C. Save Week Button
+        // Save Week Button (Smooth SPA Experience - No Reload)
         if (event.target.closest('.save-manual-week-btn')) {
             const saveBtn = event.target.closest('.save-manual-week-btn');
             const currentModal = saveBtn.closest('.modal');
@@ -170,7 +225,7 @@ export function toggleCourseSyllabusModal() {
                 const category = row.querySelector('.assessment-category').value;
                 let weight = row.querySelector('.assessment-weight').value.trim();
 
-                // Automatically append % if the user typed a weight so the database stays consistent
+                // Automatically append % if missing
                 if (weight !== '' && !weight.endsWith('%')) {
                     weight += '%';
                 }
@@ -192,7 +247,39 @@ export function toggleCourseSyllabusModal() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.reload();
+                    // Show immediate success feedback on the button
+                    saveBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Saved!';
+                    
+                    //  Quietly fetch the page in the background to get the fresh HTML
+                    fetch(window.location.href)
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+
+                        // Extract the newly updated timeline and inject it into the current modal
+                        const newTimeline = doc.querySelector(`#syllabus-data-view-${courseId}`);
+                        if (newTimeline) {
+                            document.querySelector(`#syllabus-data-view-${courseId}`).innerHTML = newTimeline.innerHTML;
+                        }
+
+                        // After a brief pause, smoothly swap the views
+                        setTimeout(() => {
+                            // Reset the form so it's blank for the next entry
+                            currentModal.querySelectorAll('input[name="target_weeks"]').forEach(cb => cb.checked = false);
+                            if (topicsInput) topicsInput.value = '';
+                            currentModal.querySelector('.assessment-list-container').innerHTML = ''; 
+                            
+                            // Reset the button
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = originalBtnHtml;
+
+                            // Slide back to the updated timeline
+                            currentModal.querySelector(`#syllabus-manual-form-${courseId}`).classList.add('d-none');
+                            currentModal.querySelector(`#syllabus-data-view-${courseId}`).classList.remove('d-none');
+                        }, 200);
+                    });
+
                 } else {
                     saveBtn.disabled = false;
                     saveBtn.innerHTML = '<span class="text-danger">Failed to save</span>';
@@ -207,7 +294,7 @@ export function toggleCourseSyllabusModal() {
             });
         }
 
-        // D. Edit Week Button
+        // Edit Week Button
         if (event.target.closest('.edit-week-btn')) {
             event.stopPropagation();
             const editBtn = event.target.closest('.edit-week-btn');
@@ -265,7 +352,7 @@ export function toggleCourseSyllabusModal() {
             return;
         }
 
-        // E. Delete Week Button (Instant UI Update, NO Reload)
+        // Delete Week Button (Instant UI Update, NO Reload)
         if (event.target.closest('.delete-week-btn')) {
             event.stopPropagation();
             const delBtn = event.target.closest('.delete-week-btn');
@@ -307,7 +394,7 @@ export function toggleCourseSyllabusModal() {
             return;
         }
 
-        // F. Granular Task Delete (Instant UI Update, NO Reload)
+        // Granular Task Delete (Instant UI Update, NO Reload)
         if (event.target.closest('.delete-task-btn')) {
             event.stopPropagation();
             const delBtn = event.target.closest('.delete-task-btn');
@@ -357,7 +444,7 @@ export function toggleMasterCalendar() {
         const showTopics = toggleTopics.checked;
         let visibleBlocks = 0;
         
-        // 1. Toggle Items
+        // Toggle Items
         document.querySelectorAll('.mc-topic-item').forEach(el => {
             el.style.display = showTopics ? 'flex' : 'none';
         });
@@ -366,7 +453,7 @@ export function toggleMasterCalendar() {
             el.style.display = !showTopics ? 'flex' : 'none';
         });
 
-        // 2. Hide Empty Week Blocks
+        // Hide Empty Week Blocks
         document.querySelectorAll('#masterCalendarModal .week-block').forEach(weekBlock => {
             const items = Array.from(weekBlock.querySelectorAll('.mc-topic-item, .mc-assessment-item'));
             const hasVisibleItems = items.some(el => el.style.display !== 'none');
@@ -375,7 +462,7 @@ export function toggleMasterCalendar() {
             if (hasVisibleItems) visibleBlocks++;
         });
 
-        // 3. Show Dynamic Empty State if nothing is visible
+        // Show Dynamic Empty State if nothing is visible
         if (emptyState) {
             // Only show if there are week blocks, but none are currently visible
             const totalBlocks = document.querySelectorAll('#masterCalendarModal .week-block').length;
