@@ -206,7 +206,7 @@ export function toggleCourseSyllabusModal() {
             return;
         }
 
-        // Save Week Button (Smooth SPA Experience - No Reload)
+        // Save Week Button (Updates Individual Syllabus AND Master Calendar)
         if (event.target.closest('.save-manual-week-btn')) {
             const saveBtn = event.target.closest('.save-manual-week-btn');
             const currentModal = saveBtn.closest('.modal');
@@ -250,34 +250,40 @@ export function toggleCourseSyllabusModal() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Show immediate success feedback on the button
                     saveBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Saved!';
                     
-                    //  Quietly fetch the page in the background to get the fresh HTML
+                    // Fetch the page in the background to get the fresh HTML for both modals
                     fetch(window.location.href)
                     .then(res => res.text())
                     .then(html => {
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
 
-                        // Extract the newly updated timeline and inject it into the current modal
+                        // 1. Update the Individual Syllabus Timeline
                         const newTimeline = doc.querySelector(`#syllabus-data-view-${courseId}`);
                         if (newTimeline) {
                             document.querySelector(`#syllabus-data-view-${courseId}`).innerHTML = newTimeline.innerHTML;
                         }
 
-                        // After a brief pause, smoothly swap the views
+                        // 2. Update the Master Calendar Timeline
+                        const newMasterTimeline = doc.querySelector('#masterCalendarModal .timeline-container');
+                        const currentMasterTimeline = document.querySelector('#masterCalendarModal .timeline-container');
+                        if (newMasterTimeline && currentMasterTimeline) {
+                            currentMasterTimeline.innerHTML = newMasterTimeline.innerHTML;
+                            // Re-trigger the active toggle to preserve the user's view
+                            const activeToggle = document.querySelector('input[name="calendarToggle"]:checked');
+                            if (activeToggle) activeToggle.dispatchEvent(new Event('change'));
+                        }
+
+                        // After a brief pause, smoothly swap the views back
                         setTimeout(() => {
-                            // Reset the form so it's blank for the next entry
                             currentModal.querySelectorAll('input[name="target_weeks"]').forEach(cb => cb.checked = false);
                             if (topicsInput) topicsInput.value = '';
                             currentModal.querySelector('.assessment-list-container').innerHTML = ''; 
                             
-                            // Reset the button
                             saveBtn.disabled = false;
                             saveBtn.innerHTML = originalBtnHtml;
 
-                            // Slide back to the updated timeline
                             currentModal.querySelector(`#syllabus-manual-form-${courseId}`).classList.add('d-none');
                             currentModal.querySelector(`#syllabus-data-view-${courseId}`).classList.remove('d-none');
                         }, 200);
@@ -440,37 +446,58 @@ export function toggleCourseSyllabusModal() {
 }
 
 export function toggleMasterCalendar() {
+    const toggleCombined = document.getElementById('toggleCombined');
     const toggleTopics = document.getElementById('toggleTopics');
     const toggleAssessments = document.getElementById('toggleAssessments');
     const emptyState = document.getElementById('mc-empty-state');
     
     function updateCalendarView() {
-        if (!toggleTopics || !toggleAssessments) return;
+        if (!toggleTopics || !toggleAssessments || !toggleCombined) return;
         
-        const showTopics = toggleTopics.checked;
+        const isCombined = toggleCombined.checked;
+        const isTopics = toggleTopics.checked;
+        const isAssessments = toggleAssessments.checked;
+        
         let visibleBlocks = 0;
         
-        // Toggle Items
+        // Topic Items: Safely toggle Bootstrap visibility classes
         document.querySelectorAll('.mc-topic-item').forEach(el => {
-            el.style.display = showTopics ? 'flex' : 'none';
+            if (isCombined || isTopics) {
+                el.classList.remove('d-none');
+                el.classList.add('d-flex');
+            } else {
+                el.classList.remove('d-flex');
+                el.classList.add('d-none');
+            }
         });
         
+        // Assessment Items: Safely toggle Bootstrap visibility classes
         document.querySelectorAll('.mc-assessment-item').forEach(el => {
-            el.style.display = !showTopics ? 'flex' : 'none';
+            if (isCombined || isAssessments) {
+                el.classList.remove('d-none');
+                el.classList.add('d-flex');
+            } else {
+                el.classList.remove('d-flex');
+                el.classList.add('d-none');
+            }
         });
 
-        // Hide Empty Week Blocks
+        // Hide empty week containers
         document.querySelectorAll('#masterCalendarModal .week-block').forEach(weekBlock => {
             const items = Array.from(weekBlock.querySelectorAll('.mc-topic-item, .mc-assessment-item'));
-            const hasVisibleItems = items.some(el => el.style.display !== 'none');
+            // Check if at least one item does NOT have the 'd-none' hidden class
+            const hasVisibleItems = items.some(el => !el.classList.contains('d-none'));
             
-            weekBlock.style.display = hasVisibleItems ? 'block' : 'none';
-            if (hasVisibleItems) visibleBlocks++;
+            if (hasVisibleItems) {
+                weekBlock.classList.remove('d-none');
+                visibleBlocks++;
+            } else {
+                weekBlock.classList.add('d-none');
+            }
         });
 
-        // Show Dynamic Empty State if nothing is visible
+        // 4. Show empty state if zero items match
         if (emptyState) {
-            // Only show if there are week blocks, but none are currently visible
             const totalBlocks = document.querySelectorAll('#masterCalendarModal .week-block').length;
             if (visibleBlocks === 0 && totalBlocks > 0) {
                 emptyState.classList.remove('d-none');
@@ -480,9 +507,10 @@ export function toggleMasterCalendar() {
         }
     }
 
-    if (toggleTopics && toggleAssessments) {
+    if (toggleTopics && toggleAssessments && toggleCombined) {
+        toggleCombined.addEventListener('change', updateCalendarView);
         toggleTopics.addEventListener('change', updateCalendarView);
         toggleAssessments.addEventListener('change', updateCalendarView);
-        updateCalendarView(); // Run on load
+        updateCalendarView(); // Run initial state check on load
     }
 }

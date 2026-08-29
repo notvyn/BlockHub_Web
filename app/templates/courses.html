@@ -262,11 +262,19 @@
                     <div class="d-flex justify-content-center mb-4">
                         <div class="btn-group bg-transparent p-1 rounded-pill" style="border: 1px solid var(--hue-shade);" role="group">
                             
-                            <input type="radio" class="btn-check" name="calendarToggle" id="toggleTopics" autocomplete="off" checked>
+                            <!-- Combined Toggle -->
+                            <input type="radio" class="btn-check" name="calendarToggle" id="toggleCombined" autocomplete="off" checked>
+                            <label class="btn btn-sm rounded-pill px-4 fw-bold mc-toggle-label" for="toggleCombined">
+                                <i class="fa-solid fa-layer-group me-2"></i>Combined
+                            </label>
+
+                            <!-- Topics Toggle -->
+                            <input type="radio" class="btn-check" name="calendarToggle" id="toggleTopics" autocomplete="off">
                             <label class="btn btn-sm rounded-pill px-4 fw-bold mc-toggle-label" for="toggleTopics">
                                 <i class="fa-solid fa-book-open me-2"></i>Topics
                             </label>
 
+                            <!-- Assessments Toggle -->
                             <input type="radio" class="btn-check" name="calendarToggle" id="toggleAssessments" autocomplete="off">
                             <label class="btn btn-sm rounded-pill px-4 fw-bold mc-toggle-label" for="toggleAssessments">
                                 <i class="fa-solid fa-triangle-exclamation me-2"></i>Assessments
@@ -320,7 +328,7 @@
                                     </div>
                                     {% elif item.type == 'topic' %}
                                     <!-- Topic Item -->
-                                    <div class="card-wrapper p-3 mb-2 shadow-sm align-items-center mc-topic-item" style="display: none; background-color: rgba(255,255,255,0.02);">
+                                    <div class="card-wrapper p-3 mb-2 shadow-sm d-flex align-items-center mc-topic-item" style="background-color: rgba(255,255,255,0.02);">
                                         <span class="badge bg-secondary rounded-pill me-3 px-3 py-2">{{ item.course_code }}</span>
                                         <div>
                                             <div class="small text-dark" style="font-size: 0.9rem;">{{ item.data }}</div>

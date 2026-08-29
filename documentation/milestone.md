@@ -215,7 +215,8 @@ A centralized class management system for CS 2103.
 - Refined Semestral Week Text for Class Summaries
 - Added new option for course syllabus action item
 - Fix master calendar not showing other course syllabus
-- add edit syllabus information action items options 
+- Added edit syllabus information action items options 
+- Added new filter for Master Course Calendar (i.e. Combined, Topics, Assessment)
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
