@@ -184,7 +184,10 @@ export function toggleCourseSyllabusModal() {
                     <select class="form-select form-select-sm bg-transparent assessment-category" style="width: auto; min-width: 130px;">
                         <option value="quiz">Quiz</option>
                         <option value="exam">Major Exam</option>
-                        <option value="project">Project / Lab</option>
+                        <option value="project">Project</option>
+                        <option value="laboratory">Laboratory</option>
+                        <option value="activity">Activity/Exercise</option>
+                        <option value="presentation">Presentation</option>
                     </select>
                     <div class="input-group input-group-sm" style="width: 110px;">
                         <input type="text" class="form-control bg-transparent assessment-weight" placeholder="Weight">
