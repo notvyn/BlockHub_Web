@@ -481,31 +481,33 @@ def courses():
     raw_calendar = {}
 
     for week in all_weeks:
-        w_num = week.week_number
-        
-        # Create a new list for the week if it doesn't exist yet
-        if w_num not in raw_calendar:
-            raw_calendar[w_num] = []
-        
-        # 1. Package the Topics (if the professor provided any)
-        if week.topics and week.topics.strip():
-            raw_calendar[w_num].append({
-                'type': 'topic',
-                'course_code': week.course.code,
-                'data': week.topics
-            })
+            w_num = week.week_number
             
-        # 2. Package the Assessments
-        for task in week.assessments:
-            raw_calendar[w_num].append({
-                'type': 'assessment',
-                'course_code': week.course.code,
-                'data': {
-                    'name': task.name,
-                    'category': task.category,
-                    'weight': task.weight
-                }
-            })
+            # Create a new list for the week if it doesn't exist yet
+            if w_num not in raw_calendar:
+                raw_calendar[w_num] = []
+            
+            # 1. Package the Topics (if the professor provided any)
+            if week.topics and week.topics.strip():
+                raw_calendar[w_num].append({
+                    'type': 'topic',
+                    'course_code': week.course.code,
+                    'data': week.topics
+                })
+                
+            # 2. Package the Assessments
+            for task in week.assessments:
+                # ADD THIS CHECK: Only append if the assessment actually has a name
+                if task.name and task.name.strip(): 
+                    raw_calendar[w_num].append({
+                        'type': 'assessment',
+                        'course_code': week.course.code,
+                        'data': {
+                            'name': task.name,
+                            'category': task.category,
+                            'weight': task.weight
+                        }
+                    })
 
     # Sort the dictionary by week number (Week 1, Week 2, etc.) so it displays chronologically
     master_calendar = dict(sorted(raw_calendar.items()))

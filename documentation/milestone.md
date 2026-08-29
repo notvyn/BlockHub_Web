@@ -214,6 +214,7 @@ A centralized class management system for CS 2103.
 - Added Start of Semester date input and dates per week for master and individual syllabus information
 - Refined Semestral Week Text for Class Summaries
 - Added new option for course syllabus action item
+- Fix master calendar not showing other course syllabus
 
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
