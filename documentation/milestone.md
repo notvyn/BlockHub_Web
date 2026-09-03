@@ -218,6 +218,9 @@ A centralized class management system for CS 2103.
 - Added edit syllabus information action items options 
 - Added new filter for Master Course Calendar (i.e. Combined, Topics, Assessment)
 
+**September 4, 2026**
+- Added Limit to deadline query on Dashboard
+
 ## TO-DO LIST
 - [/] Avoid duplicates for Class Summary Sections.
 - [/] Add password security and form validation. (Added form validation to Profile, Announcement, Course, Deadline, Summary, Feedback)

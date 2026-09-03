@@ -207,7 +207,7 @@ def dashboard():
     if completed_ids:
         active_query = active_query.filter(Deadline.id.notin_(completed_ids))
         
-    active_deadlines = active_query.order_by(Deadline.due_date.asc()).all()
+    active_deadlines = active_query.order_by(Deadline.due_date.asc()).limit(5).all()
 
     # --- Give the date a clock (11:59 PM) so Jinja can do exact hour math ---
     for d in active_deadlines:
